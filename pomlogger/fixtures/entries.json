@@ -1,0 +1,4 @@
+[
+{"pk": 1, "model": "pomlogger.pomentry", "fields": {"description": "maths and biology", "author": 1, "start_time": "20:00:56", "today": "2010-02-19", "end_time": "20:30:56", "categories": [1, 2]}
+}
+]

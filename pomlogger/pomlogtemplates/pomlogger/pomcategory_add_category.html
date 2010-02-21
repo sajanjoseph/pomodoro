@@ -1,0 +1,31 @@
+{% extends "base_categories.html" %}
+{% block title %}
+{{block.super}}add category
+{% endblock %}
+
+
+{% block content %}
+today is :<b>{{now|date:"j F, Y" }} </b> <br/><br/>
+
+{% if errors %}
+Error with these fields!Enter correct values<br/>
+  	<ul>
+	{% for k,v in errors.items %}
+    		<li>{{k}} : {{v}}  </li>
+	{% endfor %}
+   	</ul> 
+
+{% endif %}
+<h2>add a Category:</h2>
+
+<form method='post' action="{%url pomlog_add_category %}">
+<table>
+{{categoryform.as_table}}
+</table>
+<input type="submit" value="Submit">
+</form>
+{% endblock %}
+
+{% block whatis %}
+add category page
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base_entries.html" %}
+
+{% block title  %}
+{{block.super}}|addentry
+{% endblock %}
+
+{% block content %}
+{{block.super}}<br/>
+today is :<b>{{now|date:"j F, Y" }} </b><br/><br/>
+{% if errors %}
+Error!Enter correct values<br/>
+   <ul>
+{% for k,v in errors.items %}
+    <li>{{k}} : {{v}}  </li>
+{% endfor %}
+   </ul> 
+
+{% endif %}
+
+
+<h2>add an Entry:</h2>
+
+<form action="{%url pomlog_add_entry %}" method="post">
+<table>
+{{entryform.as_table }}
+</table>
+<table>
+{{categoryform.as_table }}
+</table>
+<input type="submit" value="Submit">
+</form>
+{% endblock %}
+
+{% block whatis %}
+add entry page
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base_categories.html" %}
+
+{% block title %}
+{{block.super}}|allcats
+{% endblock %}
+
+
+{% block content %}
+Today is:<b>{{now|date:"j F, Y"}} </b><br/><br/><br/>
+
+<a href="{% url pomlog_add_category %}" >ADD NEW CATEGORY </a>
+
+{% if not object_list.count%}
+<b>No categories created </b><br/>
+{% else %}
+
+<h2>Categories are: </h2>
+<table border="1">
+{% for acat in object_list %}
+<tr>
+<td> <a href="{{acat.get_absolute_url}}" > {{acat.name}}</a></td>
+<td> <a href="{% url pomlog_edit_category acat.slug %}" > EDIT </a>  </td>
+<td> <a href="{% url pomlog_delete_category acat.slug %}" > DELETE </a>  </td>
+</tr>
+{% endfor %}
+</table>
+{% endif%}
+
+
+
+{% endblock %}
+
+{% block whatis %}
+Listing of <b> {{object_list.count}}</b> categor{{object_list.count|pluralize:"y,ies" }} in this log
+{% endblock %}

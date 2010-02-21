@@ -1,0 +1,16 @@
+{% extends "base_categories.html" %}
+
+{% block title  %}
+{{block.super}} | {{ page_title }} | {{ object.name }}
+{% endblock %}
+
+{% block content %}
+Today is:<b>{{now|date:"j F, Y"}} </b><br/>
+<h2>{{page_title}}</h2>
+name:<b>{{ object.name}}</b><br/>
+description :{{object.description }}
+{% endblock %}
+
+{% block whatis %}
+Details of the category {{object.name}}
+{% endblock %}

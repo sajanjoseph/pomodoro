@@ -1,0 +1,31 @@
+{% extends "base_entries.html" %}
+{% block title %}
+{{block.super}}|index
+{% endblock %}
+
+{% block content %}
+{{block.super}}
+<br/>Today is :<b>{% now "Y b d" %}</b><br/>
+
+
+<h3> Welcome {{user.username}} </h3>
+<h3> total time spent on categories </h3>
+<ul>
+{% for k,v in entry_duration_dict.items %}
+	<li>{{k}} = {{v}} minutes </li>
+{% endfor %}
+</ul>
+<p>
+<a href="{% url pomlog_add_entry %}">ADD NEW ENTRY </a> 
+</p>
+
+{% include "pomlogger/includes/entries_list.html" %}
+{% endblock %}
+
+
+{% block whatis %}
+<p>Listing of all Entries &
+Time spent on {{entry_duration_dict.items|length}} categor{{ entry_duration_dict.items|length|pluralize:"y,ies"}} till now 
+</p>
+{% endblock %}
+

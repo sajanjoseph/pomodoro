@@ -1,0 +1,27 @@
+{% extends "base_entries.html" %}
+
+{% block title  %}
+{{block.super}}|object
+{% endblock %}
+
+{% block content %}
+today is :<b>{{now|date:"j F, Y" }} </b>
+<h2>Details of the Entry:</h2>
+category    :{% for x in object.categories.all %}
+                    {{x.name}}
+
+                {% if forloop.last %}{% else %}, {% endif %} 
+             {% endfor %}<br/>
+date posted :{{object.today|date:"j F, Y"}} <br/>
+start time  :{{ object.start_time}} <br/>
+end time  :{{ object.end_time}}<br/>
+Duration    :{{ duration}} minutes <br/>
+
+{% if object.description %}
+description :{{object.description}}
+{% endif %}
+{% endblock %}
+
+{% block whatis %}
+Details of the entry {{object}}
+{% endblock %}

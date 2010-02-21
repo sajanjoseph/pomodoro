@@ -1,0 +1,27 @@
+{% extends "base_entries.html" %}
+
+{% block title  %}
+{{block.super}}|{{page_title}}
+{% endblock %}
+
+{% block content %}
+{{block.super}}<br/>
+today is :<b>{% now "Y b d" %} </b><br/><br/>
+
+
+<h2>{{page_title}}</h2>
+
+<form action="." method="post">
+<table>
+{{entryform.as_table }}
+</table>
+<table>
+{{categoryform.as_table }}
+</table>
+<input type="submit" value="Submit">
+</form>
+{% endblock %}
+
+{% block whatis %}
+{{page_title}} page
+{% endblock %}

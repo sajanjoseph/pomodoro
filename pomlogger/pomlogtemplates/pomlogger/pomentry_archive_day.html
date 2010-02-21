@@ -1,0 +1,33 @@
+{% extends "base_entries.html" %}
+
+{% block title %}
+{{block.super}}|{{year}}-{{month}}-{{day}}
+{% endblock %}
+
+
+{% block content %}
+{{block.super}}<br/>
+<h2> total time spent on categories </h2><br/>
+
+<ul>
+{% for k,v in entry_duration_dict.items %}
+	<li>{{k}} = {{v}} minutes </li>
+{% endfor %}
+</ul>
+<h3> The entries are :</h3>
+<table border="1">
+{% for anentry in object_list %}
+<tr> 
+<td> <a href="{{anentry.get_absolute_url }}" > {{anentry}}  </a> </td>
+<td> <a href="{% url pomlog_edit_entry anentry.id %}"> EDIT </a> </td>
+<td> <a href="{% url pomlog_delete_entry anentry.id %}"> DELETE </a> </td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}
+
+
+{% block whatis %}
+Time spent on {{entry_duration_dict.items|length}} categor{{ entry_duration_dict.items|length|pluralize:"y,ies"}} on {{year}}/{{month}}/{{day}}
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base_entries.html" %}
+
+{% block title %}
+{{block.super}}|{{year}}-{{month}}
+{% endblock %}
+
+
+{% block content %}
+{{block.super}}<br/>
+<h2> total time spent on categories </h2><br/>
+
+<ul>
+{% for k,v in entry_duration_dict.items %}
+	<li>{{k}} = {{v}} minutes </li>
+{% endfor %}
+</ul>
+{% include "pomlogger/includes/entries_list.html" %}
+
+{% endblock %}
+
+
+{% block whatis %}
+Time spent on {{entry_duration_dict.items|length}} categor{{ entry_duration_dict.items|length|pluralize:"y,ies"}} in {{year}}/ {{month}}
+{% endblock %}

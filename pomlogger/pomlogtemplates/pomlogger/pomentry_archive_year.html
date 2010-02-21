@@ -1,0 +1,33 @@
+{% extends "base_entries.html" %}
+
+{% block title %}
+{{block.super}}|{{year}}
+{% endblock %}
+
+
+{% block content %}
+{{block.super}}<br/>
+
+{% if object_list %}
+<h2> total time spent on categories </h2> <br/>
+
+<ul>
+{% for k,v in entry_duration_dict.items %}
+	<li>{{k}} = {{v}} minutes </li>
+{% endfor %}
+</ul>
+
+
+{% include "pomlogger/includes/entries_list.html" %}
+{% else %}
+<h3>No Entries in {{year}} </h3> <br/>
+
+{% endif %}
+
+
+{% endblock %}
+
+
+{% block whatis %}
+Time spent on {{entry_duration_dict.items|length}} categor{{ entry_duration_dict.items|length|pluralize:"y,ies"}} in  {{year}}
+{% endblock %}

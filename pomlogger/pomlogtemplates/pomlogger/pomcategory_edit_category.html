@@ -1,0 +1,34 @@
+{% extends "base_categories.html" %}
+{% block title %}
+{{block.super}}|edit category
+{% endblock %}
+
+
+{% block content %}
+today is :<b>{{now|date:"j F, Y" }} </b><br/>
+
+{% if errors %}
+Error!Enter correct values<br/>
+   <ul>
+{% for k,v in errors.items %}
+    <li>{{k}} : {{v}}  </li>
+{% endfor %}
+   </ul> 
+
+{% endif %}
+
+
+<h2>page_title</h2>
+
+<form  method='post' action='.'  >
+<table>
+{{ categoryform.as_table }}
+</table>
+<input type='submit' name='Save' />
+</form>
+
+{% endblock %}
+
+{% block whatis %}
+
+{% endblock %}

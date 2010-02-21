@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+                                    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>PomLog{% block title %} {% endblock %}</title>
+<LINK REL=StyleSheet HREF="{{MEDIA_URL}}css/pom.css" TYPE="text/css" MEDIA="screen, print">
+</head>
+<body class="{% block bodyclass %}  {% endblock %}">
+<div id="header">
+   <h2 > Pomodoro Logger </h2>
+
+   
+
+ </div>
+
+
+<div id="content">
+   {% block content %}
+<table>
+<tr>
+<td><a href="{% url pomlog_logout %}" > Logout </a> 
+</td>
+<td>
+<a href="{% url pomlog_login %}" > Login </a> 
+</td>
+</tr>
+</table>
+   {% endblock %}
+ </div>
+
+<div id="sidebar"> 
+<h2> Navigation </h2>
+     <ul id ="main-nav">
+	<li id="main-nav-entries">
+	    <a href="{%url pomlog_entry_archive_index  %}"> Entries </a>
+	</li>
+	<li id="main-nav-categories">
+	    <a href="{% url pomlog_category_list   %}"> Categories </a>
+	</li>
+	
+     </ul>
+
+   
+<h3> what is this?</h3>
+{% block whatis %}
+{% endblock %}
+</div>
+
+</body>
+</html>

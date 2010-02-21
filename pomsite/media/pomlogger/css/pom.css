@@ -1,0 +1,51 @@
+body{
+    font-family: georgia;
+    background-color:#E3E0D1;
+}
+
+h2{
+    color: blue;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    }
+
+h3{
+    border: 1px dotted blue;
+    color :red;
+    font-family: courier;
+}
+
+div {
+    margin: 0.5em;
+    padding: 0.5em;
+    border: 1px solid blue;
+    background-color: #e0e0e0;
+    width: 90%;
+}
+
+#header{
+    /* npixels solid/dashed/dotted color */
+    
+}
+
+#header h2 {
+    font-style: italic;
+    text-align: center;
+    border: 1px solid white;
+    padding: .2em;
+    margin: 0em;
+    
+    vertical-align: middle;
+}
+
+#content{
+    border-color: green;
+    
+}
+
+#sidebar{
+
+    border: 1px dashed red;
+    
+    
+}
