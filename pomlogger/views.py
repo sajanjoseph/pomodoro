@@ -176,56 +176,6 @@ def delete_category(request,slug):
     return redirect('pomlog_category_list')
 
 
-'''
-def add_category(request,template_name,page_title):
-    print 'add_category():template=',template_name
-    print 'add_category():page_title=',page_title
-    if request.method=='POST':
-        form=PomCategoryForm(request.POST)
-        print 'add_category():POST:form created from postdata'
-        print 'add_category():before form.is_valid()'
-        if form.is_valid():
-            print 'add_category():form valid ..saving'
-            form.save()
-            print 'add_category():redirecting to cat list'
-            return redirect('pomlog_category_list')
-        else:
-            print 'add_category():POST:invalid form'
-            form=PomCategoryForm()
-            return custom_render(request,{'page_title':page_title,'categoryform':form},template_name)
-            #return render_to_response(template_name,{'page_title':page_title,'categoryform':form})
-    else:
-        print 'GET'
-        form=PomCategoryForm()
-        return custom_render(request,{'page_title':page_title,'categoryform':form},template_name)
-        #return render_to_response(template_name,{'page_title':page_title,'categoryform':form})
-
-def edit_category(request,slug,page_title,template_name):
-    print 'edit_category():template=',template_name
-    print 'edit_category():page_title=',page_title
-    cat=get_object_or_404(PomCategory,slug=slug)
-    
-    if request.method=='POST':
-        form=PomCategoryForm(request.POST,instance=cat)
-        if form.is_valid():
-            print 'edit_category::form is valid'
-            form.save()
-            print 'redirecting to category_list'            
-            return redirect('pomlog_category_list')
-        else:
-            print 'edit_category::invalid form'
-            form=PomCategoryForm(instance=cat)
-            return custom_render(request,{'page_title':page_title,'categoryform':form},template_name)
-            #return render_to_response(template_name,{'page_title':page_title,'categoryform':form})
-    else:
-        print 'edit_category::GET:'
-        form=PomCategoryForm(instance=cat)
-        return custom_render(request,{'page_title':page_title,'categoryform':form},template_name)
-        #return render_to_response(template_name,{'page_title':page_title,'categoryform':form})
-
-
-'''
-
 
 def is_duplicate_cat(name):
     if PomCategory.objects.filter(name__iexact=name).count()!=0:
@@ -233,20 +183,6 @@ def is_duplicate_cat(name):
     else:
         return False
 
-'''
-def _add_or_edit(request,page_title,template_name,instance=None):
-    form_data=get_form_data(request)
-    print '_add_or_edit:form_data=',form_data
-    form=PomCategoryForm(form_data,instance=instance)
-    print '_add_or_edit:instance=',instance
-    context={'categoryform':form,'page_title':page_title}
-    if request.method=='POST' and form.is_valid():
-        print '_add_or_edit:POST:before form.save()'
-        form.save()
-        return redirect('pomlog_category_list')
-    return render_to_response(template_name,context)
-
-'''
 
 def _add_or_edit(request,page_title,template_name,instance=None):
     form_data=get_form_data(request)
