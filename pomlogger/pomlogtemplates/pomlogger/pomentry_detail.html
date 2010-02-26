@@ -5,7 +5,9 @@
 {% endblock %}
 
 {% block content %}
-today is :<b>{{now|date:"j F, Y" }} </b>
+{{block.super}}
+<p>Today is :<b>{% now "Y b d" %}</p>
+
 <h2>Details of the Entry:</h2>
 category    :{% for x in object.categories.all %}
                     {{x.name}}
@@ -20,6 +22,8 @@ Duration    :{{ duration}} minutes <br/>
 {% if object.description %}
 description :{{object.description}}
 {% endif %}
+
+
 {% endblock %}
 
 {% block whatis %}

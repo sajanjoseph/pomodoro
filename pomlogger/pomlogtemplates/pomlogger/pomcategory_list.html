@@ -1,15 +1,15 @@
 {% extends "base_categories.html" %}
 
 {% block title %}
-{{block.super}}|allcats
+{{block.super}}|{{page_title}}
 {% endblock %}
 
 
 {% block content %}
-Today is:<b>{{now|date:"j F, Y"}} </b><br/><br/><br/>
-
+Today is:<b>{% now "d b, Y" %} </b><br/><br/><br/>
+<p>
 <a href="{% url pomlog_add_category %}" >ADD NEW CATEGORY </a>
-
+</p>
 {% if not object_list.count%}
 <b>No categories created </b><br/>
 {% else %}

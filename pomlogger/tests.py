@@ -6,6 +6,8 @@ from pomlogger.views import timediff,get_duration_for_categories,get_month_as_nu
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from datetime import time,date
+from pomlogger.test_utils import get_context_variable
+from django.db.models.query import QuerySet
 
 class PomTestCase(TestCase):
     def setUp(self):
@@ -44,17 +46,37 @@ class PomCategoryTest(PomTestCase):
     def test_404_if_category_not_found(self):
         response=self.client.get(reverse('pomlog_category_detail',args=['magic']))
         self.assertEqual(404,response.status_code)
-
-    '''
+    
     def test_add_category_trim_name(self):
         catscount=PomCategory.objects.count()
-        cat1=PomCategory.get(name='biology')
-        new_name=cat1.name
-        response=self.client.post(reverse('pomlog_add_category'),{name=' biology',description='space bio'})
-        self.assertEqual(200,response.status_code)
+        print 'test_add_category_trim_name():catscount=',catscount
+        print 'test_add_category_trim_name():catname=%s'%(' biology')
+        response=self.client.post(reverse('pomlog_add_category'),{'name':' biology','description':'space bio'})
         self.assertEqual(catscount,PomCategory.objects.count())
-    '''
-        
+        self.assertEqual(200,response.status_code)
+
+    def test_add_category_existing_cat_add_uppercase_name(self):
+        catscount=PomCategory.objects.count()
+        print 'test_add_category_existing_cat_add_uppercase_name():catscount=',catscount
+        print 'test_add_category_existing_cat_add_uppercase_name():catname=%s'%('BIOLOGY')
+        response=self.client.post(reverse('pomlog_add_category'),{'name':'BIOLOGY','description':'uppercase bio'})
+        self.assertEqual(catscount,PomCategory.objects.count())
+        self.assertEqual(200,response.status_code)
+
+    def test_add_category_existing_cat_add_lowercase_name(self):
+        catscount=PomCategory.objects.count()
+        print 'test_add_category_existing_cat_add_lowercase_name():catscount=',catscount
+        print 'test_add_category_existing_cat_add_lowercase_name():catname=%s'%('chemistry')
+        response=self.client.post(reverse('pomlog_add_category'),{'name':'chemistry','description':'lowercase chem'})
+        self.assertEqual(catscount,PomCategory.objects.count())
+        self.assertEqual(200,response.status_code)
+
+    def test_delete_category(self):
+        catscount=PomCategory.objects.count()
+        response=self.client.post(reverse('pomlog_delete_category',args=['chemistry']))
+        self.assertEquals(catscount-1,PomCategory.objects.count())
+        self.assertRedirects(response,reverse('pomlog_category_list'),status_code=302, target_status_code=200)
+
 
 class AddEntryTest(PomTestCase):
     fixtures=['cats.json']
@@ -141,6 +163,86 @@ class AddEntryTest(PomTestCase):
         self.assertEqual(entrycount+1,PomEntry.objects.count())
         
 
+class EntryListings(PomTestCase):
+    fixtures=['cats.json','entries.json']
+    
+    def test_entry_archive_year(self):
+        '''       
+        for year 2010,show 2 entries (maths,biology) and (maths)
+        for year 2009,show 1 entry with CHEMISTRY as cat
+        '''
+        #response=self.client.get(reverse('pomlog_entry_archive_year',args=['2010']))
+        response=self.client.get(reverse('pomlog_entry_archive_year',kwargs={'year':'2010'}))
+        self.assertEqual('Entries for the Year',get_context_variable(response,'page_title'))
+        self.assertEqual('2010',get_context_variable(response,'year'))
+        self.assertTrue(isinstance(get_context_variable(response,'object_list'),QuerySet))
+        ol=get_context_variable(response,'object_list')
+        self.assertEquals(2,ol.count())# 2 entries in year 2010
+        self.assertEquals(2,ol[0].categories.count())#2 categories for this entry
+        self.assertEquals(1,ol[1].categories.count())#1 category for this entry
+        self.assertEquals('maths',ol[0].categories.all()[0].name)# first entry has maths  and 
+        self.assertEquals('biology',ol[0].categories.all()[1].name)# biology as categories
+        self.assertEquals('maths',ol[1].categories.all()[0].name)# second entry has maths category only
+        self.assertContains(response,'Entries for the Year',status_code=200)
+
+        response=self.client.get(reverse('pomlog_entry_archive_year',args=['2009']))
+        self.assertEqual('Entries for the Year',get_context_variable(response,'page_title'))
+        self.assertEqual('2009',get_context_variable(response,'year'))
+        self.assertTrue(isinstance(get_context_variable(response,'object_list'),QuerySet))
+        ol=get_context_variable(response,'object_list')
+        self.assertEquals(1,ol.count())# 1 entry in year 2009
+        self.assertEquals(1,ol[0].categories.count())#1 category for this entry
+        self.assertEquals('CHEMISTRY',ol[0].categories.all()[0].name)#  entry has 'CHEMISTRY' as category
+        self.assertContains(response,'Entries for the Year',status_code=200)
+
+    def test_entry_archive_year_noentry(self):
+        response=self.client.get(reverse('pomlog_entry_archive_year',kwargs={'year':'2000'}))
+        self.assertContains(response,'No Entries in 2000',status_code=200)
+
+    def test_entry_archive_index(self):
+        '''
+        object_list should contain equal num of entries as in database
+        '''
+        response=self.client.get(reverse('pomlog_entry_archive_index'))
+        ol=get_context_variable(response,'object_list')
+        user=User.objects.get(id=1)
+        self.assertEquals(8,ol.count())# 3 entries
+        self.assertContains(response,'All entries',status_code=200)
+
+    def test_entry_archive_month(self):
+        '''
+        object_list should contain 3 entries
+        '''
+        #response=self.client.get(reverse('pomlog_entry_archive_month',args=['2008','feb']))
+        response=self.client.get(reverse('pomlog_entry_archive_month',kwargs={'year':'2008','month':'feb'}))
+        ol=get_context_variable(response,'object_list')
+        self.assertEquals(3,ol.count())# 3 entries in year 2008feb
+        self.assertContains(response,'Entries for the month of feb 2008',status_code=200)
+    
+    def test_entry_archive_month_noentry(self):
+        response=self.client.get(reverse('pomlog_entry_archive_month',kwargs={'year':'2007','month':'feb'}))
+        #context should not contain 'object_list'
+        #response shd contain No entries
+        self.assertContains(response,'No Entries in feb 2007',status_code=200)
+
+    def test_entry_archive_day(self):
+        '''
+        object_list should contain 2 entries
+        '''
+        response=self.client.get(reverse('pomlog_entry_archive_day',kwargs={'year':'2007','month':'mar','day':'13'}))
+        ol=get_context_variable(response,'object_list')
+        self.assertEquals(2,ol.count())# 2 entries in year 2007mar13
+        self.assertContains(response,'Entries for the day of 13 mar 2007',status_code=200)
+    
+    def test_entry_archive_day_noentry(self):
+        response=self.client.get(reverse('pomlog_entry_archive_day',kwargs={'year':'2007','month':'mar','day':'14'}))
+        #context should not contain 'object_list'
+        #response shd contain No entries
+        self.assertContains(response,'No Entries on 14 mar 2007',status_code=200)
+
+    def test_entry_detail(self):
+        pass
+
 class EditEntryTest(PomTestCase):
     fixtures=['cats.json','entries.json']
     def setUp(self):
@@ -164,17 +266,25 @@ class EditEntryTest(PomTestCase):
         self.assertTemplateUsed(response,'pomlogger/add_or_edit_entry.html')
         entry_form=response.context['entryform']
         cat_name_form=response.context['categoryform']
+        print 'cat_name_form.initial=',cat_name_form.initial
         
         self.assertTrue(isinstance(entry_form,PomEntryForm))
-        self.assertTrue(isinstance(cat_name_form,PomCategoryNameForm))        
-        self.assertEqual(PomEntry.objects.latest('id'),entry_form.instance)
+        self.assertTrue(isinstance(cat_name_form,PomCategoryNameForm))
+        self.assertEqual(PomEntry.objects.get(id=1),entry_form.instance)
         self.assertEquals({'categories': 'maths,biology'},cat_name_form.initial)
 
     def test_edit_entry_post_remove_one_cat(self):              
         self.client.post(reverse('pomlog_edit_entry',args=[1]),self.post_data )
-        entry=PomEntry.objects.latest('id')        
+        entry=PomEntry.objects.get(id=1)        
         self.assertEquals(1,entry.categories.count())
-        
+
+    def test_delete_entry(self):
+        entrycount=PomEntry.objects.count()
+        response=self.client.post(reverse('pomlog_delete_entry',args=[1]))
+        self.assertEquals(entrycount-1,PomEntry.objects.count())
+        self.assertRedirects(response,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
+
+    
         
         
     
@@ -184,7 +294,7 @@ class EditEntryTest(PomTestCase):
 
 
 class HelperFunctionsTest(TestCase):
-    
+    fixtures=['cats.json']
     def test_timediff(self):
         start=time(1,15,30)
         end=time(1,35,30)
@@ -193,7 +303,7 @@ class HelperFunctionsTest(TestCase):
         self.assertEqual(expected,result)
 
     def test_duration_for_categories_in_entry(self):
-        category1=PomCategory(name='maths',description='mathematics')
+        category1=PomCategory(name='magic',description='magical')
         category1.save()
         category2=PomCategory(name='astronomy',description='stars,planets')
         category2.save()
@@ -208,7 +318,7 @@ class HelperFunctionsTest(TestCase):
         entry2.save()
         entryset=[entry1,entry2]
         result_duration_dict=get_duration_for_categories(entryset)
-        expected={u'astronomy': 30,u'maths': 50}      
+        expected={u'astronomy': 30,u'magic': 50}      
         self.assertEqual(expected,result_duration_dict)
 
     def test_get_month_as_number(self):
@@ -216,6 +326,7 @@ class HelperFunctionsTest(TestCase):
         expected=3
         result=get_month_as_number(month_str)
         self.assertEqual(expected,result)
+
        
         
         

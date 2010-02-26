@@ -7,7 +7,13 @@
 {% block content %}
 {{block.super}}<br/>
 today is :<b>{% now "Y b d" %} </b><br/><br/>
+<p>
+{% if entryform.errors %}
 
+{{entryform.errors}}
+{% endif %} 
+
+</p>
 
 <h2>{{page_title}}</h2>
 

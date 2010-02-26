@@ -46,45 +46,54 @@ def custom_render(request,context,template):
     return render_to_response(template,req_context)
 
 @login_required
-def entry_archive_index(request):
+def entry_archive_index(request,page_title,template_name):
     entryset=PomEntry.objects.filter(author=request.user)
     entry_duration_dict=get_duration_for_categories(entryset)
-    now=datetime.datetime.now()
-    
-    entry_duration_info={'entry_duration_dict':entry_duration_dict,'object_list':entryset}
-    print request.user
-    return custom_render(request,entry_duration_info,'pomlogger/pomentry_archive.html')
+    now=datetime.datetime.now()    
+    context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'page_title':page_title}
+    #return custom_render(request,entry_duration_info,'pomlogger/pomentry_archive.html')
+    #print 'entry_archive_index():template=%s'%template_name
+    return custom_render(request,context,template_name)
+
 @login_required
-def entry_archive_year(request,year):
+def entry_archive_year(request,year,page_title,template_name):
     print 'year=',year,'of type=',type(year)
     entryset=PomEntry.objects.filter(today__year=year)
     entry_duration_dict=get_duration_for_categories(entryset)
-    entry_duration_info={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year}
-    return render_to_response('pomlogger/pomentry_archive_year.html',entry_duration_info)
+    context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'page_title':page_title}
+    #return render_to_response('pomlogger/pomentry_archive_year.html',entry_duration_info)
+    return custom_render(request,context,template_name)
 
-def entry_archive_month(request,year,month):
+@login_required
+def entry_archive_month(request,year,month,page_title,template_name):
     print 'year=',year,'of type=',type(year)
     print 'month=',month,'of type=',type(month)
     entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month))
     entry_duration_dict=get_duration_for_categories(entryset)
-    entry_duration_info={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'month':month}
-    return render_to_response('pomlogger/pomentry_archive_month.html',entry_duration_info)
+    context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'month':month,'page_title':page_title}
+    #return render_to_response('pomlogger/pomentry_archive_month.html',entry_duration_info)
+    return custom_render(request,context,template_name)
 
-def entry_archive_day(request,year,month,day):
+@login_required
+def entry_archive_day(request,year,month,day,page_title,template_name):
     print 'year=',year,'of type=',type(year)
     print 'month=',month,'of type=',type(month)
     print 'day=',day,'of type=',type(day)
     entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),today__day=day)
     entry_duration_dict=get_duration_for_categories(entryset)
-    entry_duration_info={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'month':month,'day':day}
-    return render_to_response('pomlogger/pomentry_archive_day.html',entry_duration_info)
+    context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'month':month,'day':day,'page_title':page_title}
+    #return render_to_response('pomlogger/pomentry_archive_day.html',entry_duration_info)
+    return custom_render(request,context,template_name)
 
-def entry_detail(request,id):	
+@login_required
+def entry_detail(request,id,page_title,template_name):	
     entry=get_object_or_404(PomEntry,id=id)
     duration=timediff(entry.start_time,entry.end_time)
-    entry_detail_dict={'object':entry,'duration':duration}
-    return render_to_response('pomlogger/pomentry_detail.html',entry_detail_dict)
+    context={'object':entry,'duration':duration,'page_title':page_title}
+    #return render_to_response('pomlogger/pomentry_detail.html',entry_detail_dict)
+    return custom_render(request,context,template_name)
 
+@login_required
 def delete_entry(request,id):
     entry=get_object_or_404(PomEntry,id=id)
     print 'delete_entry()-entry=',entry
@@ -102,6 +111,7 @@ def _get_categories(catnames):
             cats.append(cat)
     return cats
 
+@login_required
 @transaction.commit_on_success
 def add_new_entry(request,template_name,page_title):
     form_data=get_form_data(request)
@@ -115,11 +125,13 @@ def add_new_entry(request,template_name,page_title):
         newentry.save()
         return redirect('pomlog_entry_archive_index')
         
-    return render_to_response(template_name,context)
+    #return render_to_response(template_name,context)
+    return custom_render(request,context,template_name)
 
 def get_category_names_as_one_string(categorynameslist):
     return ','.join(categorynameslist)
 
+@login_required
 @transaction.commit_on_success
 def edit_entry(request,id,template_name,page_title):
     entry=get_object_or_404(PomEntry,id=id)
@@ -136,45 +148,145 @@ def edit_entry(request,id,template_name,page_title):
         edited_entry.categories=_get_categories(catnames)
         edited_entry.save()           
         return redirect('pomlog_entry_archive_index')
-    return render_to_response(template_name,context)
+    #return render_to_response(template_name,context)
+    return custom_render(request,context,template_name)
 
-def category_list(request):
+@login_required
+def category_list(request,template_name,page_title):
     categories=PomCategory.objects.all()
-    now=datetime.datetime.now()
-    category_list_dict={'object_list':categories,'now':now }
-    return render_to_response('pomlogger/pomcategory_list.html',category_list_dict)
+    category_list_dict={'object_list':categories,'page_title':page_title }
+    return custom_render(request,category_list_dict,template_name)
+    #return render_to_response('pomlogger/pomcategory_list.html',category_list_dict)
 
+@login_required
 def category_detail(request,slug,template_name,page_title):
     category=get_object_or_404(PomCategory,slug=slug)
     now=datetime.datetime.now()
-    category_detail_dict={'object':category,'now':now, 'page_title': page_title}
-    return render_to_response(template_name,category_detail_dict)
+    context={'object':category,'now':now, 'page_title': page_title}
+    #return render_to_response(template_name,category_detail_dict)
+    return custom_render(request,context,template_name)
 
+@login_required
 def delete_category(request,slug):
     print 'slug=',slug
     cat=get_object_or_404(PomCategory,slug=slug)
     print 'delete cat()=',cat
     cat.delete()
     print 'cat deleted'
-    return redirect('pomlog_entry_archive_index')
+    return redirect('pomlog_category_list')
+
+
+'''
+def add_category(request,template_name,page_title):
+    print 'add_category():template=',template_name
+    print 'add_category():page_title=',page_title
+    if request.method=='POST':
+        form=PomCategoryForm(request.POST)
+        print 'add_category():POST:form created from postdata'
+        print 'add_category():before form.is_valid()'
+        if form.is_valid():
+            print 'add_category():form valid ..saving'
+            form.save()
+            print 'add_category():redirecting to cat list'
+            return redirect('pomlog_category_list')
+        else:
+            print 'add_category():POST:invalid form'
+            form=PomCategoryForm()
+            return custom_render(request,{'page_title':page_title,'categoryform':form},template_name)
+            #return render_to_response(template_name,{'page_title':page_title,'categoryform':form})
+    else:
+        print 'GET'
+        form=PomCategoryForm()
+        return custom_render(request,{'page_title':page_title,'categoryform':form},template_name)
+        #return render_to_response(template_name,{'page_title':page_title,'categoryform':form})
+
+def edit_category(request,slug,page_title,template_name):
+    print 'edit_category():template=',template_name
+    print 'edit_category():page_title=',page_title
+    cat=get_object_or_404(PomCategory,slug=slug)
+    
+    if request.method=='POST':
+        form=PomCategoryForm(request.POST,instance=cat)
+        if form.is_valid():
+            print 'edit_category::form is valid'
+            form.save()
+            print 'redirecting to category_list'            
+            return redirect('pomlog_category_list')
+        else:
+            print 'edit_category::invalid form'
+            form=PomCategoryForm(instance=cat)
+            return custom_render(request,{'page_title':page_title,'categoryform':form},template_name)
+            #return render_to_response(template_name,{'page_title':page_title,'categoryform':form})
+    else:
+        print 'edit_category::GET:'
+        form=PomCategoryForm(instance=cat)
+        return custom_render(request,{'page_title':page_title,'categoryform':form},template_name)
+        #return render_to_response(template_name,{'page_title':page_title,'categoryform':form})
+
+
+'''
+
+
+def is_duplicate_cat(name):
+    if PomCategory.objects.filter(name__iexact=name).count()!=0:
+        return True
+    else:
+        return False
+
+'''
+def _add_or_edit(request,page_title,template_name,instance=None):
+    form_data=get_form_data(request)
+    print '_add_or_edit:form_data=',form_data
+    form=PomCategoryForm(form_data,instance=instance)
+    print '_add_or_edit:instance=',instance
+    context={'categoryform':form,'page_title':page_title}
+    if request.method=='POST' and form.is_valid():
+        print '_add_or_edit:POST:before form.save()'
+        form.save()
+        return redirect('pomlog_category_list')
+    return render_to_response(template_name,context)
+
+'''
 
 def _add_or_edit(request,page_title,template_name,instance=None):
     form_data=get_form_data(request)
     form=PomCategoryForm(form_data,instance=instance)
     context={'categoryform':form,'page_title':page_title}
     if request.method=='POST' and form.is_valid():
-        form.save()
-        return redirect('pomlog_category_list')
-    return render_to_response(template_name,context)
+        name=form.cleaned_data['name']
+        name=name.strip()
+        if is_duplicate_cat(name):
+            if instance!=None:
+                print 'we want to edit %s'%name
+                form.save()
+                return redirect('pomlog_category_list')
+            else:
+                #return render_to_response(template_name,context)
+                return custom_render(request,context,template_name)
+        else:
+            print 'we are adding a new cat %s'%name
+            form.save()
+            return redirect('pomlog_category_list') 
+    #return render_to_response(template_name,context)                       
+    return custom_render(request,context,template_name)
 
+
+
+@login_required
 def add_category(request,template_name,page_title):
     return _add_or_edit(request,page_title,template_name) 
 
-def get_form_data(request):
-    return request.POST if request.method=='POST' else None
 
+@login_required
 def edit_category(request,slug,template_name,page_title):
     cat=get_object_or_404(PomCategory,slug=slug)
     return _add_or_edit(request,page_title,template_name,instance=cat)
+
+
+@login_required
+def get_form_data(request):
+    return request.POST if request.method=='POST' else None
+
+
     
 

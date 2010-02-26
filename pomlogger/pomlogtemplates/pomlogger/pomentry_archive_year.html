@@ -6,10 +6,11 @@
 
 
 {% block content %}
-{{block.super}}<br/>
+{{block.super}}
+<p>Today is :<b>{% now "Y b d" %}</p>
 
 {% if object_list %}
-<h2> total time spent on categories </h2> <br/>
+<h3> total time spent on categories </h3>
 
 <ul>
 {% for k,v in entry_duration_dict.items %}
@@ -17,7 +18,7 @@
 {% endfor %}
 </ul>
 
-
+<h3> {{page_title}} of {{year}} </h3>
 {% include "pomlogger/includes/entries_list.html" %}
 {% else %}
 <h3>No Entries in {{year}} </h3> <br/>

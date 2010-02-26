@@ -1,29 +1,28 @@
 {% extends "base_entries.html" %}
 
 {% block title %}
-{{block.super}}|{{year}}-{{month}}-{{day}}
+{{block.super}}|{{year}} {{month}} {{day}}
 {% endblock %}
 
 
 {% block content %}
-{{block.super}}<br/>
-<h2> total time spent on categories </h2><br/>
+{{block.super}}
+<p>Today is :<b>{% now "Y b d" %}</p>
+{% if object_list %}
+<h3> total time spent on categories </h3>
 
 <ul>
 {% for k,v in entry_duration_dict.items %}
 	<li>{{k}} = {{v}} minutes </li>
 {% endfor %}
 </ul>
-<h3> The entries are :</h3>
-<table border="1">
-{% for anentry in object_list %}
-<tr> 
-<td> <a href="{{anentry.get_absolute_url }}" > {{anentry}}  </a> </td>
-<td> <a href="{% url pomlog_edit_entry anentry.id %}"> EDIT </a> </td>
-<td> <a href="{% url pomlog_delete_entry anentry.id %}"> DELETE </a> </td>
-</tr>
-{% endfor %}
-</table>
+
+<h3> {{page_title}} of {{day}} {{month}} {{year}} </h3>
+{% include "pomlogger/includes/entries_list.html" %}
+{% else %}
+
+<h3>No Entries on {{day}} {{month}} {{year}} </h3> 
+{% endif %}
 
 {% endblock %}
 

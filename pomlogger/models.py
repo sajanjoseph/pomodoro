@@ -1,7 +1,7 @@
 from django.db import models
 from datetime import datetime,date,time
 from django.contrib.auth.models import User
-from django.forms import ModelForm,Form,CharField
+from django.forms import ModelForm,Form,CharField,ValidationError
 from django.template.defaultfilters import slugify
 
 
@@ -16,11 +16,19 @@ class PomCategory(models.Model):
     def __unicode__(self):
         return self.name
 
+
     def save(self,*args,**kwargs):
         print 'cat:save()'
         self.name=self.name.strip()
-        #print 'cat:save():%s'%self.slug
+        '''
+        if (not self.pk):
+            print 'not self.pk=',self.pk
+            if PomCategory.objects.filter(name__iexact=self.name).count()!=0:
+                raise Exception('category %s already exists'%self.name)
+        '''
+        print 'cat:save():name=%s'%self.name
         self.slug=slugify(self.name)
+        print 'cat:save():slug=%s'%self.slug
         super(PomCategory,self).save(*args,**kwargs)
     
     @models.permalink
@@ -63,7 +71,16 @@ class PomCategoryForm(ModelForm):
 	class Meta:
 		model=PomCategory
 		exclude = ('slug',)
-
+'''
+        def clean_name(self):
+            print 'clean_name()'
+            name=self.cleaned_data['name']
+            name=name.strip()
+            print 'name=',name
+            if PomCategory.objects.filter(name__iexact=name).count()!=0:
+                raise ValidationError('category %s already exists'% name)
+            return name
+'''
 class PomCategoryNameForm(Form):
 	categories=CharField(max_length=200)
 

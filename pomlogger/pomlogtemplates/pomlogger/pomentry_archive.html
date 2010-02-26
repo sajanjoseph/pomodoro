@@ -5,8 +5,7 @@
 
 {% block content %}
 {{block.super}}
-<br/>Today is :<b>{% now "Y b d" %}</b><br/>
-
+<p>Today is :<b>{% now "Y b d" %}</p>
 
 <h3> Welcome {{user.username}} </h3>
 <h3> total time spent on categories </h3>
@@ -18,7 +17,7 @@
 <p>
 <a href="{% url pomlog_add_entry %}">ADD NEW ENTRY </a> 
 </p>
-
+{{page_title}}
 {% include "pomlogger/includes/entries_list.html" %}
 {% endblock %}
 
