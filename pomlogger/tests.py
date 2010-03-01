@@ -287,15 +287,7 @@ class EditEntryTest(PomTestCase):
         response=self.client.post(reverse('pomlog_delete_entry',args=[1]))
         self.assertEquals(entrycount-1,PomEntry.objects.count())
         self.assertRedirects(response,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
-
     
-        
-        
-    
-        
-        
-    
-
 
 class HelperFunctionsTest(TestCase):
     fixtures=['cats.json']
@@ -367,7 +359,16 @@ class FunctionalTests(TestCase):
         self.client.login(username='sajan',password='sajan')
         response=self.client.get(reverse('pomlog_edit_entry',args=[4]))
         self.assertEquals(404,response.status_code)
+        self.client.logout()
+
+    def test_delete_entry_created_by_another_user(self):
+        #if user tries to delete another person's entry show 404
+        self.client.login(username='sajan',password='sajan')
+        response=self.client.get(reverse('pomlog_delete_entry',args=[4]))
+        self.assertEquals(404,response.status_code)
+        self.client.logout()
         
+               
         
         
 
