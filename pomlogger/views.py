@@ -128,7 +128,7 @@ def get_category_names_as_one_string(categorynameslist):
 @login_required
 @transaction.commit_on_success
 def edit_entry(request,id,template_name,page_title):
-    entry=get_object_or_404(PomEntry,id=id)
+    entry=get_object_or_404(PomEntry,id=id,author=request.user)
     categorynames_as_separate=[x.name for x in entry.categories.all()]
     categorynames_as_one_string=get_category_names_as_one_string(categorynames_as_separate)
     categorynamesdata={'categories':categorynames_as_one_string}

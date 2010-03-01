@@ -40,7 +40,6 @@ class PomCategoryTest(PomTestCase):
     
     def test_category_detail(self):
         response=self.client.get(reverse('pomlog_category_detail',args=['maths']))
-        #print response.context
         self.assertEqual(PomCategory.objects.get(name='maths'),response.context['object'])
 
     def test_404_if_category_not_found(self):
@@ -361,6 +360,14 @@ class FunctionalTests(TestCase):
         self.client.login(username='sajan',password='sajan')
         response=self.client.get(reverse('pomlog_entry_detail',kwargs={'id':4}))
         self.assertEqual(404,response.status_code)
+        self.client.logout()
+
+    def test_view_get_edit_another_persons_entry(self):
+        #if user tries to edit another person's entry show 404
+        self.client.login(username='sajan',password='sajan')
+        response=self.client.get(reverse('pomlog_edit_entry',args=[4]))
+        self.assertEquals(404,response.status_code)
+        
         
         
 
