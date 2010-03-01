@@ -1,0 +1,19 @@
+[
+{"pk": 1, "model": "pomlogger.pomentry", "fields": {"description": "strang on calculus ", "author": 1, "start_time": "10:00:56", "today": "2010-01-10", "end_time": "10:20:56", "categories": [1]}
+},
+{"pk": 2, "model": "pomlogger.pomentry", "fields": {"description": "anatomy basics", "author": 1, "start_time": "11:00:00", "today": "2010-01-11", "end_time": "11:30:00", "categories": [2]}
+},
+
+{"pk": 3, "model": "pomlogger.pomentry", "fields": {"description": "microbe culture", "author": 1, "start_time": "12:10:00", "today": "2010-01-12", "end_time": "12:30:00", "categories": [2]}
+},
+
+{"pk": 4, "model": "pomlogger.pomentry", "fields": {"description": "endothermic reactions", "author": 2, "start_time": "09:10:00", "today": "2010-02-15", "end_time": "10:30:00", "categories": [3]}
+},
+
+{"pk": 5, "model": "pomlogger.pomentry", "fields": {"description": "aromatic compounds", "author": 2, "start_time": "12:00:00", "today": "2010-02-17", "end_time": "12:30:00", "categories": [3]}
+}
+
+
+
+
+]

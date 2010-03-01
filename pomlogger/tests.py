@@ -205,8 +205,7 @@ class EntryListings(PomTestCase):
         '''
         response=self.client.get(reverse('pomlog_entry_archive_index'))
         ol=get_context_variable(response,'object_list')
-        user=User.objects.get(id=1)
-        self.assertEquals(8,ol.count())# 3 entries
+        self.assertEquals(8,ol.count())# 8 entries
         self.assertContains(response,'All entries',status_code=200)
 
     def test_entry_archive_month(self):
@@ -241,7 +240,13 @@ class EntryListings(PomTestCase):
         self.assertContains(response,'No Entries on 14 mar 2007',status_code=200)
 
     def test_entry_detail(self):
-        pass
+        response=self.client.get(reverse('pomlog_entry_detail',kwargs={'id':5}))
+        obj=get_context_variable(response,'object')
+        self.assertTemplateUsed(response,'pomlogger/pomentry_detail.html')
+        self.assertEquals(200,response.status_code)
+        self.assertEqual('2008-02-21',str(obj.today))
+        self.assertEqual('09:00:00',str(obj.start_time))
+
 
 class EditEntryTest(PomTestCase):
     fixtures=['cats.json','entries.json']
@@ -326,6 +331,44 @@ class HelperFunctionsTest(TestCase):
         expected=3
         result=get_month_as_number(month_str)
         self.assertEqual(expected,result)
+
+
+class FunctionalTests(TestCase):
+    fixtures=['newuser.json','cats.json','newentries.json']
+    def test_users_login(self):
+        user1loggedin=self.client.login(username='sajan',password='sajan')
+        self.assertTrue(user1loggedin)
+        self.client.logout()
+        user2loggedin=self.client.login(username='denny',password='denny')
+        self.assertTrue(user2loggedin)
+        self.client.logout()
+    
+    def _test_view_entries_of_user(self,user,passwd,expected_entries):
+        userloggedin=self.client.login(username=user,password=passwd)
+        if userloggedin:
+            response=self.client.get(reverse('pomlog_entry_archive_index'))
+            ol=get_context_variable(response,'object_list')
+            self.assertEquals(expected_entries,ol.count())
+            self.client.logout()
+
+    def test_view_own_entries(self):
+        #login as sajan,list entries,only 3 should be listed ,all created by sajan
+        self._test_view_entries_of_user('sajan','sajan',3)
+        #login as denny,list entries,only 2 should be listed ,all created by denny
+        self._test_view_entries_of_user('denny','denny',2)
+
+    def test_view_another_persons_entry(self):
+        self.client.login(username='sajan',password='sajan')
+        response=self.client.get(reverse('pomlog_entry_detail',kwargs={'id':4}))
+        self.assertEqual(404,response.status_code)
+        
+        
+
+    
+        
+        
+    
+
 
        
         

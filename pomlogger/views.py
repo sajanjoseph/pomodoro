@@ -51,27 +51,23 @@ def entry_archive_index(request,page_title,template_name):
     entry_duration_dict=get_duration_for_categories(entryset)
     now=datetime.datetime.now()    
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'page_title':page_title}
-    #return custom_render(request,entry_duration_info,'pomlogger/pomentry_archive.html')
-    #print 'entry_archive_index():template=%s'%template_name
     return custom_render(request,context,template_name)
 
 @login_required
 def entry_archive_year(request,year,page_title,template_name):
     print 'year=',year,'of type=',type(year)
-    entryset=PomEntry.objects.filter(today__year=year)
+    entryset=PomEntry.objects.filter(today__year=year,author=request.user)
     entry_duration_dict=get_duration_for_categories(entryset)
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'page_title':page_title}
-    #return render_to_response('pomlogger/pomentry_archive_year.html',entry_duration_info)
     return custom_render(request,context,template_name)
 
 @login_required
 def entry_archive_month(request,year,month,page_title,template_name):
     print 'year=',year,'of type=',type(year)
     print 'month=',month,'of type=',type(month)
-    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month))
+    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),author=request.user)
     entry_duration_dict=get_duration_for_categories(entryset)
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'month':month,'page_title':page_title}
-    #return render_to_response('pomlogger/pomentry_archive_month.html',entry_duration_info)
     return custom_render(request,context,template_name)
 
 @login_required
@@ -79,23 +75,22 @@ def entry_archive_day(request,year,month,day,page_title,template_name):
     print 'year=',year,'of type=',type(year)
     print 'month=',month,'of type=',type(month)
     print 'day=',day,'of type=',type(day)
-    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),today__day=day)
+    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),today__day=day,author=request.user)
     entry_duration_dict=get_duration_for_categories(entryset)
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'month':month,'day':day,'page_title':page_title}
-    #return render_to_response('pomlogger/pomentry_archive_day.html',entry_duration_info)
     return custom_render(request,context,template_name)
 
 @login_required
-def entry_detail(request,id,page_title,template_name):	
-    entry=get_object_or_404(PomEntry,id=id)
+def entry_detail(request,id,page_title,template_name):
+    print 'entry_detail()'	
+    entry=get_object_or_404(PomEntry,id=id,author=request.user)
     duration=timediff(entry.start_time,entry.end_time)
     context={'object':entry,'duration':duration,'page_title':page_title}
-    #return render_to_response('pomlogger/pomentry_detail.html',entry_detail_dict)
     return custom_render(request,context,template_name)
 
 @login_required
 def delete_entry(request,id):
-    entry=get_object_or_404(PomEntry,id=id)
+    entry=get_object_or_404(PomEntry,id=id,author=request.user )
     print 'delete_entry()-entry=',entry
     entry.delete()
     print 'delete_entry()--deleted'
@@ -125,7 +120,6 @@ def add_new_entry(request,template_name,page_title):
         newentry.save()
         return redirect('pomlog_entry_archive_index')
         
-    #return render_to_response(template_name,context)
     return custom_render(request,context,template_name)
 
 def get_category_names_as_one_string(categorynameslist):
@@ -148,7 +142,6 @@ def edit_entry(request,id,template_name,page_title):
         edited_entry.categories=_get_categories(catnames)
         edited_entry.save()           
         return redirect('pomlog_entry_archive_index')
-    #return render_to_response(template_name,context)
     return custom_render(request,context,template_name)
 
 @login_required
@@ -156,14 +149,12 @@ def category_list(request,template_name,page_title):
     categories=PomCategory.objects.all()
     category_list_dict={'object_list':categories,'page_title':page_title }
     return custom_render(request,category_list_dict,template_name)
-    #return render_to_response('pomlogger/pomcategory_list.html',category_list_dict)
 
 @login_required
 def category_detail(request,slug,template_name,page_title):
     category=get_object_or_404(PomCategory,slug=slug)
     now=datetime.datetime.now()
     context={'object':category,'now':now, 'page_title': page_title}
-    #return render_to_response(template_name,category_detail_dict)
     return custom_render(request,context,template_name)
 
 @login_required
@@ -197,13 +188,11 @@ def _add_or_edit(request,page_title,template_name,instance=None):
                 form.save()
                 return redirect('pomlog_category_list')
             else:
-                #return render_to_response(template_name,context)
                 return custom_render(request,context,template_name)
         else:
             print 'we are adding a new cat %s'%name
             form.save()
             return redirect('pomlog_category_list') 
-    #return render_to_response(template_name,context)                       
     return custom_render(request,context,template_name)
 
 
