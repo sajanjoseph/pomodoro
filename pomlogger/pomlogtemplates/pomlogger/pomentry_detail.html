@@ -7,7 +7,7 @@
 {% block content %}
 {{block.super}}
 <p>Today is :<b>{% now "Y b d" %}</p>
-
+<h3> Welcome {{user.username}} </h3>
 <h2>{{page_title}}</h2>
 category    :{% for x in object.categories.all %}
                     {{x.name}}

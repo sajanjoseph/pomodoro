@@ -6,7 +6,8 @@
 
 {% block content %}
 {{block.super}}<br/>
-today is :<b>{% now "Y b d" %} </b><br/><br/>
+today is :<b>{% now "Y b d" %} 
+<h3> Welcome {{user.username}} </h3>
 <p>
 {% if entryform.errors %}
 

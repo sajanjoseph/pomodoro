@@ -6,17 +6,19 @@
 
 {% block content %}
 {{block.super}}<br/>
-today is :<b>{{now|date:"j F, Y" }} </b><br/>
+today is :<b>{{now|date:"j F, Y" }}
+<h3> Welcome {{user.username}} </h3>
 
 
 {% if errors %}
+<p>
 Error!Enter correct values<br/>
    <ul>
 {% for k,v in errors.items %}
     <li>{{k}} : {{v}}  </li>
 {% endfor %}
    </ul> 
-
+</p>
 {% endif %}
 
 <br/>

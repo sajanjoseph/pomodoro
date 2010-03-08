@@ -1,5 +1,5 @@
 [
 {"pk": 1, "model": "pomlogger.pomcategory", "fields": {"slug": "maths", "name": "maths", "description": "maths","users":[1]}}, 
 {"pk": 2, "model": "pomlogger.pomcategory", "fields": {"slug": "biology", "name": "biology", "description": "biology","users":[1]}},
-{"pk": 3, "model": "pomlogger.pomcategory", "fields": {"slug": "chemistry", "name": "CHEMISTRY", "description": "chemical reactions","users":[1]}}
+{"pk": 3, "model": "pomlogger.pomcategory", "fields": {"slug": "chemistry", "name": "CHEMISTRY", "description": "chemical reactions","users":[2]}}
 ]

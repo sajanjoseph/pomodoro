@@ -5,16 +5,18 @@
 
 
 {% block content %}
-today is :<b>{{now|date:"j F, Y" }} </b> <br/><br/>
+<p>today is :<b>{{now|date:"j F, Y" }} </p>
+<h3> Welcome {{user.username}} </h3>
 
 {% if errors %}
-Error with these fields!Enter correct values<br/>
+<p>
+Error with these fields!Enter correct values
   	<ul>
 	{% for k,v in errors.items %}
     		<li>{{k}} : {{v}}  </li>
 	{% endfor %}
    	</ul> 
-
+</p>
 {% endif %}
 <h2>add a Category:</h2>
 

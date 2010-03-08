@@ -5,25 +5,35 @@
 {% endblock %}
 
 
-{% block content %}
-Today is:<b>{% now "d b, Y" %} </b><br/><br/><br/>
+{% block content %}{{block.super}}
+Today is:<b>{% now "d b, Y" %}</b>
+<h3> Welcome {{user.username}} </h3>
+
+{% if not cats_status.0 %}
+the cats_status is not empty
+{% else %}
+the cats_status is empty
+{% endif %}
 <p>
 <a href="{% url pomlog_add_category %}" >ADD NEW CATEGORY </a>
 </p>
-{% if not object_list.count%}
+{% if cats_status.items|length_is:"0" %}
 <b>No categories created </b><br/>
 {% else %}
 
 <h2>Categories are: </h2>
 <table border="1">
-{% for acat in object_list %}
+{% for k,v in cats_status.items %}
 <tr>
-<td> <a href="{{acat.get_absolute_url}}" > {{acat.name}}</a></td>
-<td> <a href="{% url pomlog_edit_category acat.slug %}" > EDIT </a>  </td>
-<td> <a href="{% url pomlog_delete_category acat.slug %}" > DELETE </a>  </td>
+<td> <a href="{{k.get_absolute_url}}" > {{k.name}}</a></td>
+{% if v %}
+<td> <a href="{% url pomlog_edit_category k.slug %}" > EDIT </a>  </td>
+<td> <a href="{% url pomlog_delete_category k.slug %}" > DELETE </a>  </td>
+{% endif %}
 </tr>
 {% endfor %}
 </table>
+
 {% endif%}
 
 

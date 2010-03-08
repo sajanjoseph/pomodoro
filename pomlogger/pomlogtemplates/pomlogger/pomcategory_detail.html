@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block content %}
-Today is:<b>{{now|date:"j F, Y"}} </b><br/>
+Today is:<b>{{now|date:"j F, Y"}}
+<h3> Welcome {{user.username}} </h3>
 <h2>{{page_title}}</h2>
 name:<b>{{ object.name}}</b><br/>
 description :{{object.description }}

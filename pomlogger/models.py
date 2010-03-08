@@ -8,6 +8,7 @@ from django.template.defaultfilters import slugify
 class PomCategory(models.Model):
     name=models.CharField(unique=True,max_length=50)
     description=models.TextField(blank=True)
+    users=models.ManyToManyField(User)
     slug=models.SlugField(editable=False)
     
     class Meta:
@@ -61,7 +62,7 @@ class PomEntryForm(ModelForm):
 class PomCategoryForm(ModelForm):
 	class Meta:
 		model=PomCategory
-		exclude = ('slug',)
+		exclude = ('slug','users',)
 class PomCategoryNameForm(Form):
 	categories=CharField(max_length=200)
 

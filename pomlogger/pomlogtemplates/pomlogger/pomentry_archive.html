@@ -9,11 +9,13 @@
 
 <h3> Welcome {{user.username}} </h3>
 <h3> total time spent on categories </h3>
+<p>
 <ul>
 {% for k,v in entry_duration_dict.items %}
 	<li>{{k}} = {{v}} minutes </li>
 {% endfor %}
 </ul>
+</p>
 <p>
 <a href="{% url pomlog_add_entry %}">ADD NEW ENTRY </a> 
 </p>
