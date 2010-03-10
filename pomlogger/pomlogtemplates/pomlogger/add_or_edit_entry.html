@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block content %}
-{{block.super}}<br/>
-today is :<b>{% now "Y b d" %} 
+{{block.super}}
+Today is :<b>{% now "Y b d" %} </b>
 <h3> Welcome {{user.username}} </h3>
 <p>
 {% if entryform.errors %}

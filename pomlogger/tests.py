@@ -82,12 +82,13 @@ class AddEntryTest(PomTestCase):
     
     def setUp(self):
         super(AddEntryTest,self).setUp()
+        #'author':'1',
         self.post_data={
                         'today':'2010-02-20',
                         'start_time':'10:50:30',
                         'end_time':'11:15:30',
                         'description':'some desc',
-                        'author':'1',
+                        
                         'categories':'yogic science'
 
                         }
@@ -253,12 +254,13 @@ class EditEntryTest(PomTestCase):
     fixtures=['cats.json','entries.json']
     def setUp(self):
         super(EditEntryTest,self).setUp()
+        #'author':'1',
         self.post_data={
                         'today':'2010-02-19',
                         'start_time':'20:00:56',
                         'end_time':'20:30:56',
                         'description':'maths and biology',
-                        'author':'1',
+                        
                         'categories':'maths'
                         }
         self.post_part_data={
@@ -371,12 +373,13 @@ class FunctionalTests(TestCase):
 
     def test_add_entry_append_cat_users(self):
         self.client.login(username='sajan',password='sajan')
+        #'author':'1',
         self.post_data1={
                         'today':'2010-03-01',
                         'start_time':'08:00:00',
                         'end_time':'08:35:00',
                         'description':'cormen,rivest',
-                        'author':'1',
+                        
                         'categories':'algorithms'
                         }
         response1=self.client.post(reverse('pomlog_add_entry'),self.post_data1)
@@ -387,12 +390,13 @@ class FunctionalTests(TestCase):
         #print 'user1=',users_cat1.get(username='sajan')
         self.client.logout()
         self.client.login(username='denny',password='denny')
+        #'author':'2',
         self.post_data2={
                         'today':'2010-02-11',
                         'start_time':'09:00:00',
                         'end_time':'09:20:00',
                         'description':'Sedgewick ',
-                        'author':'2',
+                        
                         'categories':'algorithms'
                         }
         response2=self.client.post(reverse('pomlog_add_entry'),self.post_data2)
@@ -405,12 +409,13 @@ class FunctionalTests(TestCase):
 
     def test_users_edit_entries_to_update_category_users(self):
         self.client.login(username='sajan',password='sajan')
+        #'author':'1',
         self.sajan_entry_data={
                         'today':'2010-03-02',
                         'start_time':'10:00:00',
                         'end_time':'10:35:00',
                         'description':'physical measurements',
-                        'author':'1',
+                        
                         'categories':'maths,physics'
                         }
         self.client.post(reverse('pomlog_add_entry'),self.sajan_entry_data)
@@ -427,12 +432,13 @@ class FunctionalTests(TestCase):
         
         #now denny login in ,adds an entry with physics cat
         self.client.login(username='denny',password='denny')
+        #'author':'2',
         self.denny_entry_data={
                         'today':'2010-03-02',
                         'start_time':'11:00:00',
                         'end_time':'11:50:00',
                         'description':'classical physics',
-                        'author':'2',
+                        
                         'categories':'physics'
                         }
         self.client.post(reverse('pomlog_add_entry'),self.denny_entry_data)
@@ -447,12 +453,13 @@ class FunctionalTests(TestCase):
         
         #now sajan login in ,edits his entry to remove physics cat,now his entry has only maths as category
         self.client.login(username='sajan',password='sajan')
+        #'author':'1',
         self.sajan_entry_edit_data={
                                         'today':'2010-03-02',
                                         'start_time':'10:00:00',
                                         'end_time':'10:35:00',
                                         'description':'maths only',
-                                        'author':'1',
+                                        
                                          'categories':'maths'  }# removes physics so that sajan has only maths cat
         resp3=self.client.post(reverse('pomlog_edit_entry',args=[6]),self.sajan_entry_edit_data )
         physcat=PomCategory.objects.get(name='physics')

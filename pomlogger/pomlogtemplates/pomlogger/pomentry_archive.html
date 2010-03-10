@@ -5,10 +5,9 @@
 
 {% block content %}
 {{block.super}}
-<p>Today is :<b>{% now "Y b d" %}</p>
-
+Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
-<h3> total time spent on categories </h3>
+<h3> Total time spent on categories </h3>
 <p>
 <ul>
 {% for k,v in entry_duration_dict.items %}

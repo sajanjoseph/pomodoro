@@ -116,7 +116,7 @@ def add_new_entry(request,template_name,page_title):
     catnameform=PomCategoryNameForm(form_data)
     context={'page_title':page_title,'entryform':form,'categoryform':catnameform}
     if request.method=='POST' and form.is_valid() and catnameform.is_valid():
-        newentry=form.save()         
+        newentry=form.save() #getting Integrity Error ,says author_id can't be null        
         catnames=catnameform.cleaned_data['categories']
         catnames=get_list_of_names(catnames)            
         #newentry.categories=get_categories(catnames)
@@ -130,6 +130,8 @@ def add_new_entry(request,template_name,page_title):
                 x.users.add(request.user)#need to append, not assign
             print 'x.userscount=',x.users.count()
         newentry.categories=cats
+        #add the author
+        newentry.author=request.user
         newentry.save()
         return redirect('pomlog_entry_archive_index')
         
@@ -203,7 +205,6 @@ def edit_entry(request,id,template_name,page_title):
 
 def update_cats_with_editable_status(user,categories):
     cats={}
-    print '****************************'
     for cat in categories:
         usrcnt=cat.users.count()
         allcatusrs=cat.users.all()

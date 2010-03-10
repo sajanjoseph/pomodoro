@@ -32,7 +32,7 @@ class PomEntry(models.Model):
     start_time=models.TimeField(default=(lambda:datetime.now().time))
     end_time=models.TimeField(default=(lambda:datetime.now().time))
     description=models.TextField()
-    author=models.ForeignKey(User)
+    author=models.ForeignKey(User,null=True)
     categories=models.ManyToManyField(PomCategory)
     
     class Meta:
@@ -48,7 +48,7 @@ class PomEntry(models.Model):
 class PomEntryForm(ModelForm):	
     class Meta:
         model=PomEntry
-        exclude = ('categories',)
+        exclude = ('categories','author',)
     def clean(self):
         cleaned_data=self.cleaned_data
         st_t=cleaned_data.get('start_time')

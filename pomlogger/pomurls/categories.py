@@ -37,18 +37,3 @@ url(r'^$','pomlogger.views.category_list',
     },
     name='pomlog_category_list'),
     )
-
-
-'''
-url(r'^addcategory/$','pomlogger.views.add_category', 
-    {
-     'page_title':'Add A category',
-     'template_name':'pomlogger/add_or_edit_category.html'
-    },name='pomlog_add_category'),
-
-url(r'^editcategory/(?P<slug>[-\w]+)/$','pomlogger.views.edit_category',
-    {'page_title':'Edit This Category',
-    'template_name':'pomlogger/add_or_edit_category.html',
-    },name='pomlog_edit_category'),
-
-'''

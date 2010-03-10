@@ -1,18 +1,18 @@
 {% extends "base_entries.html" %}
 
 {% block title  %}
-{{block.super}}|object
+{{block.super}}|{{object}}
 {% endblock %}
 
 {% block content %}
 {{block.super}}
-<p>Today is :<b>{% now "Y b d" %}</b></p>
+Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
 <h2>{{page_title}}</h2>
 
 <table border="1">
 <tr>
-    <td> category</td>
+    <td> categories</td>
     <td> {% for x in object.categories.all %}
                     {{x.name}}
                 {% if forloop.last %}{% else %}, {% endif %} 

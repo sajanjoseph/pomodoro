@@ -4,8 +4,8 @@
 {{block.super}} | {{ page_title }} | {{ object.name }}
 {% endblock %}
 
-{% block content %}
-Today is:<b>{{now|date:"j F, Y"}}</b>
+{% block content %}{{block.super}}
+Today is :<b>{{now|date:"j F, Y"}}</b>
 <h3> Welcome {{user.username}} </h3>
 <h2>{{page_title}}</h2>
 name: {{ object.name}}<br/>

@@ -7,7 +7,7 @@
 
 {% block content %}
 {{block.super}}
-<p>Today is :<b>{% now "Y b d" %}</p>
+Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
 {% if object_list %}
 <h3> total time spent on categories </h3>
