@@ -18,8 +18,10 @@ Today is :<b>{% now "d b, Y" %}</b>
 {% for k,v in cats_status.items %}
 <tr>
 <td> <a href="{{k.get_absolute_url}}" > {{k.name}}</a></td>
+
 {% if v %}
 <td> <a href="{% url pomlog_edit_category k.slug %}" > EDIT </a>  </td>
+
 <td> <a href="{% url pomlog_delete_category k.slug %}" > DELETE </a>  </td>
 {% endif %}
 </tr>
