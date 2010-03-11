@@ -190,9 +190,11 @@ def update_cats_with_editable_status(user,categories):
 @login_required
 def category_list(request,template_name,page_title):
     categories=PomCategory.objects.all()
-    cats_of_user=PomCategory.objects.filter(users=request.user)
-    cats=update_cats_with_editable_status(request.user,cats_of_user)
-    category_list_dict={'object_list':cats_of_user,'page_title':page_title ,'cats_status':cats}# user can only see his categories
+    #cats_of_user=PomCategory.objects.filter(users=request.user)
+    #cats=update_cats_with_editable_status(request.user,cats_of_user)
+    #category_list_dict={'object_list':cats_of_user,'page_title':page_title ,'cats_status':cats}# user can only see his categories
+    cats=update_cats_with_editable_status(request.user,categories)
+    category_list_dict={'object_list':categories,'page_title':page_title ,'cats_status':cats}
     return custom_render(request,category_list_dict,template_name)
 
 @login_required

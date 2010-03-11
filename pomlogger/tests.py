@@ -28,14 +28,13 @@ class PomCategoryTest(PomTestCase):
     def test_category_list_view(self):
         response=self.client.get(reverse('pomlog_category_list'))
         status_code=response.status_code
-        print 'status_code=',status_code
+        #print 'status_code=',status_code
         self.assertEqual(200,status_code)
     
     def test_add_category_view(self):
-        print 'test_add_category'
         response=self.client.post(reverse('pomlog_add_category'),{'name':'magic','description':'mantra tantra'})        
         status_code=response.status_code
-        print 'status_code=',status_code        
+        #print 'status_code=',status_code        
         self.assertRedirects(response,reverse('pomlog_category_list'),status_code=302)
     
     def test_category_detail(self):
@@ -48,24 +47,24 @@ class PomCategoryTest(PomTestCase):
     
     def test_add_category_trim_name(self):
         catscount=PomCategory.objects.count()
-        print 'test_add_category_trim_name():catscount=',catscount
-        print 'test_add_category_trim_name():catname=%s'%(' biology')
+        #print 'test_add_category_trim_name():catscount=',catscount
+        #print 'test_add_category_trim_name():catname=%s'%(' biology')
         response=self.client.post(reverse('pomlog_add_category'),{'name':' biology','description':'space bio'})
         self.assertEqual(catscount,PomCategory.objects.count())
         self.assertEqual(200,response.status_code)
 
     def test_add_category_existing_cat_add_uppercase_name(self):
         catscount=PomCategory.objects.count()
-        print 'test_add_category_existing_cat_add_uppercase_name():catscount=',catscount
-        print 'test_add_category_existing_cat_add_uppercase_name():catname=%s'%('BIOLOGY')
+        #print 'test_add_category_existing_cat_add_uppercase_name():catscount=',catscount
+        #print 'test_add_category_existing_cat_add_uppercase_name():catname=%s'%('BIOLOGY')
         response=self.client.post(reverse('pomlog_add_category'),{'name':'BIOLOGY','description':'uppercase bio'})
         self.assertEqual(catscount,PomCategory.objects.count())
         self.assertEqual(200,response.status_code)
 
     def test_add_category_existing_cat_add_lowercase_name(self):
         catscount=PomCategory.objects.count()
-        print 'test_add_category_existing_cat_add_lowercase_name():catscount=',catscount
-        print 'test_add_category_existing_cat_add_lowercase_name():catname=%s'%('chemistry')
+        #print 'test_add_category_existing_cat_add_lowercase_name():catscount=',catscount
+        #print 'test_add_category_existing_cat_add_lowercase_name():catname=%s'%('chemistry')
         response=self.client.post(reverse('pomlog_add_category'),{'name':'chemistry','description':'lowercase chem'})
         self.assertEqual(catscount,PomCategory.objects.count())
         self.assertEqual(200,response.status_code)
@@ -103,7 +102,7 @@ class AddEntryTest(PomTestCase):
 
     def test_add_entry_post_new_cat(self):     
         response=self.client.post(reverse('pomlog_add_entry'),self.post_data)
-        print 'resp=',response
+        #print 'resp=',response
         self.assertRedirects(response,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
         self.assertEqual(1,PomEntry.objects.count())
         entry=PomEntry.objects.latest('id')
@@ -147,7 +146,7 @@ class AddEntryTest(PomTestCase):
         self.post_data['categories']='maths, '
         response=self.client.post(reverse('pomlog_add_entry'),self.post_data)
         self.assertRedirects(response,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
-        print 'cats=',PomCategory.objects.all()
+        #print 'cats=',PomCategory.objects.all()
         self.assertEqual(catscount,PomCategory.objects.count())
         self.assertEqual(entrycount+1,PomEntry.objects.count())
 
@@ -157,7 +156,7 @@ class AddEntryTest(PomTestCase):
         self.post_data['categories']='maths, , , ,biology,'
         response=self.client.post(reverse('pomlog_add_entry'),self.post_data)
         self.assertRedirects(response,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
-        print 'cats=',PomCategory.objects.all()
+        #print 'cats=',PomCategory.objects.all()
         self.assertEqual(catscount,PomCategory.objects.count())
         self.assertEqual(entrycount+1,PomEntry.objects.count())
 
@@ -176,7 +175,6 @@ class EntryListings(PomTestCase):
         self.assertEqual('2010',get_context_variable(response,'year'))
         self.assertTrue(isinstance(get_context_variable(response,'object_list'),QuerySet))
         ol=get_context_variable(response,'object_list')
-        print 'type of ol=',type(ol)
         self.assertEquals(2,ol.count())# 2 entries in year 2010
         self.assertEquals(2,ol[0].categories.count())#2 categories for this entry
         self.assertEquals(1,ol[1].categories.count())#1 category for this entry
@@ -273,7 +271,7 @@ class EditEntryTest(PomTestCase):
         self.assertTemplateUsed(response,'pomlogger/add_or_edit_entry.html')
         entry_form=response.context['entryform']
         cat_name_form=response.context['categoryform']
-        print 'cat_name_form.initial=',cat_name_form.initial
+        #print 'cat_name_form.initial=',cat_name_form.initial
         
         self.assertTrue(isinstance(entry_form,PomEntryForm))
         self.assertTrue(isinstance(cat_name_form,PomCategoryNameForm))
@@ -287,7 +285,14 @@ class EditEntryTest(PomTestCase):
 
     def test_delete_entry(self):
         entrycount=PomEntry.objects.count()
+        test_entry=PomEntry.objects.get(id=1)
+        testcat1=PomCategory.objects.get(name='maths')
+        testcat2=PomCategory.objects.get(name='biology')
+        self.assertEquals(1,testcat1.users.count())
+        self.assertEquals(1,testcat2.users.count())
         response=self.client.post(reverse('pomlog_delete_entry',args=[1]))
+        self.assertEquals(0,testcat1.users.count())
+        self.assertEquals(0,testcat2.users.count())
         self.assertEquals(entrycount-1,PomEntry.objects.count())
         self.assertRedirects(response,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
     
@@ -446,7 +451,7 @@ class FunctionalTests(TestCase):
         denny=User.objects.get(username='denny')
         self.assertTrue(denny in physcat.users.all())
         resp2=self.client.get(reverse('pomlog_category_list'))
-        self.assertNotContains(resp2,'maths',status_code=200)
+        #self.assertNotContains(resp2,'maths',status_code=200) #commented out to let all categories to be shown
         self.assertContains(resp2,'physics',status_code=200)
         self.client.logout()
         print 'denny logged out first time'
@@ -465,16 +470,17 @@ class FunctionalTests(TestCase):
         physcat=PomCategory.objects.get(name='physics')
         
         physusers=physcat.users.all()
-        print 'physusers=',physusers
+        #print 'physusers=',physusers
         mathusers=mathcat.users.all()
-        print 'mathusers=',mathusers
+        #print 'mathusers=',mathusers
         self.assertEqual(1,physcat.users.count())
         self.assertTrue(denny in physcat.users.all())
         self.assertFalse(sajan in physcat.users.all())
         resp4=self.client.get(reverse('pomlog_category_list'))
         
         self.assertContains(resp4,'maths',status_code=200)#sajan can see maths in cat listing
-        self.assertNotContains(resp4,'physics',status_code=200)#sajan cannot see physics in cat listing
+        #commented out the following to let all categories to be shown
+        #self.assertNotContains(resp4,'physics',status_code=200)#sajan cannot see physics in cat listing
         self.client.logout()
 
 
