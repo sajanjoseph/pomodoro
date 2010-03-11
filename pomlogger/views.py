@@ -181,18 +181,19 @@ def update_cats_with_editable_status(user,categories):
         usrcnt=cat.users.count()
         allcatusrs=cat.users.all()
         user_in_users=user in allcatusrs
+        entries_of_cat=PomEntry.objects.filter(categories=cat)
+        edit_delete_status=[False,False]
+        if entries_of_cat.count()==0:
+            edit_delete_status[0]=True
+            edit_delete_status[1]=True
         if usrcnt==1 and user in allcatusrs:
-            cats[cat]=True
-        else:
-            cats[cat]=False
+            edit_delete_status[0]=True
+        cats[cat]=edit_delete_status
     return cats
 
 @login_required
 def category_list(request,template_name,page_title):
     categories=PomCategory.objects.all()
-    #cats_of_user=PomCategory.objects.filter(users=request.user)
-    #cats=update_cats_with_editable_status(request.user,cats_of_user)
-    #category_list_dict={'object_list':cats_of_user,'page_title':page_title ,'cats_status':cats}# user can only see his categories
     cats=update_cats_with_editable_status(request.user,categories)
     category_list_dict={'object_list':categories,'page_title':page_title ,'cats_status':cats}
     return custom_render(request,category_list_dict,template_name)
