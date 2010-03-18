@@ -2,7 +2,7 @@
 <table border="1">
 {% for anentry in object_list %}
 <tr> 
-<td> <a href="{{anentry.get_absolute_url }}" > {{anentry.description}}  </a> </td>
+<td> <a href="{{anentry.get_absolute_url }}" > {{anentry.description|truncatewords:2}}  </a> </td>
 <td> <a href="{% url pomlog_edit_entry anentry.id %}"> EDIT </a> </td>
 <td> <a href="{% url pomlog_delete_entry anentry.id %}"> DELETE </a> </td>
 </tr>

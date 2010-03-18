@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test.client import Client
 from pomlogger.models import PomCategory,PomEntry,PomEntryForm,PomCategoryNameForm
-from pomlogger.views import timediff,get_duration_for_categories,get_month_as_number
+from pomlogger.views import timediff,get_duration_for_categories,get_month_as_number,get_list_of_names
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from datetime import time,date
@@ -81,13 +81,11 @@ class AddEntryTest(PomTestCase):
     
     def setUp(self):
         super(AddEntryTest,self).setUp()
-        #'author':'1',
         self.post_data={
                         'today':'2010-02-20',
                         'start_time':'10:50:30',
                         'end_time':'11:15:30',
-                        'description':'some desc',
-                        
+                        'description':'some desc',                        
                         'categories':'yogic science'
 
                         }
@@ -102,7 +100,6 @@ class AddEntryTest(PomTestCase):
 
     def test_add_entry_post_new_cat(self):     
         response=self.client.post(reverse('pomlog_add_entry'),self.post_data)
-        #print 'resp=',response
         self.assertRedirects(response,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
         self.assertEqual(1,PomEntry.objects.count())
         entry=PomEntry.objects.latest('id')
@@ -146,7 +143,6 @@ class AddEntryTest(PomTestCase):
         self.post_data['categories']='maths, '
         response=self.client.post(reverse('pomlog_add_entry'),self.post_data)
         self.assertRedirects(response,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
-        #print 'cats=',PomCategory.objects.all()
         self.assertEqual(catscount,PomCategory.objects.count())
         self.assertEqual(entrycount+1,PomEntry.objects.count())
 
@@ -156,7 +152,6 @@ class AddEntryTest(PomTestCase):
         self.post_data['categories']='maths, , , ,biology,'
         response=self.client.post(reverse('pomlog_add_entry'),self.post_data)
         self.assertRedirects(response,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
-        #print 'cats=',PomCategory.objects.all()
         self.assertEqual(catscount,PomCategory.objects.count())
         self.assertEqual(entrycount+1,PomEntry.objects.count())
 
@@ -169,7 +164,6 @@ class EntryListings(PomTestCase):
         for year 2010,show 2 entries (maths,biology) and (maths)
         for year 2009,show 1 entry with CHEMISTRY as cat
         '''
-        #response=self.client.get(reverse('pomlog_entry_archive_year',args=['2010']))
         response=self.client.get(reverse('pomlog_entry_archive_year',kwargs={'year':'2010'}))
         self.assertEqual('Entries for the Year',get_context_variable(response,'page_title'))
         self.assertEqual('2010',get_context_variable(response,'year'))
@@ -195,6 +189,8 @@ class EntryListings(PomTestCase):
 
     def test_entry_archive_year_noentry(self):
         response=self.client.get(reverse('pomlog_entry_archive_year',kwargs={'year':'2000'}))
+        ol=get_context_variable(response,'object_list')
+        self.assertEquals(0,ol.count())
         self.assertContains(response,'No Entries in 2000',status_code=200)
 
     def test_entry_archive_index(self):
@@ -210,16 +206,17 @@ class EntryListings(PomTestCase):
         '''
         object_list should contain 3 entries
         '''
-        #response=self.client.get(reverse('pomlog_entry_archive_month',args=['2008','feb']))
         response=self.client.get(reverse('pomlog_entry_archive_month',kwargs={'year':'2008','month':'feb'}))
         ol=get_context_variable(response,'object_list')
         self.assertEquals(3,ol.count())# 3 entries in year 2008feb
         self.assertContains(response,'Entries for the month of feb 2008',status_code=200)
+
     
     def test_entry_archive_month_noentry(self):
         response=self.client.get(reverse('pomlog_entry_archive_month',kwargs={'year':'2007','month':'feb'}))
-        #context should not contain 'object_list'
-        #response shd contain No entries
+        #object_list has 0 items
+        ol=get_context_variable(response,'object_list')
+        self.assertEquals(0,ol.count())
         self.assertContains(response,'No Entries in feb 2007',status_code=200)
 
     def test_entry_archive_day(self):
@@ -233,10 +230,9 @@ class EntryListings(PomTestCase):
     
     def test_entry_archive_day_noentry(self):
         response=self.client.get(reverse('pomlog_entry_archive_day',kwargs={'year':'2007','month':'mar','day':'14'}))
-        #context should not contain 'object_list'
+        #object_list has 0 items
         ol=get_context_variable(response,'object_list')
         self.assertEquals(0,ol.count())
-        #response shd contain No entries
         self.assertContains(response,'No Entries on 14 mar 2007',status_code=200)
 
     def test_entry_detail(self):
@@ -252,13 +248,11 @@ class EditEntryTest(PomTestCase):
     fixtures=['cats.json','entries.json']
     def setUp(self):
         super(EditEntryTest,self).setUp()
-        #'author':'1',
         self.post_data={
                         'today':'2010-02-19',
                         'start_time':'20:00:56',
                         'end_time':'20:30:56',
                         'description':'maths and biology',
-                        
                         'categories':'maths'
                         }
         self.post_part_data={
@@ -271,7 +265,6 @@ class EditEntryTest(PomTestCase):
         self.assertTemplateUsed(response,'pomlogger/add_or_edit_entry.html')
         entry_form=response.context['entryform']
         cat_name_form=response.context['categoryform']
-        #print 'cat_name_form.initial=',cat_name_form.initial
         
         self.assertTrue(isinstance(entry_form,PomEntryForm))
         self.assertTrue(isinstance(cat_name_form,PomCategoryNameForm))
@@ -331,6 +324,20 @@ class HelperFunctionsTest(TestCase):
         result=get_month_as_number(month_str)
         self.assertEqual(expected,result)
 
+    def test_get_list_of_names(self):
+        names=' sajan ,ravi, manoj ,denny '
+        expected_names_list=['sajan' ,'ravi', 'manoj' ,'denny']
+        self.assertEqual(expected_names_list,get_list_of_names(names))
+        names=' , sajan ,, manoj , '
+        expected_names_list=['sajan' ,'manoj']
+        self.assertEqual(expected_names_list,get_list_of_names(names))
+        names=' , ,,  , '
+        expected_names_list=[]
+        self.assertEqual(expected_names_list,get_list_of_names(names))
+        names=''
+        expected_names_list=[]
+        self.assertEqual(expected_names_list,get_list_of_names(names))
+        
 
 class FunctionalTests(TestCase):
     fixtures=['newuser.json','newcats.json','newentries.json']
@@ -378,43 +385,34 @@ class FunctionalTests(TestCase):
 
     def test_add_entry_append_cat_users(self):
         self.client.login(username='sajan',password='sajan')
-        #'author':'1',
         self.post_data1={
                         'today':'2010-03-01',
                         'start_time':'08:00:00',
                         'end_time':'08:35:00',
                         'description':'cormen,rivest',
-                        
                         'categories':'algorithms'
                         }
         response1=self.client.post(reverse('pomlog_add_entry'),self.post_data1)
         newcat1=PomCategory.objects.latest('id')
-        #print 'newcat1=',newcat1
         users_cat1=newcat1.users
         self.assertEquals(1,users_cat1.count())
-        #print 'user1=',users_cat1.get(username='sajan')
         self.client.logout()
         self.client.login(username='denny',password='denny')
-        #'author':'2',
         self.post_data2={
                         'today':'2010-02-11',
                         'start_time':'09:00:00',
                         'end_time':'09:20:00',
                         'description':'Sedgewick ',
-                        
                         'categories':'algorithms'
                         }
         response2=self.client.post(reverse('pomlog_add_entry'),self.post_data2)
         newcat2=PomCategory.objects.latest('id')
-        #print 'newcat2=',newcat2
         users_cat2=newcat1.users
-        #print 'user2=',users_cat2.get(username='denny')
         self.assertEquals(2,users_cat2.count())
         self.client.logout()
 
     def test_users_edit_entries_to_update_category_users(self):
         self.client.login(username='sajan',password='sajan')
-        #'author':'1',
         self.sajan_entry_data={
                         'today':'2010-03-02',
                         'start_time':'10:00:00',
@@ -437,7 +435,6 @@ class FunctionalTests(TestCase):
         
         #now denny login in ,adds an entry with physics cat
         self.client.login(username='denny',password='denny')
-        #'author':'2',
         self.denny_entry_data={
                         'today':'2010-03-02',
                         'start_time':'11:00:00',
@@ -458,21 +455,17 @@ class FunctionalTests(TestCase):
         
         #now sajan login in ,edits his entry to remove physics cat,now his entry has only maths as category
         self.client.login(username='sajan',password='sajan')
-        #'author':'1',
         self.sajan_entry_edit_data={
                                         'today':'2010-03-02',
                                         'start_time':'10:00:00',
                                         'end_time':'10:35:00',
                                         'description':'maths only',
-                                        
                                          'categories':'maths'  }# removes physics so that sajan has only maths cat
         resp3=self.client.post(reverse('pomlog_edit_entry',args=[6]),self.sajan_entry_edit_data )
         physcat=PomCategory.objects.get(name='physics')
         
         physusers=physcat.users.all()
-        #print 'physusers=',physusers
         mathusers=mathcat.users.all()
-        #print 'mathusers=',mathusers
         self.assertEqual(1,physcat.users.count())
         self.assertTrue(denny in physcat.users.all())
         self.assertFalse(sajan in physcat.users.all())

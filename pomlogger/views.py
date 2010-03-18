@@ -125,6 +125,9 @@ def get_category_names_as_one_string(categorynameslist):
     return ','.join(categorynameslist)
 
 def get_list_of_names(names):
+    '''
+    from a given string of comma separated names return a list of names
+    '''
     return [x.strip() for x in names.split(',') if len( x.strip())  !=0]
 
 def add_user_to_categories(categories,user):
@@ -222,7 +225,7 @@ def is_duplicate_cat(name):
         return False
 
 
-def _add_or_edit(request,page_title,template_name,instance=None):
+def add_or_edit(request,page_title,template_name,instance=None):
     form_data=get_form_data(request)
     form=PomCategoryForm(form_data,instance=instance)
     context={'categoryform':form,'page_title':page_title}
@@ -246,13 +249,13 @@ def _add_or_edit(request,page_title,template_name,instance=None):
 
 @login_required
 def add_category(request,template_name,page_title):
-    return _add_or_edit(request,page_title,template_name) 
+    return add_or_edit(request,page_title,template_name) 
 
 
 @login_required
 def edit_category(request,slug,template_name,page_title):
     cat=get_object_or_404(PomCategory,slug=slug)
-    return _add_or_edit(request,page_title,template_name,instance=cat)
+    return add_or_edit(request,page_title,template_name,instance=cat)
 
 
 @login_required

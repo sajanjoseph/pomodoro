@@ -8,13 +8,7 @@
 {{block.super}}
 Today is :<b>{% now "Y b d" %} </b>
 <h3> Welcome {{user.username}} </h3>
-<p>
-{% if entryform.errors %}
 
-{{entryform.errors}}
-{% endif %} 
-
-</p>
 
 <h2>{{page_title}}</h2>
 
