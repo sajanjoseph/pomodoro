@@ -198,7 +198,7 @@ def update_cats_with_editable_status(user,categories):
 def category_list(request,template_name,page_title):
     categories=PomCategory.objects.all()
     cats=update_cats_with_editable_status(request.user,categories)
-    category_list_dict={'object_list':categories,'page_title':page_title ,'cats_status':cats}
+    category_list_dict={'page_title':page_title ,'cats_status':cats}
     return custom_render(request,category_list_dict,template_name)
 
 @login_required

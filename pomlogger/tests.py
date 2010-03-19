@@ -28,7 +28,9 @@ class PomCategoryTest(PomTestCase):
     def test_category_list_view(self):
         response=self.client.get(reverse('pomlog_category_list'))
         status_code=response.status_code
-        #print 'status_code=',status_code
+        allcats_count=PomCategory.objects.count()
+        cats_status=ol=get_context_variable(response,'cats_status')
+        self.assertEqual(allcats_count,len(cats_status))
         self.assertEqual(200,status_code)
     
     def test_add_category_view(self):
@@ -74,6 +76,29 @@ class PomCategoryTest(PomTestCase):
         response=self.client.post(reverse('pomlog_delete_category',args=['chemistry']))
         self.assertEquals(catscount-1,PomCategory.objects.count())
         self.assertRedirects(response,reverse('pomlog_category_list'),status_code=302, target_status_code=200)
+
+    def test_edit_category(self):
+        initial_catscount=PomCategory.objects.count()
+        response=self.client.post(reverse('pomlog_edit_category',args=['maths']),{'name':'maths','description':'algebra' })
+        self.assertEqual(initial_catscount,PomCategory.objects.count())
+        self.assertRedirects(response,reverse('pomlog_category_list'),status_code=302, target_status_code=200)
+        newdescription=PomCategory.objects.get(id=1).description
+        self.assertEqual('algebra',newdescription)
+
+    def test_edit_category_newname(self):
+        initial_catscount=PomCategory.objects.count()
+        response=self.client.post(reverse('pomlog_edit_category',args=['maths']),{'name':'algebra','description':'algebra in 24 hrs' })
+        self.assertEqual(initial_catscount,PomCategory.objects.count())
+        self.assertRedirects(response,reverse('pomlog_category_list'),status_code=302, target_status_code=200)
+        newname=PomCategory.objects.get(id=1).name
+        self.assertEqual('algebra',newname)
+
+    def test_edit_category_with_existing_name(self):
+        initial_catscount=PomCategory.objects.count()
+        response=self.client.post(reverse('pomlog_edit_category',args=['maths']),{'name':'biology','description':'bio' })        
+        self.assertContains(response,'category with this Name already exists',status_code=200)
+        self.assertEqual(initial_catscount,PomCategory.objects.count())
+        
 
 
 class AddEntryTest(PomTestCase):
@@ -195,7 +220,7 @@ class EntryListings(PomTestCase):
 
     def test_entry_archive_index(self):
         '''
-        object_list should contain equal num of entries as in database
+        object_list should contain same num of entries as in database
         '''
         response=self.client.get(reverse('pomlog_entry_archive_index'))
         ol=get_context_variable(response,'object_list')
