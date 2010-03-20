@@ -98,8 +98,6 @@ class PomCategoryTest(PomTestCase):
         response=self.client.post(reverse('pomlog_edit_category',args=['maths']),{'name':'biology','description':'bio' })        
         self.assertContains(response,'category with this Name already exists',status_code=200)
         self.assertEqual(initial_catscount,PomCategory.objects.count())
-        
-
 
 class AddEntryTest(PomTestCase):
     fixtures=['cats.json']
@@ -472,9 +470,11 @@ class FunctionalTests(TestCase):
         physcat=PomCategory.objects.get(name='physics')
         denny=User.objects.get(username='denny')
         self.assertTrue(denny in physcat.users.all())
+        self.assertEqual(2,physcat.users.count())
         resp2=self.client.get(reverse('pomlog_category_list'))
         #self.assertNotContains(resp2,'maths',status_code=200) #commented out to let all categories to be shown
         self.assertContains(resp2,'physics',status_code=200)
+        self.assertContains(resp2,'maths',status_code=200)
         self.client.logout()
         print 'denny logged out first time'
         
