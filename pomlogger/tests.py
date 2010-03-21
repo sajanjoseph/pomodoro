@@ -99,6 +99,14 @@ class PomCategoryTest(PomTestCase):
         self.assertContains(response,'category with this Name already exists',status_code=200)
         self.assertEqual(initial_catscount,PomCategory.objects.count())
 
+    def test_get_edit_category_of_another_user(self):
+        self.client.logout()
+        self.client.login(username='denny',password='denny')
+        response=self.client.get(reverse('pomlog_edit_category',args=['maths']))
+        self.assertEqual(404,response.status_code)
+        
+        
+
 class AddEntryTest(PomTestCase):
     fixtures=['cats.json']
     

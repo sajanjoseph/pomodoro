@@ -1,7 +1,7 @@
 from pomlogger.models import PomEntry,PomCategory
 from pomlogger.models import PomEntryForm,PomCategoryForm,PomCategoryNameForm
 from django.core.urlresolvers import reverse
-from django.http import HttpResponse,HttpResponseRedirect
+from django.http import HttpResponse,HttpResponseRedirect,Http404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
@@ -251,11 +251,16 @@ def add_or_edit(request,page_title,template_name,instance=None):
 def add_category(request,template_name,page_title):
     return add_or_edit(request,page_title,template_name) 
 
+def has_permission(user,category):
+    return (category.users.count()==1  or category.users.count()==0 )and user in category.users.all()
 
 @login_required
 def edit_category(request,slug,template_name,page_title):
     cat=get_object_or_404(PomCategory,slug=slug)
-    return add_or_edit(request,page_title,template_name,instance=cat)
+    if has_permission(request.user,cat):
+        return add_or_edit(request,page_title,template_name,instance=cat)
+    else:
+        raise Http404
 
 
 @login_required
