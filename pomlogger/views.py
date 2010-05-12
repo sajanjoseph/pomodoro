@@ -83,12 +83,28 @@ def entry_detail(request,id,page_title,template_name):
 
 @login_required
 def delete_entry(request,id):
+    print 'delete_entry()'
     entry=get_object_or_404(PomEntry,id=id,author=request.user )
+    print 'delete_entry()entry=',entry
     #need to remove user from its categories
     cats=entry.categories.all()
+    print 'delete_entry()cats=',cats
     remove_user_from_categories(cats,request.user)
     entry.delete()
+    print 'delete_entry() entry deleted'
+    #remove categories that have no entries associated
+    remove_lone_categories()
     return redirect('pomlog_entry_archive_index')
+
+
+def remove_lone_categories():
+    print 'remove_lone_categories()'
+    allcats=PomCategory.objects.all()
+    for acat in allcats:
+        entries_of_acat=PomEntry.objects.filter(categories=acat)
+        if entries_of_acat.count()==0:
+            acat.delete()
+            print 'deleted ',acat
 
 
 def get_categories(catnames):
@@ -173,12 +189,30 @@ def edit_entry(request,id,template_name,page_title):
             remove_user_from_categories(removedcats,request.user)
         cats=get_categories(get_list_of_names(catnames))
         edited_entry.categories=cats
-        edited_entry.save()           
+        edited_entry.save()
+        remove_lone_categories()#update to remove cats with no entries           
         return redirect('pomlog_entry_archive_index')
     return custom_render(request,context,template_name)
 
 
 def update_cats_with_editable_status(user,categories):
+    print 'update_cats_with_editable_status()::'
+    cats={}
+    for cat in categories:
+        usrcnt=cat.users.count()
+        allcatusrs=cat.users.all()
+        user_in_users=user in allcatusrs
+        entries_of_cat=PomEntry.objects.filter(categories=cat)
+        edit_status=False        
+        if usrcnt==1 and user in allcatusrs:
+            #print '1 usr only..setting edit=True'
+            edit_status=True
+        cats[cat]=edit_status
+        #print 'for',cat,' edit_status=',edit_status
+    return cats
+'''
+def update_cats_with_editable_status(user,categories):
+    print 'update_cats_with_editable_status()::'
     cats={}
     for cat in categories:
         usrcnt=cat.users.count()
@@ -187,23 +221,29 @@ def update_cats_with_editable_status(user,categories):
         entries_of_cat=PomEntry.objects.filter(categories=cat)
         edit_delete_status=[False,False]
         if entries_of_cat.count()==0:
+            #print 'entries_of_cat.count()==%d'%entries_of_cat.count()
+            #print 'setting edit=True,delete=True'
             edit_delete_status[0]=True
             edit_delete_status[1]=True
         if usrcnt==1 and user in allcatusrs:
+            #print '1 usr only..setting edit=True'
             edit_delete_status[0]=True
         cats[cat]=edit_delete_status
+        #print 'for',cat,' edit_delete_status=',edit_delete_status
     return cats
+'''
 
 @login_required
 def category_list(request,template_name,page_title):
-    categories=PomCategory.objects.all()
-    cats=update_cats_with_editable_status(request.user,categories)
-    category_list_dict={'page_title':page_title ,'cats_status':cats}
+    #categories=PomCategory.objects.all()
+    categories=PomCategory.objects.filter(users=request.user)
+    cats_with_status=update_cats_with_editable_status(request.user,categories)
+    category_list_dict={'page_title':page_title ,'cats_status':cats_with_status}
     return custom_render(request,category_list_dict,template_name)
 
 @login_required
 def category_detail(request,slug,template_name,page_title):
-    category=get_object_or_404(PomCategory,slug=slug)
+    category=get_object_or_404(PomCategory,slug=slug,users=request.user)
     now=datetime.datetime.now()
     context={'object':category,'now':now, 'page_title': page_title}
     return custom_render(request,context,template_name)
@@ -256,10 +296,14 @@ def has_permission(user,category):
 
 @login_required
 def edit_category(request,slug,template_name,page_title):
+    print 'edit_category()::'
+    print 'edit_category()::user is:',request.user
     cat=get_object_or_404(PomCategory,slug=slug)
     if has_permission(request.user,cat):
+        print 'edit_category()::user has permission'
         return add_or_edit(request,page_title,template_name,instance=cat)
     else:
+        print 'edit_category()::user has no permission..raising 404'
         raise Http404
 
 

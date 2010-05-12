@@ -19,12 +19,10 @@ Today is :<b>{% now "d b, Y" %}</b>
 <tr>
 <td> <a href="{{k.get_absolute_url}}" > {{k.name}}</a></td>
 
-{% if v.0 %}
+{% if v %}
 <td> <a href="{% url pomlog_edit_category k.slug %}" > EDIT </a>  </td>
 {%endif %}
-{% if v.1 %}
-<td> <a href="{% url pomlog_delete_category k.slug %}" > DELETE </a>  </td>
-{% endif %}
+
 </tr>
 {% endfor %}
 </table>

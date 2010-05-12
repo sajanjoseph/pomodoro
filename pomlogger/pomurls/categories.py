@@ -36,4 +36,5 @@ url(r'^$','pomlogger.views.category_list',
     'template_name':'pomlogger/pomcategory_list.html'
     },
     name='pomlog_category_list'),
-    )
+
+)
