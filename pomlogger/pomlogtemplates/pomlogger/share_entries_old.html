@@ -1,0 +1,53 @@
+{% extends "base_entries.html" %}
+
+{% block title %}
+{{block.super}}|{{page_title}}
+{% endblock %}
+
+{% block content %}
+{{block.super}}
+Today is :<b>{% now "Y b d" %}</b>
+<h3> Welcome {{user.username}} </h3>
+
+<FORM action="." method="POST">
+
+SHARE
+<p><INPUT TYPE="radio" NAME="sharing_options" VALUE="allentries"  CHECKED>All Entries </p>
+<p><INPUT TYPE="radio" NAME="sharing_options" VALUE="selectedentries"  > Select from Entries</p> <p>
+   <SELECT multiple size="2" name="entries_selected">
+      {% for entry in ownentries %}
+      <OPTION selected value={{entry.id}}>{{entry}}</OPTION>
+      {% endfor %}      
+   </SELECT> 
+
+</p>
+<p><INPUT TYPE="radio" NAME="sharing_options" VALUE="entries_with_cat"  > Entries with Category</p><p>
+<SELECT multiple size="2" name="entries_with_cat">
+      {% for cat in owncats %}
+      <OPTION selected value={{cat.id}}>{{cat.name}}</OPTION>
+      {% endfor %}      
+   </SELECT> 
+
+</p>
+
+
+WITH
+<P>
+   <SELECT multiple size="2" name="users_selected">
+      {% for usr in otherusers %}
+      <OPTION selected value={{usr.username}}>{{usr.username}}</OPTION>
+      {% endfor %}      
+   </SELECT>
+</P>
+
+
+<INPUT type="submit" value="Share">
+</FORM>
+{% endblock %}
+
+
+
+
+{% block whatis %}
+
+{% endblock %}

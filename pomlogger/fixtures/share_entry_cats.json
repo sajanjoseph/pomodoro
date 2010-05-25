@@ -1,0 +1,6 @@
+[
+{"pk": 1, "model": "pomlogger.pomcategory", "fields": {"users": [1, 2], "slug": "algebra", "name": "algebra", "description": "algebra"}},
+{"pk": 2, "model": "pomlogger.pomcategory", "fields": {"users": [1], "slug": "physics", "name": "physics", "description": "physics"}},
+{"pk": 3, "model": "pomlogger.pomcategory", "fields": {"users": [2], "slug": "maths", "name": "maths", "description": "maths"}}
+
+]

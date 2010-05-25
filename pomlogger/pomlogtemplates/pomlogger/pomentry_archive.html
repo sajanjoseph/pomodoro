@@ -1,6 +1,6 @@
 {% extends "base_entries.html" %}
 {% block title %}
-{{block.super}}|index
+{{block.super}}|{{page_title}}
 {% endblock %}
 
 {% block content %}
@@ -20,6 +20,13 @@ Today is :<b>{% now "Y b d" %}</b>
 </p>
 {{page_title}}
 {% include "pomlogger/includes/entries_list.html" %}
+<br/>
+<h3>Other Peoples' Entries shared to me </h3>
+<br/>
+{% include "pomlogger/includes/entries_shared.html" %}
+<p>
+<a href="{% url pomlog_share_entries  %}">Share</a>
+</p>
 {% endblock %}
 
 

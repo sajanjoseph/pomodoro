@@ -1,5 +1,5 @@
 from pomlogger.models import PomEntry,PomCategory
-from pomlogger.models import PomEntryForm,PomCategoryForm,PomCategoryNameForm
+from pomlogger.models import PomEntryForm,PomCategoryForm,PomCategoryNameForm,PomEntryShareForm
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect,Http404
 from django.contrib.auth import authenticate,login,logout
@@ -13,6 +13,9 @@ from django.template.defaultfilters import title
 from django.http import Http404
 from django.template import RequestContext
 from django.shortcuts import render_to_response,get_object_or_404,redirect
+
+from django.forms import ModelMultipleChoiceField
+from django.contrib.auth.models import User
 
 def get_month_as_number(monthname):
     if title(monthname) not in calendar.month_abbr:
@@ -49,8 +52,9 @@ def custom_render(request,context,template):
 def entry_archive_index(request,page_title,template_name):
     entryset=PomEntry.objects.filter(author=request.user)
     entry_duration_dict=get_duration_for_categories(entryset)
-    now=datetime.datetime.now()    
-    context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'page_title':page_title}
+    now=datetime.datetime.now()
+    entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user)#added for sharing
+    context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
@@ -76,7 +80,14 @@ def entry_archive_day(request,year,month,day,page_title,template_name):
 
 @login_required
 def entry_detail(request,id,page_title,template_name):
-    entry=get_object_or_404(PomEntry,id=id,author=request.user)
+    print 'entry_detail()::'
+    #entry=get_object_or_404(PomEntry,id=id,author=request.user)
+    from django.db.models import Q
+    q_for_id_and_author=Q(id=id,author=request.user)
+    q_for_id_and_shared_user=Q(id=id,sharedwith=request.user)
+    #get entry with id=id and author=user OR entry with sharedwith=user .If both fail raise 404
+    entry=get_object_or_404(PomEntry,q_for_id_and_author | q_for_id_and_shared_user)
+    print 'entry=',entry,type(entry)
     duration=timediff(entry.start_time,entry.end_time)
     context={'object':entry,'duration':duration,'page_title':page_title}
     return custom_render(request,context,template_name)
@@ -233,10 +244,17 @@ def update_cats_with_editable_status(user,categories):
     return cats
 '''
 
+def get_categories_of_user(user):
+    ownentries=PomEntry.objects.filter(author=user)
+    owncats=[]
+    for entry in ownentries:
+        catsofentry=entry.categories.all()
+        owncats.extend(catsofentry)
+    return list(set(owncats))
+
 @login_required
 def category_list(request,template_name,page_title):
-    #categories=PomCategory.objects.all()
-    categories=PomCategory.objects.filter(users=request.user)
+    categories=get_categories_of_user(request.user)
     cats_with_status=update_cats_with_editable_status(request.user,categories)
     category_list_dict={'page_title':page_title ,'cats_status':cats_with_status}
     return custom_render(request,category_list_dict,template_name)
@@ -248,6 +266,8 @@ def category_detail(request,slug,template_name,page_title):
     context={'object':category,'now':now, 'page_title': page_title}
     return custom_render(request,context,template_name)
 
+
+
 @login_required
 def delete_category(request,slug):
     cat=get_object_or_404(PomCategory,slug=slug)
@@ -257,6 +277,7 @@ def delete_category(request,slug):
     else:
         print 'cannot delete category'       
     return redirect('pomlog_category_list')
+
 
 def is_duplicate_cat(name):
     if PomCategory.objects.filter(name__iexact=name).count()!=0:
@@ -310,6 +331,148 @@ def edit_category(request,slug,template_name,page_title):
 @login_required
 def get_form_data(request):
     return request.POST if request.method=='POST' else None
+
+
+def get_categories_from_idstring(cat_id_list):
+    cats=[]
+    for id in cat_id_list:
+        print 'id is=',id,type(id)
+        cat=PomCategory.objects.get(id=id)
+        print 'cat=',cat,type(cat)
+        cats.append(cat)
+
+    print 'cats=',cats
+    return cats
+
+def get_entries_from_idstring(entry_id_list):
+    entries=[]
+    for id in entry_id_list:
+        print 'id is=',id,type(id)
+        entry=PomEntry.objects.get(id=id)
+        print 'entry=',entry,type(entry)
+        entries.append(entry)
+
+    print 'entries',entries
+    return entries
+
+def get_own_entries_with_cats(cats,user):
+    ownentries_with_cats=[]
+    for cat in cats:
+        entries=PomEntry.objects.filter(categories=cat).filter(author=user)
+        ownentries_with_cats.extend(entries)
+
+    return list(set(ownentries_with_cats))
+    
+'''
+@login_required
+def share_entries_oldway(request,template_name,page_title):
+    allusers=User.objects.all()
+    others=User.objects.exclude(username=request.user.username)
+    ownentries=PomEntry.objects.filter(author=request.user)
+    owncats=get_categories_of_user(request.user)    
+    context={'ownentries':ownentries,'owncats':owncats,'otherusers':others,'allusers':allusers,'page_title':page_title}
+    if request.method=='POST':
+        print '===========request.POST==========='
+        print request.POST
+        selected_users=request.POST.getlist('users_selected')
+        entries_to_share=request.POST.getlist('sharing_options')        
+        if len(entries_to_share)==1 and len(selected_users)>0:
+            usrs_to_share_with=[User.objects.get(username=name) for name in selected_users]
+            entries=[]
+            if entries_to_share[0]==u'allentries':
+                entries=PomEntry.objects.filter(author=request.user)
+                print 'you selected all entries option:',entries
+            elif entries_to_share[0]=='selectedentries':
+                entry_id_list=request.POST.getlist('entries_selected')
+                print 'you selected selectedentries option:',
+                entries=get_entries_from_idstring(entry_id_list)
+            elif entries_to_share[0]=='entries_with_cat':
+                cat_idlist=request.POST.getlist('entries_with_cat')
+                print 'you selected entries_with_cat option:',cat_idlist
+                cats=get_categories_from_idstring(cat_idlist)
+                entries=get_own_entries_with_cats(cats,request.user)
+
+            print 'sharing',entries,'with users',usrs_to_share_with            
+            share_entries_with_users(entries,usrs_to_share_with)
+            return redirect('pomlog_entry_archive_index')
+
+    print 'GET or invalid'
+    return custom_render(request,context,template_name)
+
+'''
+
+@login_required
+def share_entries(request,template_name,page_title):
+    print 'share_entries()::'  
+    allusers=User.objects.all()
+    others=User.objects.exclude(username=request.user.username)
+    ownentries=PomEntry.objects.filter(author=request.user)
+    owncats=get_categories_of_user(request.user)
+    print 'owncats=',owncats,type(owncats),len(owncats)
+    form_data=get_form_data(request)
+    qset=PomEntry.objects.filter(author=request.user)
+    form=PomEntryShareForm(form_data)
+    form.fields['entries_selected']=ModelMultipleChoiceField(required=False,queryset=PomEntry.objects.filter(author=request.user))
+    form.fields['entries_with_cat']=ModelMultipleChoiceField(required=False,queryset=PomCategory.objects.filter(pomentry__author=request.user).distinct())
+    
+    form.fields['users_selected']=ModelMultipleChoiceField(queryset=others)
+    context={'ownentries':ownentries,'otherusers':others,'allusers':allusers,'page_title':page_title,'sharemyentryform':form}
+    selected_entries=None
+    if request.method=='POST' and form.is_valid():
+        print '===========request.POST==========='
+        print request.POST
+        print '===========request.POST  END==========='
+        print 'form.cleaned_data:',form.cleaned_data
+        print 'you selected radio option:%s'% form.cleaned_data['sharing_options']
+        if form.cleaned_data['sharing_options']==u'selectedentries':
+            print 'you chose the share multiple entries..'
+            selected_entries=form.cleaned_data['entries_selected']
+            print 'your selection=' ,selected_entries,type(selected_entries)
+            
+        elif form.cleaned_data['sharing_options']==u'allentries':
+            print 'you chose the share all entries..'
+            selected_entries=ownentries
+            print 'your selection=' ,selected_entries,type(selected_entries)
+
+        elif form.cleaned_data['sharing_options']==u'entriesofcat':
+            print 'you chose the share entries with categories..'
+            selected_cats=form.cleaned_data['entries_with_cat']
+            print 'your selection of cats=',selected_cats
+            selected_entries=get_own_entries_with_cats(selected_cats,request.user)
+            print 'your selection of entries=',selected_entries
+        
+        users_to_sharewith=form.cleaned_data['users_selected']
+        
+        print 'you have chosen to share:' ,selected_entries,type(selected_entries)
+        print 'with these users:' ,users_to_sharewith,type(users_to_sharewith)
+        share_entries_with_users(selected_entries,users_to_sharewith)
+        return redirect('pomlog_entry_archive_index')
+
+    print 'GET or invalid post data'
+    return custom_render(request,context,template_name)
+    
+
+def share_entries_with_users(entries,users):
+    for entry in entries:
+        for user in users:
+            share_entry_with_user(entry,user)
+
+def share_entry_with_user(entry,user):
+    if not is_shared(entry,user):
+        entry.sharedwith.add(user)
+    else:
+        print 'the entry:',entry,' is already shared with user:',user
+
+def is_shared(entry,user):
+    if user in entry.sharedwith.all():
+        return True
+    else:
+        return False
+
+
+
+
+
 
 
     

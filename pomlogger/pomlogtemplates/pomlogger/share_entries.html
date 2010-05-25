@@ -1,0 +1,26 @@
+{% extends "base_entries.html" %}
+
+{% block title %}
+{{block.super}}|{{page_title}}
+{% endblock %}
+
+{% block content %}
+{{block.super}}
+Today is :<b>{% now "Y b d" %}</b>
+<h3> Welcome {{user.username}} </h3>
+
+<FORM action="." method="POST">
+<table>
+{{sharemyentryform.as_table }}
+</table>
+
+<INPUT type="submit" value="Share">
+</FORM>
+{% endblock %}
+
+
+
+
+{% block whatis %}
+
+{% endblock %}

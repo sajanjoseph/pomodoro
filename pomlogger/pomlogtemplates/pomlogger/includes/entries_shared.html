@@ -1,0 +1,16 @@
+<table border="1">
+{% for anentry in entries_sharedto_me %}
+<tr> 
+<td><a href="{{anentry.get_absolute_url }}" > {{anentry.description|truncatewords:10}}  </a></td>
+<td> {{anentry.author}}   </td>
+<td> {{anentry.today}}   </td>
+<td> {% for x in anentry.categories.all %}
+                    {{x.name}}
+                {% if forloop.last %}{% else %}, {% endif %} 
+             {% endfor %} 
+</td>
+<td>{{ anentry.start_time}}  </td>
+<td>{{ anentry.end_time}}  </td>
+</tr>
+{% endfor %}
+</table>
