@@ -75,6 +75,10 @@ url(r'^$','pomlogger.views.entry_archive_index',
     },
     name='pomlog_entry_archive_index'),
 
+url(r'^unshare/(?P<entryid>\d+)/(?P<userid>\d+)/$','pomlogger.views.unshare_entry',
+    
+    name='pomlog_unshare_entry'),
+
 
 
 

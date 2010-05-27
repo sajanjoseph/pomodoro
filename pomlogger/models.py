@@ -75,38 +75,48 @@ class PomEntryShareForm(Form):
     RADIO_CHOICES=(('allentries','All Entries'),('selectedentries','Select from Entries'),('entriesofcat','Entries of Category'),)
     sharing_options=ChoiceField(widget=RadioSelect,label='Sharing Options',choices=RADIO_CHOICES)
 
-    def clean(self):
-        cleaned_data=self.cleaned_data
+    def clean_sharing_options(self):
         try:
-            share_options=cleaned_data['sharing_options']
+            share_options=self.cleaned_data['sharing_options']
                         
         except KeyError:
             raise ValidationError('you must select one of the sharing options')
 
-        try:
-            entries_sel=cleaned_data['entries_selected']
+        return share_options
 
+    def clean_entries_selected(self):
+        try:
+            entries_sel=self.cleaned_data['entries_selected']
+                        
         except KeyError:
             raise ValidationError('you must select at least one of the entries')
-            
 
+        return entries_sel
 
-        if share_options==u'selectedentries' and len(entries_sel)==0:
-                raise ValidationError('select at least one entry from list box')
-
+    def clean_users_selected(self):
         try:
-            users_sel=cleaned_data['users_selected']
+            users_sel=self.cleaned_data['users_selected']
 
         except KeyError:
             raise ValidationError('you must select at least one of the users')
 
+        return users_sel
+
+
+    def clean_ecategories_selected(self):
         try:
-            cats_sel=cleaned_data['entries_with_cat']
+            cats_sel=self.cleaned_data['categories_selected']
 
         except KeyError:
             raise ValidationError('you must select at least one of the categories')
-
-
+        return cats_sel
+        
+    def clean(self):
+        cleaned_data=self.cleaned_data
+        if 'sharing_options' in cleaned_data and 'entries_selected' in cleaned_data:
+            if cleaned_data['sharing_options']==u'selectedentries' and len(cleaned_data['entries_selected'])==0:
+                raise ValidationError('select at least one entry from list box')
+        print 'PomEntryShareForm::cleaned_data=',cleaned_data
         return  cleaned_data
 
 

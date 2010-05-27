@@ -590,7 +590,7 @@ class ShareEntriesTest(TestCase):
         self.share_entries_with_cat_post_data={
                                        'sharing_options': [u'entriesofcat'],
                                        'users_selected': [u'2'],
-                                       'entries_with_cat': [u'2']
+                                       'categories_selected': [u'2']
                                              }
         response=self.client.post(reverse('pomlog_share_entries'),self.share_entries_with_cat_post_data)
         cat_shared=PomCategory.objects.get(id=2)
@@ -668,7 +668,7 @@ class ShareEntriesTest(TestCase):
         self.share_entries_with_cat_post_data={
                                 'sharing_options':[u'entriesofcat'],
                                 'users_selected': [u'2'],
-                                'entries_with_cat': [u'2']
+                                'categories_selected': [u'2']
                               }
         response1=self.client.post(reverse('pomlog_share_entries'),self.share_entries_with_cat_post_data)
         self.assertRedirects(response1,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
@@ -677,10 +677,9 @@ class ShareEntriesTest(TestCase):
         response2=self.client.get(reverse('pomlog_entry_archive_index'))
         ol=list(get_context_variable(response2,'entries_sharedto_me'))
         cat_shared=PomCategory.objects.get(id=2)
-        entries_shared=list(PomEntry.objects.filter(categories=cat_shared).filter(author=user1))
+        #entries_shared=list(PomEntry.objects.filter(categories=cat_shared).filter(author=user1))
+        entries_shared=list(PomEntry.objects.filter(author=user1,categories=cat_shared))
         self.assertEqual(entries_shared,ol)
-        #entries_sharedto_user2=list(PomEntry.objects.filter(sharedwith=user2))
-        #self.assertEqual(entries_sharedto_user2,ol)
         self.client.logout()
 
     def test_allentries_option_no_entries_selected_for_sharing(self):
@@ -828,6 +827,56 @@ class ShareEntriesTest(TestCase):
         response=self.client.get(reverse('pomlog_delete_entry',args=[2]))
         self.assertEquals(404,response.status_code)
         self.client.logout()
+
+    '''
+    def test_sharing_entry_of_another_user(self):
+        print 'test_sharing_entry_of_another_user::'
+        self.client.logout()
+        self.client.login(username='sajan',password='sajan')
+        user1=User.objects.get(username='sajan')
+        user2=User.objects.get(username='denny')
+        user1entries=PomEntry.objects.filter(author=user1)
+        print 'user1entries=',len(user1entries),'\n',user1entries
+        for entry in user1entries:
+            self.assertTrue(user2 not in entry.sharedwith.all())
+
+        self.share_not_own_entry_data={
+                                'sharing_options':[u'selectedentries'],
+                                'users_selected': [u'2'],
+                                'entries_selected': [u'3']
+                              }
+        response=self.client.post(reverse('pomlog_share_entries'),self.share_not_own_entry_data)
+        #self.assertEquals(404,response.status_code)
+        self.client.logout()
+    '''
+
+    def test_unshare_entry(self):
+        print 'test_unshare_entry()::'
+        self.client.logout()
+        self.client.login(username='sajan',password='sajan')
+        user1=User.objects.get(username='sajan')
+        user2=User.objects.get(username='denny')
+        user1entries=PomEntry.objects.filter(author=user1)
+        print 'user1entries=',len(user1entries),'\n',user1entries
+        for entry in user1entries:
+            self.assertTrue(user2 not in entry.sharedwith.all())
+        
+        self.share_selectedentries_post_data={
+                                'sharing_options':[u'selectedentries'],
+                                'users_selected': [u'2'],
+                                'entries_selected': [u'2']
+                              }
+        
+
+        response=self.client.post(reverse('pomlog_share_entries'),self.share_selectedentries_post_data)
+        entry2=PomEntry.objects.get(id=2)
+        self.assertTrue(user2 in entry2.sharedwith.all())
+        response1=self.client.post(reverse('pomlog_unshare_entry',kwargs={'entryid':2,'userid':2}))
+        self.assertRedirects(response1,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
+        self.assertTrue(user2 not in entry2.sharedwith.all())
+        
+        
+        
 
 
         

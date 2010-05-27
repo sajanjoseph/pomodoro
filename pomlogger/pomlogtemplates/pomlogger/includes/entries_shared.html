@@ -1,4 +1,12 @@
 <table border="1">
+<tr>
+<th>entry </th>
+<th>author </th>
+<th>entry date </th>
+<th> categories</th>
+<th>start time </th>
+<th> end time</th>
+</tr>
 {% for anentry in entries_sharedto_me %}
 <tr> 
 <td><a href="{{anentry.get_absolute_url }}" > {{anentry.description|truncatewords:10}}  </a></td>

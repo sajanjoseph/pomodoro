@@ -408,20 +408,16 @@ def share_entries(request,template_name,page_title):
     others=User.objects.exclude(username=request.user.username)
     ownentries=PomEntry.objects.filter(author=request.user)
     owncats=get_categories_of_user(request.user)
-    print 'owncats=',owncats,type(owncats),len(owncats)
+    #print 'owncats=',owncats,type(owncats),len(owncats)
     form_data=get_form_data(request)
     qset=PomEntry.objects.filter(author=request.user)
     form=PomEntryShareForm(form_data)
     form.fields['entries_selected']=ModelMultipleChoiceField(required=False,queryset=PomEntry.objects.filter(author=request.user))
-    form.fields['entries_with_cat']=ModelMultipleChoiceField(required=False,queryset=PomCategory.objects.filter(pomentry__author=request.user).distinct())
-    
+    form.fields['categories_selected']=ModelMultipleChoiceField(required=False,queryset=PomCategory.objects.filter(pomentry__author=request.user).distinct())
     form.fields['users_selected']=ModelMultipleChoiceField(queryset=others)
     context={'ownentries':ownentries,'otherusers':others,'allusers':allusers,'page_title':page_title,'sharemyentryform':form}
     selected_entries=None
     if request.method=='POST' and form.is_valid():
-        print '===========request.POST==========='
-        print request.POST
-        print '===========request.POST  END==========='
         print 'form.cleaned_data:',form.cleaned_data
         print 'you selected radio option:%s'% form.cleaned_data['sharing_options']
         if form.cleaned_data['sharing_options']==u'selectedentries':
@@ -436,7 +432,7 @@ def share_entries(request,template_name,page_title):
 
         elif form.cleaned_data['sharing_options']==u'entriesofcat':
             print 'you chose the share entries with categories..'
-            selected_cats=form.cleaned_data['entries_with_cat']
+            selected_cats=form.cleaned_data['categories_selected']
             print 'your selection of cats=',selected_cats
             selected_entries=get_own_entries_with_cats(selected_cats,request.user)
             print 'your selection of entries=',selected_entries
@@ -468,6 +464,14 @@ def is_shared(entry,user):
         return True
     else:
         return False
+
+@login_required
+def unshare_entry(request,entryid,userid):
+    entry=get_object_or_404(PomEntry,id=entryid,author=request.user)
+    user=get_object_or_404(User,id=userid)
+    if is_shared(entry,user):
+        entry.sharedwith.remove(user)
+    return redirect('pomlog_entry_archive_index')
 
 
 
