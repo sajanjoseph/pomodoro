@@ -42,7 +42,7 @@ class PomEntry(models.Model):
 	    verbose_name_plural="PomEntries"
 
     def __unicode__(self):
-        return "%s%s"%([x.name for x in self.categories.all()],self.start_time)
+        return "%s%s"%([str(x.name) for x in self.categories.all()],self.start_time)
 
     @models.permalink
     def get_absolute_url(self):

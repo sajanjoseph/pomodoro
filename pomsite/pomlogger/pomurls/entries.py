@@ -60,11 +60,7 @@ url(r'^editentry/(?P<id>\d+)/$','pomlogger.views.edit_entry',
 
 url(r'^deletentry/(?P<id>\d+)/$','pomlogger.views.delete_entry',name='pomlog_delete_entry'),
 
-url(r'^share/$','pomlogger.views.share_entries',
-    {   'template_name':'pomlogger/share_entries.html',
-        'page_title':'Share Entries'  
-    },
-    name='pomlog_share_entries'),
+
 
 
 url(r'^$','pomlogger.views.entry_archive_index',
@@ -74,6 +70,12 @@ url(r'^$','pomlogger.views.entry_archive_index',
 
     },
     name='pomlog_entry_archive_index'),
+
+url(r'^share/$','pomlogger.views.share_entries',
+    {   'template_name':'pomlogger/share_entries.html',
+        'page_title':'Share Entries'  
+    },
+    name='pomlog_share_entries'),
 
 url(r'^unshare/(?P<entryid>\d+)/(?P<userid>\d+)/$','pomlogger.views.unshare_entry',
     

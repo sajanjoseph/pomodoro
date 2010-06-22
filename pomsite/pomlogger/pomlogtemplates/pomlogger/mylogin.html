@@ -1,12 +1,17 @@
 <html>
 <head>
 <title>
-my login
+login
 </title>
+<LINK REL=StyleSheet HREF="{{MEDIA_URL}}css/pom.css" TYPE="text/css" MEDIA="screen, print">
 </head>
 
 <body>
+<div id="login"> 
+<center>
+<h2>user login </h2>
 <form method="post" action=".">
+
 <table>
 {{form.as_table}}
 </table>
@@ -14,6 +19,8 @@ my login
 <input type="submit" name="submit" value="Login"/>
 
 </form>
+</center>
+</div>
 </body>
 
 </html>

@@ -17,6 +17,11 @@ from django.shortcuts import render_to_response,get_object_or_404,redirect
 from django.forms import ModelMultipleChoiceField
 from django.contrib.auth.models import User
 
+@login_required
+def index(request, template_name):
+    print 'index()::template=',template_name
+    return custom_render(request, {},template_name )
+
 def get_month_as_number(monthname):
     if title(monthname) not in calendar.month_abbr:
         raise Http404
@@ -81,16 +86,19 @@ def entry_archive_day(request,year,month,day,page_title,template_name):
 @login_required
 def entry_detail(request,id,page_title,template_name):
     print 'entry_detail()::'
-    #entry=get_object_or_404(PomEntry,id=id,author=request.user)
-    from django.db.models import Q
-    q_for_id_and_author=Q(id=id,author=request.user)
-    q_for_id_and_shared_user=Q(id=id,sharedwith=request.user)
-    #get entry with id=id and author=user OR entry with sharedwith=user .If both fail raise 404
-    entry=get_object_or_404(PomEntry,q_for_id_and_author | q_for_id_and_shared_user)
+    entry=get_object_or_404(PomEntry,id=id)
+    if not canview(entry,request.user):    
+        raise Http404
     print 'entry=',entry,type(entry)
     duration=timediff(entry.start_time,entry.end_time)
     context={'object':entry,'duration':duration,'page_title':page_title}
     return custom_render(request,context,template_name)
+
+def canview(entry,user):
+    if entry.author==user or user in entry.sharedwith.all():
+        return True
+    else:
+        return False
 
 @login_required
 def delete_entry(request,id):
