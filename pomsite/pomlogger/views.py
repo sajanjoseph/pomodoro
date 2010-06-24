@@ -416,17 +416,12 @@ def share_entries(request,template_name,page_title):
     others=User.objects.exclude(username=request.user.username)
     ownentries=PomEntry.objects.filter(author=request.user)
     owncats=get_categories_of_user(request.user)
-    #print 'owncats=',owncats,type(owncats),len(owncats)
     form_data=get_form_data(request)
-    qset=PomEntry.objects.filter(author=request.user)
-    form=PomEntryShareForm(form_data)
-    form.fields['entries_selected']=ModelMultipleChoiceField(required=False,queryset=PomEntry.objects.filter(author=request.user))
-    form.fields['categories_selected']=ModelMultipleChoiceField(required=False,queryset=PomCategory.objects.filter(pomentry__author=request.user).distinct())
-    form.fields['users_selected']=ModelMultipleChoiceField(queryset=others)
+    form=PomEntryShareForm(form_data,request)
     context={'ownentries':ownentries,'otherusers':others,'allusers':allusers,'page_title':page_title,'sharemyentryform':form}
     selected_entries=None
     if request.method=='POST' and form.is_valid():
-        print 'form.cleaned_data:',form.cleaned_data
+        print 'POST::form.cleaned_data:',form.cleaned_data
         print 'you selected radio option:%s'% form.cleaned_data['sharing_options']
         if form.cleaned_data['sharing_options']==u'selectedentries':
             print 'you chose the share multiple entries..'

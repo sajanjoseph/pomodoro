@@ -828,7 +828,6 @@ class ShareEntriesTest(TestCase):
         self.assertEquals(404,response.status_code)
         self.client.logout()
 
-    '''
     def test_sharing_entry_of_another_user(self):
         print 'test_sharing_entry_of_another_user::'
         self.client.logout()
@@ -839,16 +838,19 @@ class ShareEntriesTest(TestCase):
         print 'user1entries=',len(user1entries),'\n',user1entries
         for entry in user1entries:
             self.assertTrue(user2 not in entry.sharedwith.all())
-
         self.share_not_own_entry_data={
                                 'sharing_options':[u'selectedentries'],
                                 'users_selected': [u'2'],
-                                'entries_selected': [u'3']
+                                'entries_selected': [u'4']
                               }
         response=self.client.post(reverse('pomlog_share_entries'),self.share_not_own_entry_data)
-        #self.assertEquals(404,response.status_code)
+        print 'here'
+        self.assertEquals(200,response.status_code)
+        #need to find the right way,just checking that the entry with id=4 is not shared to user2
+        not_own_entry=PomEntry.objects.get(id=4)
+        self.assertTrue(user2 not in not_own_entry.sharedwith.all())
+        
         self.client.logout()
-    '''
 
     def test_unshare_entry(self):
         print 'test_unshare_entry()::'

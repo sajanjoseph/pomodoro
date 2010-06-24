@@ -59,7 +59,6 @@ class PomEntryForm(ModelForm):
         if not (st_t and en_t):
             return
         if not st_t < en_t:
-            #self._errors.update({'start,end timedate error':'end time must be greater than start time'})
             raise ValidationError('end time must be greater than start time')			
         return cleaned_data
 
@@ -74,8 +73,15 @@ class PomCategoryNameForm(Form):
 class PomEntryShareForm(Form):
     RADIO_CHOICES=(('allentries','All Entries'),('selectedentries','Select from Entries'),('entriesofcat','Entries of Category'),)
     sharing_options=ChoiceField(widget=RadioSelect,label='Sharing Options',choices=RADIO_CHOICES)
+    
+    def __init__(self,formdata,request,*args,**kwargs):
+        Form.__init__(self,formdata, *args, **kwargs)
+        self.fields['entries_selected']=ModelMultipleChoiceField(required=False,queryset=PomEntry.objects.filter(author=request.user))
+        self.fields['categories_selected']=ModelMultipleChoiceField(required=False,queryset=PomCategory.objects.filter(pomentry__author=request.user).distinct())
+        self.fields['users_selected']=ModelMultipleChoiceField(queryset=User.objects.exclude(username=request.user.username))
 
     def clean_sharing_options(self):
+        print 'PomEntryShareForm::clean_sharing_options()'
         try:
             share_options=self.cleaned_data['sharing_options']
                         
@@ -85,42 +91,42 @@ class PomEntryShareForm(Form):
         return share_options
 
     def clean_entries_selected(self):
+        print 'PomEntryShareForm::clean_entries_selected()'
         try:
-            entries_sel=self.cleaned_data['entries_selected']
+            entries_selected=self.cleaned_data['entries_selected']
                         
         except KeyError:
             raise ValidationError('you must select at least one of the entries')
 
-        return entries_sel
+        return entries_selected
 
     def clean_users_selected(self):
+        print 'PomEntryShareForm::clean_users_selected()'
         try:
-            users_sel=self.cleaned_data['users_selected']
+            users_selected=self.cleaned_data['users_selected']
 
         except KeyError:
             raise ValidationError('you must select at least one of the users')
 
-        return users_sel
+        return users_selected
 
-
-    def clean_ecategories_selected(self):
+    def clean_categories_selected(self):
+        print 'PomEntryShareForm::clean_categories_selected()'
         try:
-            cats_sel=self.cleaned_data['categories_selected']
+            cats_selected=self.cleaned_data['categories_selected']
 
         except KeyError:
             raise ValidationError('you must select at least one of the categories')
-        return cats_sel
+        return cats_selected
         
     def clean(self):
+        print 'PomEntryShareForm::clean()'
         cleaned_data=self.cleaned_data
         if 'sharing_options' in cleaned_data and 'entries_selected' in cleaned_data:
             if cleaned_data['sharing_options']==u'selectedentries' and len(cleaned_data['entries_selected'])==0:
                 raise ValidationError('select at least one entry from list box')
+        else:
+            print 'if condition failed'
         print 'PomEntryShareForm::cleaned_data=',cleaned_data
         return  cleaned_data
-
-
-
-
-
 
