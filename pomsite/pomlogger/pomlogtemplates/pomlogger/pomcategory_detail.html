@@ -7,9 +7,16 @@
 {% block content %}{{block.super}}
 Today is :<b>{{now|date:"j F, Y"}}</b>
 <h3> Welcome {{user.username}} </h3>
-<h2>{{page_title}}</h2>
-name: {{ object.name}}<br/>
-description : {{object.description }}
+<h3>{{page_title}}</h3>
+<table border="1">
+<tr>  
+<td>name </td> <td>{{ object.name}} </td>
+</tr>
+<tr>
+<td>description </td> <td>{{object.description }} </td>
+</tr>
+</table>
+
 {% endblock %}
 
 {% block whatis %}

@@ -449,7 +449,6 @@ def share_entries(request,template_name,page_title):
 
     print 'GET or invalid post data'
     return custom_render(request,context,template_name)
-    
 
 def share_entries_with_users(entries,users):
     for entry in entries:

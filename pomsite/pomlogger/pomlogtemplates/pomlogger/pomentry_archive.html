@@ -7,6 +7,11 @@
 {{block.super}}
 Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
+<p>
+<a href="{% url pomlog_add_entry %}">ADD NEW ENTRY </a> 
+</p>
+{%if object_list %}
+
 <h3> Total time spent on categories </h3>
 <p>
 <ul>
@@ -15,18 +20,27 @@ Today is :<b>{% now "Y b d" %}</b>
 {% endfor %}
 </ul>
 </p>
-<p>
-<a href="{% url pomlog_add_entry %}">ADD NEW ENTRY </a> 
-</p>
+
 {{page_title}}
 {% include "pomlogger/includes/entries_list.html" %}
 <br/>
-<h3>Other Peoples' Entries shared to me </h3>
-<br/>
-{% include "pomlogger/includes/entries_shared.html" %}
 <p>
 <a href="{% url pomlog_share_entries  %}">Share</a>
 </p>
+
+{% else %}
+<h3> You have not created any entry  yet</h3>
+{% endif %}
+
+{% if entries_sharedto_me %}
+<h3>Other Peoples' Entries shared to me </h3>
+<br/>
+{% include "pomlogger/includes/entries_shared.html" %}
+
+{% else %}
+<h3> No entries shared to you  </h3>
+{% endif %}
+
 {% endblock %}
 
 

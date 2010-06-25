@@ -10,10 +10,10 @@ Today is :<b>{% now "d b, Y" %}</b>
 <h3> Welcome {{user.username}} </h3>
 
 {% if cats_status.items|length_is:"0" %}
-<b>No categories created </b><br/>
+<h3>No categories created </h3><br/>
 {% else %}
 
-<h2>Categories are: </h2>
+<h3>Categories are: </h3>
 <table border="1">
 {% for k,v in cats_status.items %}
 <tr>
