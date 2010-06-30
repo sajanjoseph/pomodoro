@@ -1,4 +1,4 @@
-{% extends "base_entries.html" %}
+{% extends "pomlogger/base_entries.html" %}
 
 {% block title %}
 {{block.super}}|{{page_title}}
@@ -8,12 +8,39 @@
 {{block.super}}
 Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
-
+<script type="text/javascript">
+	{% include "pomlogger/includes/share_entries.js" %}
+</script>
 <FORM action="." method="POST">
 <table>
-{{sharemyentryform.as_table }}
+<tr>
+<INPUT TYPE="radio" NAME="sharing_options" VALUE= "allentries" >"All Entries" </p>
+</tr>
+<tr>
+<INPUT TYPE="radio" NAME="sharing_options" VALUE= "selectedentries"  onclick="showEntriesList();" >"Select from Entries" </p>
+</tr>
+<tr>
+<INPUT TYPE="radio" NAME="sharing_options" VALUE= "entriesofcat" onclick="showCategories();" >"Entries with Category" </p>
+</tr>
 </table>
+<div id="some_entries_selected" style="display:none;">
+<table>
+{{sharemyentryform.entries_selected}}
+</table>
+</div>
 
+<div id="categories_selected" style="display:none;">
+<table>
+{{sharemyentryform.categories_selected}}
+</table>
+</div>
+
+<h3>With</h3>
+<div id="users_selected" style="display:block;">
+<table>
+{{sharemyentryform.users_selected}}
+</table>
+</div>
 <INPUT type="submit" value="Share">
 </FORM>
 {% endblock %}

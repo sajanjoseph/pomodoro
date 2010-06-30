@@ -40,7 +40,7 @@ name='pomlog_entry_detail'),
 
 url(r'^addentry/$','pomlogger.views.add_new_entry',
     {
-        'template_name':'pomlogger/add_or_edit_entry.html',
+        'template_name':'pomlogger/add_entry.html',
         'page_title':'Add Entry'
 
     },
@@ -50,7 +50,7 @@ url(r'^addentry/$','pomlogger.views.add_new_entry',
 
 url(r'^editentry/(?P<id>\d+)/$','pomlogger.views.edit_entry',
 {
-'template_name':'pomlogger/add_or_edit_entry.html',
+'template_name':'pomlogger/edit_entry.html',
  'page_title':'Edit Entry',
 
 },name='pomlog_edit_entry'),

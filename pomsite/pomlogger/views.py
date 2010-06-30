@@ -1,5 +1,5 @@
 from pomlogger.models import PomEntry,PomCategory
-from pomlogger.models import PomEntryForm,PomCategoryForm,PomCategoryNameForm,PomEntryShareForm
+from pomlogger.models import PomEntryForm,PomCategoryForm,PomCategoryNameForm,PomEntryShareForm,PomEntryPartialForm
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect,Http404
 from django.contrib.auth import authenticate,login,logout
@@ -14,7 +14,6 @@ from django.http import Http404
 from django.template import RequestContext
 from django.shortcuts import render_to_response,get_object_or_404,redirect
 
-from django.forms import ModelMultipleChoiceField
 from django.contrib.auth.models import User
 
 @login_required
@@ -89,7 +88,6 @@ def entry_detail(request,id,page_title,template_name):
     entry=get_object_or_404(PomEntry,id=id)
     if not canview(entry,request.user):    
         raise Http404
-    print 'entry=',entry,type(entry)
     duration=timediff(entry.start_time,entry.end_time)
     context={'object':entry,'duration':duration,'page_title':page_title}
     return custom_render(request,context,template_name)
@@ -102,15 +100,14 @@ def canview(entry,user):
 
 @login_required
 def delete_entry(request,id):
-    print 'delete_entry()'
     entry=get_object_or_404(PomEntry,id=id,author=request.user )
-    print 'delete_entry()entry=',entry
+    print 'delete_entry()::entry=',entry
     #need to remove user from its categories
     cats=entry.categories.all()
-    print 'delete_entry()cats=',cats
+    print 'delete_entry()::cats=',cats
     remove_user_from_categories(cats,request.user)
     entry.delete()
-    print 'delete_entry() entry deleted'
+    print 'entry deleted'
     #remove categories that have no entries associated
     remove_lone_categories()
     return redirect('pomlog_entry_archive_index')
@@ -138,11 +135,19 @@ def get_categories(catnames):
 @transaction.commit_on_success
 def add_new_entry(request,template_name,page_title):
     form_data=get_form_data(request)
-    form=PomEntryForm(form_data)
+    form=PomEntryPartialForm(form_data)
     catnameform=PomCategoryNameForm(form_data)
     context={'page_title':page_title,'entryform':form,'categoryform':catnameform}
     if request.method=='POST' and form.is_valid() and catnameform.is_valid():
-        newentry=form.save() #getting Integrity Error ,says author_id can't be null        
+        newentry=form.save()
+        start_time=request.POST[u'timerstarted']
+        stop_time=request.POST[u'timerstopped']
+        start_ttpl,stop_ttpl=adjust_pmtime(start_time,stop_time)
+        start_timeval=datetime.time(*start_ttpl)
+        stop_timeval=datetime.time(*stop_ttpl)
+        newentry.start_time=start_timeval
+        newentry.end_time=stop_timeval
+        newentry.save()        
         catnames=catnameform.cleaned_data['categories']
         catnames=get_list_of_names(catnames)            
         cats=get_categories(catnames)
@@ -155,6 +160,22 @@ def add_new_entry(request,template_name,page_title):
         return redirect('pomlog_entry_archive_index')
         
     return custom_render(request,context,template_name)
+
+def adjust_pmtime(starttime,endtime):
+    print 'adjust_pmtime():'
+    fmtstr='%H:%M:%S %p'
+    start_l=list(time.strptime(starttime,fmtstr)[3:6])
+    stop_l=list(time.strptime(endtime,fmtstr)[3:6])
+    if starttime.find('PM'):
+        if start_l[0]!=12:
+            start_l[0]+=12
+    
+    if endtime.find('PM'):
+        if stop_l[0]!=12:
+            stop_l[0]+=12
+    start_ttpl=tuple(start_l)
+    stop_ttpl=tuple(stop_l)
+    return (start_ttpl,stop_ttpl)
 
 def get_category_names_as_one_string(categorynameslist):
     return ','.join(categorynameslist)
@@ -227,10 +248,9 @@ def update_cats_with_editable_status(user,categories):
             #print '1 usr only..setting edit=True'
             edit_status=True
         cats[cat]=edit_status
-        #print 'for',cat,' edit_status=',edit_status
     return cats
 '''
-def update_cats_with_editable_status(user,categories):
+def update_cats_with_editable_status_old(user,categories):
     print 'update_cats_with_editable_status()::'
     cats={}
     for cat in categories:
@@ -325,8 +345,6 @@ def has_permission(user,category):
 
 @login_required
 def edit_category(request,slug,template_name,page_title):
-    print 'edit_category()::'
-    print 'edit_category()::user is:',request.user
     cat=get_object_or_404(PomCategory,slug=slug)
     if has_permission(request.user,cat):
         print 'edit_category()::user has permission'
@@ -359,8 +377,6 @@ def get_entries_from_idstring(entry_id_list):
         entry=PomEntry.objects.get(id=id)
         print 'entry=',entry,type(entry)
         entries.append(entry)
-
-    print 'entries',entries
     return entries
 
 def get_own_entries_with_cats(cats,user):

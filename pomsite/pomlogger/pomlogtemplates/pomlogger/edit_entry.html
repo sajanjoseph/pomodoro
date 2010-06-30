@@ -1,23 +1,28 @@
-{% extends "pomlogger/base_categories.html" %}
-{% block title %}
+{% extends "pomlogger/base_entries.html" %}
+
+{% block title  %}
 {{block.super}}|{{page_title}}
 {% endblock %}
 
-
 {% block content %}
-Today is :<b>{% now "Y b d" %}</b>
+{{block.super}}
+Today is :<b>{% now "Y b d" %} </b>
 <h3> Welcome {{user.username}} </h3>
+
 
 <h2>{{page_title}}</h2>
 
-<form method='post' action=".">
+<form action="." method="post">
 <table>
-{{categoryform.as_table}}
+{{entryform.as_table }}
+</table>
+<table>
+{{categoryform.as_table }}
 </table>
 <input type="submit" value="Submit">
 </form>
 {% endblock %}
 
 {% block whatis %}
-add/edit category page
+{{page_title}} page
 {% endblock %}

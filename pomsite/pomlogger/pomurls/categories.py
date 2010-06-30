@@ -11,7 +11,6 @@ url(r'^addcategory/$','pomlogger.views.add_category',
     },
     name='pomlog_add_category'),
 
-
 url(r'^editcategory/(?P<slug>[-\w]+)/$','pomlogger.views.edit_category',
     {
     'page_title':'EditCategory',

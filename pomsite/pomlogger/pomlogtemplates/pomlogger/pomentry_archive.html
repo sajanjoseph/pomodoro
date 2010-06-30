@@ -1,4 +1,4 @@
-{% extends "base_entries.html" %}
+{% extends "pomlogger/base_entries.html" %}
 {% block title %}
 {{block.super}}|{{page_title}}
 {% endblock %}
@@ -8,7 +8,7 @@
 Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
 <p>
-<a href="{% url pomlog_add_entry %}">ADD NEW ENTRY </a> 
+<a href="{% url pomlog_add_entry %}">ADD NEW POMODORO ENTRY </a> 
 </p>
 {%if object_list %}
 

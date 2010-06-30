@@ -2,9 +2,8 @@ from django.db import models
 from datetime import datetime,date,time
 from django.contrib.auth.models import User
 from django.forms import ModelForm,Form,CharField,ValidationError
-from django.forms import RadioSelect,SelectMultiple
+from django.forms import RadioSelect
 from django.template.defaultfilters import slugify
-
 from django.forms import RadioSelect,ChoiceField,ModelMultipleChoiceField
 
 class PomCategory(models.Model):
@@ -31,8 +30,10 @@ class PomCategory(models.Model):
 
 class PomEntry(models.Model):
     today=models.DateField(default=date.today)
-    start_time=models.TimeField(default=(lambda:datetime.now().time))
-    end_time=models.TimeField(default=(lambda:datetime.now().time))
+    #start_time=models.TimeField(default=(lambda:datetime.now().time))
+    #end_time=models.TimeField(default=(lambda:datetime.now().time))
+    start_time=models.TimeField(null=True)
+    end_time=models.TimeField(null=True)
     description=models.TextField()
     author=models.ForeignKey(User,null=True)
     sharedwith=models.ManyToManyField(User,related_name='sharedwith',null=True)
@@ -48,6 +49,7 @@ class PomEntry(models.Model):
     def get_absolute_url(self):
         return ('pomlog_entry_detail',(),{'id':self.id})
 
+
 class PomEntryForm(ModelForm):	
     class Meta:
         model=PomEntry
@@ -61,6 +63,11 @@ class PomEntryForm(ModelForm):
         if not st_t < en_t:
             raise ValidationError('end time must be greater than start time')			
         return cleaned_data
+
+class PomEntryPartialForm(ModelForm):
+    class Meta:
+        model=PomEntry
+        exclude = ('today','start_time','end_time','categories','sharedwith','author',)
 
 class PomCategoryForm(ModelForm):
 	class Meta:

@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+                                    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>{{page_title}}</title>
+<LINK REL="StyleSheet" HREF="{{MEDIA_URL}}css/pom.css" TYPE="text/css" MEDIA="screen, print">
+<body onload="initpage();">
+
+Today is :<b>{% now "Y b d" %} </b>
+<h3> Welcome {{user.username}} </h3>
+
+
+<h2>{{page_title}}</h2>
+<noscript>
+<h3> Turn on  javascript and reload the page</h3>
+</noscript>
+<script type="text/javascript">
+	{% include "pomlogger/includes/addentry.js" %}
+</script>
+<form name="timeform" method="POST" action ="." onsubmit="return validateForm(this);">
+<table border="1">
+<tr>
+<td><input type=button name="timebtn" value= "stop" onclick="changeBtnStatus();"> </td>
+
+<td> 
+Time is:<span class="result" id="currenttime"></span></td>
+</td>
+</tr>
+</table>
+<div id="entrydata" style="display:none;">
+<table border='1'>
+<tr>
+<td>timer started at:</td><td><span class="result" id="timerstartedfld"></span></td>
+</tr>
+<tr>
+<td>timer stopped at:</td><td><span class="result" id="timerstoppedfld"></span></td>
+</tr>
+</table>
+<table>
+{{entryform.as_table }}
+</table>
+<table>
+{{categoryform.as_table }}
+</table>
+<input type="hidden" name="timerstarted"/>
+<input type="hidden" name="timerstopped"/>
+
+<input type="submit" value="Submit"/>
+</form>
+</div>
+</body>
+</html>
