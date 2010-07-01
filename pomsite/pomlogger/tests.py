@@ -398,7 +398,10 @@ class HelperFunctionsTest(TestCase):
         exp_result=((11,30,45),(12,34,55))
         retval=adjust_pmtime(start_t,end_t)
         print 'retval=',retval
-        self.assertEquals(exp_result,retval)
+        self.assertEquals(((12,34,55),(12,04,05)),adjust_pmtime('12:34:55 AM','12:04:05 AM'))
+        self.assertEquals(((12,34,55),(13,04,05)),adjust_pmtime('12:34:55 PM','01:04:05 PM'))
+        self.assertEquals(((12,34,55),(12,04,05)),adjust_pmtime('12:34:55 PM','12:04:05 PM'))
+        self.assertEquals(((13,34,55),(14,04,05)),adjust_pmtime('01:34:55 PM','02:04:05 PM'))
         
 
 class FunctionalTests(TestCase):
