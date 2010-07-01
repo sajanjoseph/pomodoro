@@ -166,16 +166,23 @@ def adjust_pmtime(starttime,endtime):
     fmtstr='%H:%M:%S %p'
     start_l=list(time.strptime(starttime,fmtstr)[3:6])
     stop_l=list(time.strptime(endtime,fmtstr)[3:6])
-    if starttime.find('PM'):
+    print 'starttime=',starttime
+    print 'endtime=',endtime
+    if starttime.find('PM') !=-1:
+        print 'PM found in starttime:',starttime
         if start_l[0]!=12:
+            print 'starttime:not 12 so adding 12'
             start_l[0]+=12
     
-    if endtime.find('PM'):
+    if endtime.find('PM') !=-1:
+        print 'PM found in endtime:',endtime
         if stop_l[0]!=12:
+            print 'endtime:not 12 so adding 12'
             stop_l[0]+=12
     start_ttpl=tuple(start_l)
     stop_ttpl=tuple(stop_l)
     return (start_ttpl,stop_ttpl)
+
 
 def get_category_names_as_one_string(categorynameslist):
     return ','.join(categorynameslist)

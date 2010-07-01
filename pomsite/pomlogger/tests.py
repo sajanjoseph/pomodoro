@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test.client import Client
 from pomlogger.models import PomCategory,PomEntry,PomEntryForm,PomCategoryNameForm,PomEntryPartialForm
-from pomlogger.views import timediff,get_duration_for_categories,get_month_as_number,get_list_of_names
+from pomlogger.views import timediff,get_duration_for_categories,get_month_as_number,get_list_of_names,adjust_pmtime
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from datetime import time,date
@@ -391,6 +391,14 @@ class HelperFunctionsTest(TestCase):
         names=''
         expected_names_list=[]
         self.assertEqual(expected_names_list,get_list_of_names(names))
+
+    def test_adjust_pmtime(self):
+        start_t='11:30:45 AM'
+        end_t='12:34:55 PM'
+        exp_result=((11,30,45),(12,34,55))
+        retval=adjust_pmtime(start_t,end_t)
+        print 'retval=',retval
+        self.assertEquals(exp_result,retval)
         
 
 class FunctionalTests(TestCase):
