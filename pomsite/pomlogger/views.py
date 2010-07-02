@@ -241,7 +241,6 @@ def edit_entry(request,id,template_name,page_title):
         return redirect('pomlog_entry_archive_index')
     return custom_render(request,context,template_name)
 
-
 def update_cats_with_editable_status(user,categories):
     print 'update_cats_with_editable_status()::'
     cats={}
@@ -256,6 +255,23 @@ def update_cats_with_editable_status(user,categories):
             edit_status=True
         cats[cat]=edit_status
     return cats
+
+'''
+def update_cats_with_editable_status(user,categories):
+    print 'update_cats_with_editable_status()::'
+    cats={}
+    for cat in categories:
+        usrcnt=cat.users.count()
+        allcatusrs=cat.users.all()
+        user_in_users=user in allcatusrs
+        entries_of_cat=PomEntry.objects.filter(categories=cat)
+        edit_status=False        
+        if usrcnt==1 and user in allcatusrs:
+            #print '1 usr only..setting edit=True'
+            edit_status=True
+        cats[cat]=edit_status
+    return cats
+'''
 '''
 def update_cats_with_editable_status_old(user,categories):
     print 'update_cats_with_editable_status()::'
@@ -290,8 +306,10 @@ def get_categories_of_user(user):
 @login_required
 def category_list(request,template_name,page_title):
     categories=get_categories_of_user(request.user)
-    cats_with_status=update_cats_with_editable_status(request.user,categories)
-    category_list_dict={'page_title':page_title ,'cats_status':cats_with_status}
+    print 'categories=',categories
+    #cats_with_status=update_cats_with_editable_status(request.user,categories)
+    #category_list_dict={'page_title':page_title ,'cats_status':cats_with_status}
+    category_list_dict={'page_title':page_title ,'cats':categories}
     return custom_render(request,category_list_dict,template_name)
 
 @login_required
@@ -348,7 +366,13 @@ def add_category(request,template_name,page_title):
     return add_or_edit(request,page_title,template_name) 
 
 def has_permission(user,category):
+    catsofuser=get_categories_of_user(user)
+    return (category in catsofuser)
+
+'''
+def has_permission(user,category):
     return (category.users.count()==1  or category.users.count()==0 )and user in category.users.all()
+'''
 
 @login_required
 def edit_category(request,slug,template_name,page_title):

@@ -68,6 +68,7 @@ function validateForm(form){
     else{   
         return false;
     }
+/*
     start_time=start_d;
     stop_time=stop_d;
     if (start_time < stop_time){
@@ -77,8 +78,7 @@ function validateForm(form){
         alert('start_time'+start_time+ 'must be < stop_time'+stop_time);
         return false;
     }
-    
-
+*/
 }
 function isNotEmpty(elem) {
     var str = elem.value;

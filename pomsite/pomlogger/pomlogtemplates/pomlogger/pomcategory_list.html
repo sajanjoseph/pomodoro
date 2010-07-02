@@ -9,19 +9,18 @@
 Today is :<b>{% now "d b, Y" %}</b>
 <h3> Welcome {{user.username}} </h3>
 
-{% if cats_status.items|length_is:"0" %}
+
+{% if cats|length_is:"0" %}
 <h3>No categories created </h3><br/>
 {% else %}
 
 <h3>Categories are: </h3>
 <table border="1">
-{% for k,v in cats_status.items %}
+{% for k in cats %}
 <tr>
 <td> <a href="{{k.get_absolute_url}}" > {{k.name}}</a></td>
 
-{% if v %}
 <td> <a href="{% url pomlog_edit_category k.slug %}" > EDIT </a>  </td>
-{%endif %}
 
 </tr>
 {% endfor %}

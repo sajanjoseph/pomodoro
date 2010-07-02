@@ -2,7 +2,8 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test.client import Client
 from pomlogger.models import PomCategory,PomEntry,PomEntryForm,PomCategoryNameForm,PomEntryPartialForm
-from pomlogger.views import timediff,get_duration_for_categories,get_month_as_number,get_list_of_names,adjust_pmtime
+from pomlogger.views import timediff,get_duration_for_categories,get_month_as_number
+from pomlogger.views import get_list_of_names,adjust_pmtime,has_permission
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from datetime import time,date
@@ -27,8 +28,8 @@ class PomCategoryTest(PomTestCase):
     def test_category_list_view(self):
         response=self.client.get(reverse('pomlog_category_list'))
         status_code=response.status_code
-        cats_status=ol=get_context_variable(response,'cats_status')
-        self.assertEqual(3,len(cats_status))
+        cats=ol=get_context_variable(response,'cats')
+        self.assertEqual(3,len(cats))
         self.assertEqual(200,status_code)
 
     def test_post_add_category(self):
@@ -345,7 +346,7 @@ class EditEntryTest(PomTestCase):
     
 
 class HelperFunctionsTest(TestCase):
-    fixtures=['cats.json']
+    fixtures=['cats.json','entries.json']
     def test_timediff(self):
         start=time(1,15,30)
         end=time(1,35,30)
@@ -402,7 +403,13 @@ class HelperFunctionsTest(TestCase):
         self.assertEquals(((12,34,55),(13,04,05)),adjust_pmtime('12:34:55 PM','01:04:05 PM'))
         self.assertEquals(((12,34,55),(12,04,05)),adjust_pmtime('12:34:55 PM','12:04:05 PM'))
         self.assertEquals(((13,34,55),(14,04,05)),adjust_pmtime('01:34:55 PM','02:04:05 PM'))
-        
+
+    def test_user_has_permission(self):
+        cat1=PomCategory.objects.get(id=1)
+        user1=User.objects.get(id=1)
+        user2=User.objects.get(id=2)
+        self.assertTrue(has_permission(user1,cat1))
+        self.assertFalse(has_permission(user2,cat1))
 
 class FunctionalTests(TestCase):
     fixtures=['newcats.json','newentries.json']
