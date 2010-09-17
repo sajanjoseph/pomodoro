@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.test.client import Client
-from pomlogger.models import PomCategory,PomEntry,PomEntryForm,PomCategoryNameForm,PomEntryPartialForm
+from pomlogger.models import PomCategory,PomEntry,PomEntryForm,PomCategoryNameForm,PomEntryDescForm
 from pomlogger.views import timediff,get_duration_for_categories,get_month_as_number
-from pomlogger.views import get_list_of_names,adjust_pmtime,has_permission
+from pomlogger.views import get_list_of_names,get_timetuples,has_permission
 from django.template.defaultfilters import slugify
 from django.core.urlresolvers import reverse
 from datetime import time,date
@@ -149,7 +149,7 @@ class AddEntryTest(PomTestCase):
         response=self.client.get(reverse('pomlog_add_entry'))
         self.assertEqual(200,response.status_code)
         self.assertTemplateUsed(response,'pomlogger/add_entry.html')
-        self.assertTrue(isinstance(response.context['entryform'],PomEntryPartialForm))
+        self.assertTrue(isinstance(response.context['entryform'],PomEntryDescForm))
         self.assertTrue(isinstance(response.context['categoryform'],PomCategoryNameForm))
         self.assertEquals('Add Entry',response.context['page_title'])
     def test_add_entry_post_new_cat(self):     
@@ -209,6 +209,52 @@ class AddEntryTest(PomTestCase):
         self.assertRedirects(response,reverse('pomlog_entry_archive_index'),status_code=302, target_status_code=200)
         self.assertEqual(catscount,PomCategory.objects.count())
         self.assertEqual(entrycount+1,PomEntry.objects.count())
+        
+    def test_add_entry_endtime_less_than_starttime(self):
+        print 'test_add_entry_endtime_less_than_starttime()::'
+        initialentrycount=PomEntry.objects.count()
+        print 'initialentrycount=%d'%initialentrycount
+        self.post_data['timerstopped']='09:15:30 AM'                
+        response=self.client.post(reverse('pomlog_add_entry'),self.post_data)        
+        finalentrycount=PomEntry.objects.count()
+        print 'finalentrycount=%d'%finalentrycount
+        print 'status code=%d'%response.status_code
+        erlst=get_context_variable(response,'errorlist')
+        self.assertTrue('starttime should be less than endtime' in erlst)
+        self.assertEqual(0,finalentrycount)
+        self.assertEqual(200,response.status_code)
+    
+    def test_add_entry_description_empty(self):
+        print 'test_add_entry_description_empty()::'        
+        self.post_data['description']=u''
+        response=self.client.post(reverse('pomlog_add_entry'),self.post_data)
+        finalentrycount=PomEntry.objects.count()
+        print 'finalentrycount=%d'%finalentrycount
+        self.assertEqual(0,finalentrycount)
+    
+    def test_add_entry_categories_empty(self):
+        print 'test_add_entry_categories_empty()::'        
+        self.post_data['categories']=u''
+        response=self.client.post(reverse('pomlog_add_entry'),self.post_data)
+        finalentrycount=PomEntry.objects.count()
+        print 'finalentrycount=%d'%finalentrycount
+        self.assertEqual(0,finalentrycount)
+        
+    def test_add_entry_wrong_time_format(self):
+        print 'test_add_entry_wrong_time_format()::'
+        self.post_data['timerstarted']='100:50:30 AM'
+        initialentrycount=PomEntry.objects.count()
+        print 'initialentrycount=%d'%initialentrycount
+        response=self.client.post(reverse('pomlog_add_entry'),self.post_data)
+        
+        finalentrycount=PomEntry.objects.count()
+        print 'finalentrycount=%d'%finalentrycount
+        erlst=get_context_variable(response,'errorlist')
+        print 'erlst=',erlst
+        self.assertTrue('format of time entries not correct' in erlst)
+        self.assertEqual(0,finalentrycount)
+        
+    
 
 
 
@@ -393,16 +439,12 @@ class HelperFunctionsTest(TestCase):
         expected_names_list=[]
         self.assertEqual(expected_names_list,get_list_of_names(names))
 
-    def test_adjust_pmtime(self):
-        start_t='11:30:45 AM'
-        end_t='12:34:55 PM'
-        exp_result=((11,30,45),(12,34,55))
-        retval=adjust_pmtime(start_t,end_t)
-        print 'retval=',retval
-        self.assertEquals(((12,34,55),(12,04,05)),adjust_pmtime('12:34:55 AM','12:04:05 AM'))
-        self.assertEquals(((12,34,55),(13,04,05)),adjust_pmtime('12:34:55 PM','01:04:05 PM'))
-        self.assertEquals(((12,34,55),(12,04,05)),adjust_pmtime('12:34:55 PM','12:04:05 PM'))
-        self.assertEquals(((13,34,55),(14,04,05)),adjust_pmtime('01:34:55 PM','02:04:05 PM'))
+    def test_get_timetuples(self):        
+        self.assertEquals(((23,30,45),(0,34,55)),get_timetuples('11:30:45 PM','12:34:55 AM'))
+        self.assertEquals(((0,34,55),(0,04,05)),get_timetuples('12:34:55 AM','12:04:05 AM'))
+        self.assertEquals(((12,34,55),(13,04,05)),get_timetuples('12:34:55 PM','01:04:05 PM'))
+        self.assertEquals(((12,34,55),(12,04,05)),get_timetuples('12:34:55 PM','12:04:05 PM'))
+        self.assertEquals(((13,34,55),(14,04,05)),get_timetuples('01:34:55 PM','02:04:05 PM'))
 
     def test_user_has_permission(self):
         cat1=PomCategory.objects.get(id=1)

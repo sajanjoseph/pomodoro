@@ -4,8 +4,12 @@
 <head>
 <title>PomLog{% block title %} {% endblock %}</title>
 <LINK REL=StyleSheet HREF="{{MEDIA_URL}}css/pom.css" TYPE="text/css" MEDIA="screen, print">
+
+{% block js %} {% endblock %}
+
 </head>
-<body class="{% block bodyclass %}  {% endblock %}">
+<body {% block load_js %}{% endblock %} >
+
 <div id="header">
    <h2 > Pomodoro Logger </h2>
 
@@ -38,7 +42,7 @@
      </ul>
 
    
-<h3> what is this?</h3>
+<h3> page info </h3>
 {% block whatis %}
 {% endblock %}
 </div>

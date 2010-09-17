@@ -1,5 +1,6 @@
 from pomlogger.models import PomEntry,PomCategory
-from pomlogger.models import PomEntryForm,PomCategoryForm,PomCategoryNameForm,PomEntryShareForm,PomEntryPartialForm
+from pomlogger.models import PomEntryForm,PomCategoryForm,PomCategoryNameForm,PomEntryShareForm
+from pomlogger.models import PomEntryDescForm
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect,Http404
 from django.contrib.auth import authenticate,login,logout
@@ -135,19 +136,42 @@ def get_categories(catnames):
 @transaction.commit_on_success
 def add_new_entry(request,template_name,page_title):
     form_data=get_form_data(request)
-    form=PomEntryPartialForm(form_data)
+    form=PomEntryDescForm(form_data)
     catnameform=PomCategoryNameForm(form_data)
-    context={'page_title':page_title,'entryform':form,'categoryform':catnameform}
+    errorlist=[]    
+    context={'page_title':page_title,'entryform':form,'categoryform':catnameform,'errorlist':errorlist}
     if request.method=='POST' and form.is_valid() and catnameform.is_valid():
-        newentry=form.save()
+        print 'add_new_entry()::post OK'
+        desc=form.cleaned_data['description']
         start_time=request.POST[u'timerstarted']
         stop_time=request.POST[u'timerstopped']
-        start_ttpl,stop_ttpl=adjust_pmtime(start_time,stop_time)
-        start_timeval=datetime.time(*start_ttpl)
-        stop_timeval=datetime.time(*stop_ttpl)
+        print 'add_new_entry()::start_time=',start_time
+        print 'add_new_entry()::stop_time=',stop_time
+        try:
+            start_ttpl,stop_ttpl=get_timetuples(start_time,stop_time)
+            start_timeval=datetime.time(*start_ttpl)
+            stop_timeval=datetime.time(*stop_ttpl)
+            if not (start_timeval < stop_timeval):
+                print 'add_new_entry()::start_timeval=',start_timeval
+                print 'add_new_entry()::stop_timeval=',stop_timeval
+                print 'add_new_entry()::start time NOT LESS'
+                #need to put this in errors
+                errorlist.append('starttime should be less than endtime')
+                return custom_render(request,context,template_name)
+        except ValueError:
+            print 'add_new_entry()::format not correct'
+            #need to put this in errors
+            errorlist.append('format of time entries not correct')
+            return custom_render(request,context,template_name)
+        
+        newentry=PomEntry(description=desc)
+        newentry.save()
+        #newentry=form.save()
+        
         newentry.start_time=start_timeval
         newentry.end_time=stop_timeval
-        newentry.save()        
+        newentry.save()
+        print 'add_new_entry()::saved new entry'        
         catnames=catnameform.cleaned_data['categories']
         catnames=get_list_of_names(catnames)            
         cats=get_categories(catnames)
@@ -157,32 +181,31 @@ def add_new_entry(request,template_name,page_title):
         newentry.categories=cats
         newentry.author=request.user
         newentry.save()
+        print 'redirecting to index'
         return redirect('pomlog_entry_archive_index')
-        
+    '''
+    else:
+        print 'post not complete'
+        print 'request.POST=',request.POST
+        return custom_render(request,context,template_name)
+    '''
     return custom_render(request,context,template_name)
 
-def adjust_pmtime(starttime,endtime):
-    print 'adjust_pmtime():'
-    fmtstr='%H:%M:%S %p'
-    start_l=list(time.strptime(starttime,fmtstr)[3:6])
-    stop_l=list(time.strptime(endtime,fmtstr)[3:6])
-    print 'starttime=',starttime
-    print 'endtime=',endtime
-    if starttime.find('PM') !=-1:
-        print 'PM found in starttime:',starttime
-        if start_l[0]!=12:
-            print 'starttime:not 12 so adding 12'
-            start_l[0]+=12
-    
-    if endtime.find('PM') !=-1:
-        print 'PM found in endtime:',endtime
-        if stop_l[0]!=12:
-            print 'endtime:not 12 so adding 12'
-            stop_l[0]+=12
-    start_ttpl=tuple(start_l)
-    stop_ttpl=tuple(stop_l)
+def get_timetuples(starttime,endtime):
+    print 'get_timetuples():'
+    print 'get_timetuples()::starttime=',starttime;
+    print 'get_timetuples()::endtime=',endtime;
+    fmtstr='%I:%M:%S %p'
+    try:
+        start_l=list(time.strptime(starttime,fmtstr)[3:6])
+        print 'get_timetuples()::start_l=',start_l;
+        stop_l=list(time.strptime(endtime,fmtstr)[3:6])
+        print 'get_timetuples()::stop_l=',stop_l;
+        start_ttpl=tuple(start_l)
+        stop_ttpl=tuple(stop_l)
+    except ValueError:
+        raise ValueError
     return (start_ttpl,stop_ttpl)
-
 
 def get_category_names_as_one_string(categorynameslist):
     return ','.join(categorynameslist)

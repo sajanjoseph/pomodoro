@@ -1,34 +1,44 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
-                                    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
-<head>
-<title>{{page_title}}</title>
-<LINK REL="StyleSheet" HREF="{{MEDIA_URL}}css/pom.css" TYPE="text/css" MEDIA="screen, print">
-<body onload="initpage();">
+{% extends "pomlogger/base_entries.html" %}
+{% block title %}{{block.super}}|{{ page_title }}{% endblock %}
+{% block js %}
+<script type="text/javascript">
+    {% include "pomlogger/includes/jquery-1.4.2.js" %}
+    {% include "pomlogger/includes/addentry.js" %}
+</script>
+ {% endblock %}
+{% block load_js %} onload="initpage();" {% endblock %}
 
+{% block content %}
 Today is :<b>{% now "Y b d" %} </b>
 <h3> Welcome {{user.username}} </h3>
 
 
 <h2>{{page_title}}</h2>
-<noscript>
-<h3> Turn on  javascript and reload the page</h3>
-</noscript>
-<script type="text/javascript">
-	{% include "pomlogger/includes/addentry.js" %}
-</script>
-<form name="timeform" method="POST" action ="." onsubmit="return validateForm(this);">
-<table border="1">
-<tr>
-<td><input type=button name="timebtn" value= "stop" onclick="changeBtnStatus();"> </td>
 
-<td> 
-Time is:<span class="result" id="currenttime"></span></td>
+
+
+{% if errorlist %}
+
+{% for error in errorlist%}
+<h4>{{error}}</h4>
+{% endfor %}
+{% endif %}
+
+<form name="timeform" method="POST" action ="." onsubmit='return validateForm(this);'>
+<table border="0">
+<tr>
+<td><input type=button name="timebtn" id="timebtn" value= "stop" onclick="changeBtnStatus();"> </td>
+
+
+<td> <div id="currenttimediv" style="display:none;">
+            Time is:<span class="result" id="currenttime"></span>
+         </div>
 </td>
+
 </tr>
 </table>
 <div id="entrydata" style="display:none;">
-<table border='1'>
+<table border='0'>
 <tr>
 <td>timer started at:</td><td><span class="result" id="timerstartedfld"></span></td>
 </tr>
@@ -42,11 +52,10 @@ Time is:<span class="result" id="currenttime"></span></td>
 <table>
 {{categoryform.as_table }}
 </table>
-<input type="hidden" name="timerstarted"/>
-<input type="hidden" name="timerstopped"/>
+<input type="hidden" name="timerstarted" id="timerstarted"/>
+<input type="hidden" name="timerstopped" id="timerstopped"/>
 
 <input type="submit" value="Submit"/>
 </form>
 </div>
-</body>
-</html>
+{% endblock %}

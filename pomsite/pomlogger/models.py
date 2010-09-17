@@ -1,8 +1,9 @@
 from django.db import models
 from datetime import datetime,date,time
 from django.contrib.auth.models import User
-from django.forms import ModelForm,Form,CharField,ValidationError
-from django.forms import RadioSelect
+from django.forms import ModelForm,Form,ValidationError
+from django.forms import CharField,Textarea,TimeField
+
 from django.template.defaultfilters import slugify
 from django.forms import RadioSelect,ChoiceField,ModelMultipleChoiceField
 
@@ -64,6 +65,9 @@ class PomEntryForm(ModelForm):
             raise ValidationError('end time must be greater than start time')			
         return cleaned_data
 
+class PomEntryDescForm(Form):
+    description=CharField(max_length=200,widget=Textarea)
+    
 class PomEntryPartialForm(ModelForm):
     class Meta:
         model=PomEntry
