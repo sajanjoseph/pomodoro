@@ -3,10 +3,10 @@
 {% block js %}
 <script type="text/javascript">
     {% include "pomlogger/includes/jquery-1.4.2.js" %}
-    {% include "pomlogger/includes/addentry.js" %}
+    {% include "pomlogger/includes/pom_timer.js" %}
 </script>
  {% endblock %}
-{% block load_js %} onload="initpage();" {% endblock %}
+
 
 {% block content %}
 Today is :<b>{% now "Y b d" %} </b>
@@ -15,47 +15,53 @@ Today is :<b>{% now "Y b d" %} </b>
 
 <h2>{{page_title}}</h2>
 
-
-
-{% if errorlist %}
-
-{% for error in errorlist%}
-<h4>{{error}}</h4>
-{% endfor %}
-{% endif %}
-
-<form name="timeform" method="POST" action ="." onsubmit='return validateForm(this);'>
-<table border="0">
+<form name="timeform" id="timeform" method="POST" action ="." >
+<table >
 <tr>
-<td><input type=button name="timebtn" id="timebtn" value= "stop" onclick="changeBtnStatus();"> </td>
+    <td>
+        <button type="button" name="timebtn" id="timebtn" value="start"  >
+            <img src="{{ MEDIA_URL }}img/Play1.png" id="btnimg" align="middle" alt="start" >
+        </button>    
+    </td>
 
-
-<td> <div id="currenttimediv" style="display:none;">
+    <td> <div id="ctimefld" style="display:none;">
             Time is:<span class="result" id="currenttime"></span>
          </div>
-</td>
+    </td>
+</tr>
+</table><div id="entrydata" style="display:none;">
 
-</tr>
-</table>
-<div id="entrydata" style="display:none;">
-<table border='0'>
-<tr>
-<td>timer started at:</td><td><span class="result" id="timerstartedfld"></span></td>
-</tr>
-<tr>
-<td>timer stopped at:</td><td><span class="result" id="timerstoppedfld"></span></td>
-</tr>
-</table>
-<table>
-{{entryform.as_table }}
-</table>
-<table>
-{{categoryform.as_table }}
-</table>
+  {% if entryform.non_field_errors %}
+      <p class="nonfielderror">{{ entryform.non_field_errors|join:", " }}</p>
+  {% endif %}
+<p>
+    <label for="id_start_time">timer started at:</label>
+   
+    
+    <span  id='start_time_show'></span>
+    
+</p>
+<p>
+ <label for="id_stop_time">timer stopped at:</label>
+ 
+  
+  <span  id='stop_time_show'></span>
+  
+</p>
+<p>
+ <label for="id_categories">Enter description:</label>
+ {{entryform.description}}
+</p>
+
+<p>
+ <label for="id_categories">Enter Categories:</label>
+{{categoryform.categories}}
+</p>
 <input type="hidden" name="timerstarted" id="timerstarted"/>
 <input type="hidden" name="timerstopped" id="timerstopped"/>
 
-<input type="submit" value="Submit"/>
+<input type="submit" id="submitBtn" value="Submit"/>
 </form>
 </div>
+</form>
 {% endblock %}

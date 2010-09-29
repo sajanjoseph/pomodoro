@@ -32,5 +32,5 @@ Today is :<b>{% now "d b, Y" %}</b>
 {% endblock %}
 
 {% block whatis %}
-Listing of <b> {{cats_status|length}}</b> categor{{cats_status|length|pluralize:"y,ies" }} in this log
+Listing of <b> {{cats|length}}</b> categor{{cats|length|pluralize:"y,ies" }} in this log
 {% endblock %}

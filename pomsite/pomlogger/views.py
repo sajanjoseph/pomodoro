@@ -141,20 +141,14 @@ def add_new_entry(request,template_name,page_title):
     errorlist=[]    
     context={'page_title':page_title,'entryform':form,'categoryform':catnameform,'errorlist':errorlist}
     if request.method=='POST' and form.is_valid() and catnameform.is_valid():
-        print 'add_new_entry()::post OK'
         desc=form.cleaned_data['description']
         start_time=request.POST[u'timerstarted']
         stop_time=request.POST[u'timerstopped']
-        print 'add_new_entry()::start_time=',start_time
-        print 'add_new_entry()::stop_time=',stop_time
         try:
             start_ttpl,stop_ttpl=get_timetuples(start_time,stop_time)
             start_timeval=datetime.time(*start_ttpl)
             stop_timeval=datetime.time(*stop_ttpl)
             if not (start_timeval < stop_timeval):
-                print 'add_new_entry()::start_timeval=',start_timeval
-                print 'add_new_entry()::stop_timeval=',stop_timeval
-                print 'add_new_entry()::start time NOT LESS'
                 #need to put this in errors
                 errorlist.append('starttime should be less than endtime')
                 return custom_render(request,context,template_name)
@@ -166,12 +160,10 @@ def add_new_entry(request,template_name,page_title):
         
         newentry=PomEntry(description=desc)
         newentry.save()
-        #newentry=form.save()
         
         newentry.start_time=start_timeval
         newentry.end_time=stop_timeval
         newentry.save()
-        print 'add_new_entry()::saved new entry'        
         catnames=catnameform.cleaned_data['categories']
         catnames=get_list_of_names(catnames)            
         cats=get_categories(catnames)
@@ -183,18 +175,9 @@ def add_new_entry(request,template_name,page_title):
         newentry.save()
         print 'redirecting to index'
         return redirect('pomlog_entry_archive_index')
-    '''
-    else:
-        print 'post not complete'
-        print 'request.POST=',request.POST
-        return custom_render(request,context,template_name)
-    '''
     return custom_render(request,context,template_name)
 
 def get_timetuples(starttime,endtime):
-    print 'get_timetuples():'
-    print 'get_timetuples()::starttime=',starttime;
-    print 'get_timetuples()::endtime=',endtime;
     fmtstr='%I:%M:%S %p'
     try:
         start_l=list(time.strptime(starttime,fmtstr)[3:6])
