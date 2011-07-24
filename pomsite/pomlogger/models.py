@@ -10,7 +10,7 @@ from django.forms import RadioSelect,ChoiceField,ModelMultipleChoiceField
 class PomCategory(models.Model):
     name=models.CharField(unique=True,max_length=50)
     description=models.TextField(blank=True)
-    users=models.ManyToManyField(User)    
+    users=models.ManyToManyField(User)
     slug=models.SlugField(editable=False)
     
     class Meta:
@@ -18,7 +18,6 @@ class PomCategory(models.Model):
 
     def __unicode__(self):
         return self.name
-
 
     def save(self,*args,**kwargs):
         self.name=self.name.strip()
@@ -43,9 +42,8 @@ class PomEntry(models.Model):
     class Meta:
 	    verbose_name_plural="PomEntries"
 
-    def __unicode__(self):
-        return "%s%s"%([str(x.name) for x in self.categories.all()],self.start_time)
-
+    def __unicode__(self):       
+        return "%s-%s-%s"%(",".join(str(x.name) for x in self.categories.all()),self.start_time,self.today)
     @models.permalink
     def get_absolute_url(self):
         return ('pomlog_entry_detail',(),{'id':self.id})
@@ -67,12 +65,12 @@ class PomEntryForm(ModelForm):
 
 class PomEntryDescForm(Form):
     description=CharField(max_length=200,widget=Textarea)
-    
+'''    
 class PomEntryPartialForm(ModelForm):
     class Meta:
         model=PomEntry
         exclude = ('today','start_time','end_time','categories','sharedwith','author',)
-
+'''
 class PomCategoryForm(ModelForm):
 	class Meta:
 		model=PomCategory

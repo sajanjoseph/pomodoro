@@ -1,0 +1,29 @@
+{% extends "pomlogger/base_reports.html" %}
+{% block title %}
+{{block.super}}|{{page_title}}
+{% endblock %}
+
+{% block content %}
+{{block.super}}
+
+{%if entry_duration_dict %}
+<h3>{{page_title}}</h3>  
+<img src="{{ MEDIA_URL }}img/{{basefilename}}.png" alt="allcategories" >
+
+<p>
+
+<a href="{{ MEDIA_URL }}img/{{basefilename}}.pdf" >get as pdf <img src="{{ MEDIA_URL }}img/pdf.png" alt="pdfreport" ></a>
+</p>
+{% include "pomlogger/includes/time_on_categories.html" %}
+{% else %} 
+<h3> You have not created any entry  yet</h3>
+
+{% endif %}
+
+
+
+{% endblock %}
+
+{% block whatis %}
+Bar Plot of Time spent on {{entry_duration_dict.items|length}} categor{{ entry_duration_dict.items|length|pluralize:"y,ies"}} 
+{% endblock %}

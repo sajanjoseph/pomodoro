@@ -1,0 +1,5 @@
+{% extends "pomlogger/allentriesreport.html" %}
+
+{% block whatis %}
+Bar Plot of Time spent on {{entry_duration_dict.items|length}} entr{{ entry_duration_dict.items|length|pluralize:"y,ies"}} in  {{year}} 
+{% endblock %}

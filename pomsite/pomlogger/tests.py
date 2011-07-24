@@ -13,7 +13,7 @@ from django.db.models.query import QuerySet
 class PomTestCase(TestCase):
     def setUp(self):
         super(PomTestCase,self).setUp()
-        self.client.login(username='sajan',password='sajan')    
+        self.client.login(username='sajan',password='sajan')
 
 class PomCategoryTest(PomTestCase):
     fixtures=['cats.json','entries1.json']

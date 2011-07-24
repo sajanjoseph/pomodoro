@@ -1,0 +1,83 @@
+{% extends "pomlogger/base_reports.html" %}
+{% block title %}
+{{block.super}}|{{page_title}}
+{% endblock %}
+
+{% block content %}
+{{block.super}}
+
+<ul id ="entriesplots" class="report">
+    
+    <li id="entriesplots_list" class="report">
+        <a class ="button" href="{% url pomlog_allcategories_report   %}"> All Categories Plot </a>
+    </li>
+
+    <li id="entriesplots_list" class="report">
+        <a class ="button" href="{% url pomlog_allentries_report   %}"> All Entries Plot </a>
+    </li>
+    
+    <li id="yearlyentriesplots_list" class="report">
+    <form action="." >
+        <select name="year" id="year">
+            {% for anyear in years %}
+                <option  value={{anyear}} > {{anyear}}</option>
+            {% endfor %}
+        </select>
+        
+        <input type="submit" value="Plot for entries of the year" class="button"/>
+       </form>
+    </li>
+    
+    <li id="monthlyentriesplots_list" class="report">
+    <form action="." >
+        <select name="year" id="year">
+            {% for anyear in years %}
+                <option  value={{anyear}} > {{anyear}}</option>
+            {% endfor %}
+        </select>
+        
+        <select name="month" id="month">
+            {% for amonth in months %}
+                <option  value={{amonth}} > {{amonth}}</option>
+            {% endfor %}
+        </select>
+        
+        <input type="submit" value="Plot for entries of the month" class="button"/>
+       </form>
+    </li>
+    
+    <li id="dailyentriesplots_list" class="report">
+    <form action="." >
+        <select name="year" id="yearselect">
+            {% for anyear in years %}
+                <option  value={{anyear}} > {{anyear}}</option>
+            {% endfor %}
+        </select>
+        
+        <select name="month" id="monthselect">
+            {% for amonth in months %}
+                <option  value={{amonth}} > {{amonth}}</option>
+            {% endfor %}
+        </select>
+        
+        <select name="day" id="dayselect">
+            {% for aday in days %}
+                <option  value={{aday|stringformat:"02d"}} > {{aday}}</option>
+            {% endfor %}
+        </select>
+        
+        <input type="submit" value="Plot for entries of the day" class="button"/>
+       </form>
+    </li>
+    
+     
+</ul>
+
+
+
+
+{% endblock %}
+
+{% block whatis %}
+Links to various Bar Plots 
+{% endblock %}

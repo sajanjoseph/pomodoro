@@ -18,8 +18,8 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 
 
 #login url added by sajan
-LOGIN_URL='/pomlog/account/login/'
-LOGIN_REDIRECT_URL='/pomlog/entries/'
+LOGIN_URL='/pomodoro/pomlog/account/login/'
+LOGIN_REDIRECT_URL='/pomodoro/pomlog/entries/'
 
 '''
 #for gmail added by sajan
@@ -57,14 +57,12 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-#MEDIA_ROOT = ''
-MEDIA_ROOT = '/home/sajan/dev/python/django/pomodoro/pomsite/media/'
+MEDIA_ROOT = ''
+
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = '/site_media/pomlogger/'
-
-IMAGE_FOLDER_PATH = '/home/sajan/dev/python/django/pomodoro/pomsite/media/pomlogger/img'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.

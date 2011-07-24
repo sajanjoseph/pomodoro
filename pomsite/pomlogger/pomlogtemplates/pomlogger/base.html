@@ -11,7 +11,8 @@
 <body {% block load_js %}{% endblock %} >
 
 <div id="header">
-   <h2 > Pomodoro Logger </h2>
+    <img class="centerpage" src="{{ MEDIA_URL }}img/pomodorologgeranim1.gif" alt="POMODORO LOGGER">
+   
 
  </div>
 
@@ -30,7 +31,7 @@
  </div>
 
 <div id="sidebar"> 
-<h2> Navigation </h2>
+<img src="{{ MEDIA_URL }}img/navigation1.png" alt="NAVIGATION">
      <ul id ="main-nav">
 	<li id="main-nav-entries">
 	    <a href="{%url pomlog_entry_archive_index  %}"> Entries </a>
@@ -39,6 +40,9 @@
 	    <a href="{% url pomlog_category_list   %}"> Categories </a>
 	</li>
 	
+	<li id="main-nav-categories">
+        <a href="{% url pomlog_reports   %}"> Reports </a>
+    </li>
      </ul>
 
    

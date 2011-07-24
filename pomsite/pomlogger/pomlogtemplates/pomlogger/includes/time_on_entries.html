@@ -1,0 +1,8 @@
+<h3>time spent on entries </h3>
+<p>
+<ul>
+{% for k,v in entry_duration_dict.items %}
+    <li>{{k}} = {{v}} minutes </li>
+{% endfor %}
+</ul>
+</p>

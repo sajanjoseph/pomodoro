@@ -10,7 +10,7 @@ Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
 <h2>{{page_title}}</h2>
 
-<table border="1">
+<table border="1" id="cats">
 <tr>
     <td> categories</td>
     <td> {% for x in object.categories.all %}

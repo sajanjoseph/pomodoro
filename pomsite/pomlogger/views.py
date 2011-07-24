@@ -17,6 +17,11 @@ from django.shortcuts import render_to_response,get_object_or_404,redirect
 
 from django.contrib.auth.models import User
 
+import settings
+import matplotlib.pyplot as plt
+import pylab
+from matplotlib.backends.backend_pdf import PdfPages
+
 @login_required
 def index(request, template_name):
     print 'index()::template=',template_name
@@ -47,6 +52,13 @@ def get_duration_for_categories(entryset):
             else:
                 entry_duration_dict[acat.name]=duration_mts
                 print 'new cat:%s ,durn=%s'%(acat.name,duration_mts)
+    return entry_duration_dict
+
+def get_durations_for_entries(entryset):
+    entry_duration_dict={}
+    for anentry in entryset:
+        duration_mts=timediff(anentry.start_time,anentry.end_time)
+        entry_duration_dict[anentry.__unicode__() ] = duration_mts
     return entry_duration_dict
 
 def custom_render(request,context,template):
@@ -100,6 +112,7 @@ def canview(entry,user):
         return False
 
 @login_required
+@transaction.commit_on_success
 def delete_entry(request,id):
     entry=get_object_or_404(PomEntry,id=id,author=request.user )
     print 'delete_entry()::entry=',entry
@@ -328,6 +341,7 @@ def category_detail(request,slug,template_name,page_title):
 
 
 @login_required
+@transaction.commit_on_success
 def delete_category(request,slug):
     cat=get_object_or_404(PomCategory,slug=slug)
     if cat.users.count()==1 and request.user in cat.users.all():
@@ -344,7 +358,7 @@ def is_duplicate_cat(name):
     else:
         return False
 
-
+@transaction.commit_on_success
 def add_or_edit(request,page_title,template_name,instance=None):
     form_data=get_form_data(request)
     form=PomCategoryForm(form_data,instance=instance)
@@ -423,44 +437,7 @@ def get_own_entries_with_cats(cats,user):
         ownentries_with_cats.extend(entries)
 
     return list(set(ownentries_with_cats))
-    
-'''
-@login_required
-def share_entries_oldway(request,template_name,page_title):
-    allusers=User.objects.all()
-    others=User.objects.exclude(username=request.user.username)
-    ownentries=PomEntry.objects.filter(author=request.user)
-    owncats=get_categories_of_user(request.user)    
-    context={'ownentries':ownentries,'owncats':owncats,'otherusers':others,'allusers':allusers,'page_title':page_title}
-    if request.method=='POST':
-        print '===========request.POST==========='
-        print request.POST
-        selected_users=request.POST.getlist('users_selected')
-        entries_to_share=request.POST.getlist('sharing_options')        
-        if len(entries_to_share)==1 and len(selected_users)>0:
-            usrs_to_share_with=[User.objects.get(username=name) for name in selected_users]
-            entries=[]
-            if entries_to_share[0]==u'allentries':
-                entries=PomEntry.objects.filter(author=request.user)
-                print 'you selected all entries option:',entries
-            elif entries_to_share[0]=='selectedentries':
-                entry_id_list=request.POST.getlist('entries_selected')
-                print 'you selected selectedentries option:',
-                entries=get_entries_from_idstring(entry_id_list)
-            elif entries_to_share[0]=='entries_with_cat':
-                cat_idlist=request.POST.getlist('entries_with_cat')
-                print 'you selected entries_with_cat option:',cat_idlist
-                cats=get_categories_from_idstring(cat_idlist)
-                entries=get_own_entries_with_cats(cats,request.user)
 
-            print 'sharing',entries,'with users',usrs_to_share_with            
-            share_entries_with_users(entries,usrs_to_share_with)
-            return redirect('pomlog_entry_archive_index')
-
-    print 'GET or invalid'
-    return custom_render(request,context,template_name)
-
-'''
 
 @login_required
 def share_entries(request,template_name,page_title):
@@ -528,9 +505,136 @@ def unshare_entry(request,entryid,userid):
         entry.sharedwith.remove(user)
     return redirect('pomlog_entry_archive_index')
 
+#reports
+@login_required
+def reports(request,page_title,template_name):
+    currentyear = datetime.datetime.today().year
+    oldyear = currentyear-5
+    days=[x for x in range(1,32)]
+    years=[x+oldyear for x in range(10)]
+    months = list(calendar.month_abbr)[1:]
+    datemap = {'years':years,'months':months,'days':days}
+    year = request.GET.get('year')
+    month =  request.GET.get('month')
+    day = request.GET.get('day')
+    if day:
+        return redirect('pomlog_report_entries_for_day',year=year,month=month,day=day)
+    elif month:
+        return redirect('pomlog_report_entries_for_month',year=year,month=month)
+    elif year :
+        return redirect('pomlog_report_entries_year',year=year)
+    return custom_render(request,datemap,template_name)
 
+@login_required
+def report_entries_for_day(request,year,month,day,page_title,template_name):
+    monthname = month
+    month = get_month_as_number(month)
+    entryset=PomEntry.objects.filter(today__year=year,today__month=month,today__day=day,author=request.user)
+    entry_duration_dict = get_durations_for_entries(entryset)
+    basefilename = "entriesofday%s-%s-%s"%(year,month,day)
+    page_title = page_title+" "+day+"-"+monthname+"-"+year
+    imgfilename,docfilename = create_chart(entry_duration_dict,basefilename)
+    report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year,'month':monthname,'day':day}
+    report_data["entry_duration_dict"]=entry_duration_dict
+    return custom_render(request,report_data,template_name)
 
+@login_required
+def report_entries_for_month(request,year,month,page_title,template_name):
+    monthname = month
+    month = get_month_as_number(month)
+    entryset=PomEntry.objects.filter(today__year=year,today__month=month,author=request.user)
+    entry_duration_dict = get_durations_for_entries(entryset)
+    basefilename = "entriesofmonth%s-%s"%(monthname,year)
+    page_title = page_title+" "+monthname+"-"+year
+    imgfilename,docfilename = create_chart(entry_duration_dict,basefilename)
+    report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year,'month':monthname}
+    report_data["entry_duration_dict"]=entry_duration_dict
+    return custom_render(request,report_data,template_name)
 
+@login_required
+def report_entries_for_year(request,year,page_title,template_name):
+    entryset=PomEntry.objects.filter(today__year=year,author=request.user)
+    entry_duration_dict = get_durations_for_entries(entryset)
+    basefilename = "entriesofyear%s"%year
+    page_title = page_title+" "+year
+    imgfilename,docfilename = create_chart(entry_duration_dict,basefilename)
+    report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year}
+    report_data["entry_duration_dict"]=entry_duration_dict
+    return custom_render(request,report_data,template_name)
+
+@login_required
+def entries_report(request,page_title,template_name):
+    entryset=PomEntry.objects.filter(author=request.user)
+    entry_duration_dict = get_durations_for_entries(entryset)
+    basefilename = "allentriesreport"
+    imgfilename,docfilename = create_chart(entry_duration_dict,basefilename)
+    report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
+    report_data["entry_duration_dict"]=entry_duration_dict
+    return custom_render(request,report_data,template_name)
+
+@login_required
+def categories_report(request,page_title,template_name):
+    entryset=PomEntry.objects.filter(author=request.user)
+    entry_duration_dict = get_duration_for_categories(entryset)
+    basefilename = "allcategoriesreport"
+    imgfilename,docfilename = create_chart(entry_duration_dict,basefilename)
+    report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
+    report_data["entry_duration_dict"]=entry_duration_dict
+    return custom_render(request,report_data,template_name)
+    
+    
+def create_chart(map,basefilename):
+    now = datetime.datetime.now().strftime("%I-%M-%S%p-%d%b%Y")
+    imgfilename = settings.IMAGE_FOLDER_PATH+"/"+basefilename+".png"
+    docfilename = settings.IMAGE_FOLDER_PATH+"/"+basefilename+".pdf"
+    catnames = map.keys()
+    catnames.sort()
+    durations = map.values()
+    maxduration = get_max_duration(durations)
+    xdata = range(len(catnames))
+    ydata = [map[x] for x in catnames]
+    min_x,max_x = get_extreme_values(xdata)
+    splitxdata = [x.split('-',1) for x in catnames]
+    xlabels = [x[0] for x in splitxdata]
+    dates = [x[1] for x in splitxdata if len(x)>1]
+    figure = pylab.figure()
+    ax = figure.add_subplot(1,1,1)
+    barwidth = 0.25
+    ystep = 1
+    pylab.grid(True)
+    if xdata and ydata:
+        ax.bar(xdata, ydata, width=barwidth,align='center',color='magenta')
+        ax.set_xlabel('categories',color='green')
+        ax.set_ylabel('durations in  minutes',color='green')
+        ax.set_title('durations for categories-created at :'+now,color='blue')
+        ax.set_xticks(xdata)
+        ax.set_xlim([min(xdata) - 0.5, max(xdata) + 0.5])
+        ax.set_xticklabels(xlabels)
+        ax.set_yticks(range(0,maxduration+ystep,ystep))
+        ax.set_ylim(0,max(ydata)+ystep)
+        
+        for i in range(len(xdata)):
+            if dates:
+                pylab.text(xdata[i], 0, dates[i], rotation='vertical',size='large',fontweight="bold",family='fantasy')
+    figure.autofmt_xdate(rotation=30)
+    figure.savefig(imgfilename,format="png")
+    figure.savefig(docfilename,format="pdf")
+    return imgfilename,docfilename
+
+def get_max_duration(durations):
+    if durations: 
+        maxduration = max(durations)
+    else:
+        maxduration = 0
+    return maxduration
+    
+def get_extreme_values(data):
+    if data:
+        min_x = min(data)
+        max_x = max(data)
+    else:
+        min_x = max_x = 0
+    return min_x,max_x  
 
 
 

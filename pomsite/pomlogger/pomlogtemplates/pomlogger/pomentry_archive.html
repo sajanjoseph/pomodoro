@@ -8,18 +8,11 @@
 Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
 <p>
-<a href="{% url pomlog_add_entry %}">ADD NEW POMODORO ENTRY </a> 
+<a href="{% url pomlog_add_entry %}"><img src="{{ MEDIA_URL }}img/addentryanim2b.gif" alt="ADD NEW POMODORO ENTRY"> </a> 
 </p>
 {%if object_list %}
 
-<h3> Total time spent on categories </h3>
-<p>
-<ul>
-{% for k,v in entry_duration_dict.items %}
-	<li>{{k}} = {{v}} minutes </li>
-{% endfor %}
-</ul>
-</p>
+{% include "pomlogger/includes/time_on_categories.html" %}
 
 {{page_title}}
 {% include "pomlogger/includes/entries_list.html" %}

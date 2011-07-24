@@ -13,7 +13,7 @@ Today is :<b>{% now "Y b d" %} </b>
 <h3> Welcome {{user.username}} </h3>
 
 
-<h2>{{page_title}}</h2>
+<img src="{{ MEDIA_URL }}img/addentryanim2b.gif" alt="ADD NEW POMODORO ENTRY">
 
 <form name="timeform" id="timeform" method="POST" action ="." >
 <table >
@@ -64,4 +64,7 @@ Today is :<b>{% now "Y b d" %} </b>
 </form>
 </div>
 </form>
+{% endblock %}
+{% block whatis %}
+{{page_title}} page
 {% endblock %}
