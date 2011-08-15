@@ -66,6 +66,11 @@ MEDIA_URL = '/site_media/pomlogger/'
 
 IMAGE_FOLDER_PATH = '/home/sajan/dev/python/django/pomodoro/pomsite/media/pomlogger/img'
 
+LOGFILE_NAME = '/home/sajan/dev/python/django/pomodoro/pomodorolog.txt'
+
+#chart type to be created
+CHART_TYPE="bar"
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".

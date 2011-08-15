@@ -124,5 +124,6 @@ td{
     padding:8px;
 }
 caption{
-    
+    font-weight:bold;
+    background:none repeat scroll 0 0 #B9C9FE;
 }

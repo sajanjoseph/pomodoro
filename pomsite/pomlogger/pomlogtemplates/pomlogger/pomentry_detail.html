@@ -8,23 +8,23 @@
 {{block.super}}
 Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
-<h2>{{page_title}}</h2>
 
 <table border="1" id="cats">
+<caption>{{page_title}}</caption>
 <tr>
-    <td> categories</td>
+    <th> categories</th>
     <td> {% for x in object.categories.all %}
                     {{x.name}}
                 {% if forloop.last %}{% else %}, {% endif %} 
              {% endfor %} 
     </td>
 </tr>
- <tr>   <td> date posted   </td> <td> {{object.today|date:"j F, Y"}} </td>  </tr>
-<tr>    <td> start time    </td>   <td> {{ object.start_time}} </td>  </tr>
-<tr>    <td> end time      </td>   <td> {{ object.end_time}} </td> </tr>
-<tr>    <td> Duration      </td>   <td> {{ duration}} minutes  </td> </tr>
+ <tr>   <th> date posted   </th> <td> {{object.today|date:"j F, Y"}} </td>  </tr>
+<tr>    <th> start time    </th>   <td> {{ object.start_time}} </td>  </tr>
+<tr>    <th> end time      </th>   <td> {{ object.end_time}} </td> </tr>
+<tr>    <th> Duration      </th>   <td> {{ duration}} minutes  </td> </tr>
 {% if object.description %}
-<tr>    <td> description   </td>   <td> {{object.description}}</td>  </tr>
+<tr>    <th> description   </th>   <td> {{object.description}}</td>  </tr>
 {% endif %}
 
 </table>

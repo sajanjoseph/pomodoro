@@ -16,11 +16,14 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response,get_object_or_404,redirect
 
 from django.contrib.auth.models import User
-
 import settings
+
+import logging
 import matplotlib.pyplot as plt
 import pylab
 from matplotlib.backends.backend_pdf import PdfPages
+
+logger = logging.getLogger("pomodoro")
 
 @login_required
 def index(request, template_name):
@@ -67,30 +70,30 @@ def custom_render(request,context,template):
 
 @login_required
 def entry_archive_index(request,page_title,template_name):
-    entryset=PomEntry.objects.filter(author=request.user)
+    entryset=PomEntry.objects.filter(author=request.user).order_by('-today','-start_time')
     entry_duration_dict=get_duration_for_categories(entryset)
     now=datetime.datetime.now()
-    entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user)#added for sharing
+    entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user).order_by('-today','-start_time')#added for sharing
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
 def entry_archive_year(request,year,page_title,template_name):
-    entryset=PomEntry.objects.filter(today__year=year,author=request.user)
+    entryset=PomEntry.objects.filter(today__year=year,author=request.user).order_by('-today','-start_time')
     entry_duration_dict=get_duration_for_categories(entryset)
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
 def entry_archive_month(request,year,month,page_title,template_name):
-    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),author=request.user)
+    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),author=request.user).order_by('-today','-start_time')
     entry_duration_dict=get_duration_for_categories(entryset)
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'month':month,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
 def entry_archive_day(request,year,month,day,page_title,template_name):
-    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),today__day=day,author=request.user)
+    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),today__day=day,author=request.user).order_by('-today','-start_time')
     entry_duration_dict=get_duration_for_categories(entryset)
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'month':month,'day':day,'page_title':page_title}
     return custom_render(request,context,template_name)
@@ -151,22 +154,35 @@ def add_new_entry(request,template_name,page_title):
     form_data=get_form_data(request)
     form=PomEntryDescForm(form_data)
     catnameform=PomCategoryNameForm(form_data)
-    errorlist=[]    
+    errorlist=[]   
     context={'page_title':page_title,'entryform':form,'categoryform':catnameform,'errorlist':errorlist}
     if request.method=='POST' and form.is_valid() and catnameform.is_valid():
         desc=form.cleaned_data['description']
         start_time=request.POST[u'timerstarted']
         stop_time=request.POST[u'timerstopped']
+        
         try:
-            start_ttpl,stop_ttpl=get_timetuples(start_time,stop_time)
+            logger.debug("start_time is="+start_time)
+            logger.debug("stop_time is="+stop_time)
+            start_ttpl,stop_ttpl = get_timetuples(start_time,stop_time)
+            logger.debug("start_ttpl="+str(start_ttpl))
+            logger.debug("stop_ttpl="+str(stop_ttpl))
+            
             start_timeval=datetime.time(*start_ttpl)
             stop_timeval=datetime.time(*stop_ttpl)
+            
+            logger.debug("start_timeval="+str(start_timeval))
+            logger.debug("stop_timeval="+str(stop_timeval))
+            print 'start_timeval=',start_timeval
+            print 'stop_timeval=',stop_timeval
             if not (start_timeval < stop_timeval):
                 #need to put this in errors
+                logger.debug('starttime should be less than endtime')
                 errorlist.append('starttime should be less than endtime')
                 return custom_render(request,context,template_name)
         except ValueError:
             print 'add_new_entry()::format not correct'
+            logger.debug('add_new_entry()::format not correct')
             #need to put this in errors
             errorlist.append('format of time entries not correct')
             return custom_render(request,context,template_name)
@@ -191,14 +207,24 @@ def add_new_entry(request,template_name,page_title):
     return custom_render(request,context,template_name)
 
 def get_timetuples(starttime,endtime):
-    fmtstr='%I:%M:%S %p'
     try:
-        start_l=list(time.strptime(starttime,fmtstr)[3:6])
+        #start_l = list(time.strptime(starttime,fmtstr)[3:6])
+        starttime = long(starttime)
+        start_time = datetime.datetime.fromtimestamp(starttime/1000.0)
+        start_l = list(start_time.timetuple()[3:6])
+        logger.debug("start_l="+str(start_l))
+        
         print 'get_timetuples()::start_l=',start_l;
-        stop_l=list(time.strptime(endtime,fmtstr)[3:6])
+        #stop_l = list(time.strptime(endtime,fmtstr)[3:6])
+        endtime = long(endtime)
+        stop_time = datetime.datetime.fromtimestamp(endtime/1000.0)
+        stop_l = list(stop_time.timetuple()[3:6])
+        logger.debug("stop_l="+str(stop_l))
         print 'get_timetuples()::stop_l=',stop_l;
-        start_ttpl=tuple(start_l)
-        stop_ttpl=tuple(stop_l)
+        start_ttpl = tuple(start_l)
+        logger.debug("start_ttpl="+str(start_ttpl))
+        stop_ttpl = tuple(stop_l)
+        logger.debug("stop_ttpl="+str(stop_ttpl))
     except ValueError:
         raise ValueError
     return (start_ttpl,stop_ttpl)
@@ -533,7 +559,7 @@ def report_entries_for_day(request,year,month,day,page_title,template_name):
     entry_duration_dict = get_durations_for_entries(entryset)
     basefilename = "entriesofday%s-%s-%s"%(year,month,day)
     page_title = page_title+" "+day+"-"+monthname+"-"+year
-    imgfilename,docfilename = create_chart(entry_duration_dict,basefilename)
+    imgfilename,docfilename = create_chart(settings.CHART_TYPE,entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year,'month':monthname,'day':day}
     report_data["entry_duration_dict"]=entry_duration_dict
     return custom_render(request,report_data,template_name)
@@ -546,7 +572,7 @@ def report_entries_for_month(request,year,month,page_title,template_name):
     entry_duration_dict = get_durations_for_entries(entryset)
     basefilename = "entriesofmonth%s-%s"%(monthname,year)
     page_title = page_title+" "+monthname+"-"+year
-    imgfilename,docfilename = create_chart(entry_duration_dict,basefilename)
+    imgfilename,docfilename = create_chart(settings.CHART_TYPE,entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year,'month':monthname}
     report_data["entry_duration_dict"]=entry_duration_dict
     return custom_render(request,report_data,template_name)
@@ -557,7 +583,7 @@ def report_entries_for_year(request,year,page_title,template_name):
     entry_duration_dict = get_durations_for_entries(entryset)
     basefilename = "entriesofyear%s"%year
     page_title = page_title+" "+year
-    imgfilename,docfilename = create_chart(entry_duration_dict,basefilename)
+    imgfilename,docfilename = create_chart(settings.CHART_TYPE,entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year}
     report_data["entry_duration_dict"]=entry_duration_dict
     return custom_render(request,report_data,template_name)
@@ -567,7 +593,7 @@ def entries_report(request,page_title,template_name):
     entryset=PomEntry.objects.filter(author=request.user)
     entry_duration_dict = get_durations_for_entries(entryset)
     basefilename = "allentriesreport"
-    imgfilename,docfilename = create_chart(entry_duration_dict,basefilename)
+    imgfilename,docfilename = create_chart(settings.CHART_TYPE,entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
     report_data["entry_duration_dict"]=entry_duration_dict
     return custom_render(request,report_data,template_name)
@@ -577,13 +603,21 @@ def categories_report(request,page_title,template_name):
     entryset=PomEntry.objects.filter(author=request.user)
     entry_duration_dict = get_duration_for_categories(entryset)
     basefilename = "allcategoriesreport"
-    imgfilename,docfilename = create_chart(entry_duration_dict,basefilename)
+    imgfilename,docfilename = create_chart(settings.CHART_TYPE,entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
     report_data["entry_duration_dict"]=entry_duration_dict
     return custom_render(request,report_data,template_name)
     
-    
-def create_chart(map,basefilename):
+def create_chart(chart_type,map,basefilename):
+    if chart_type is "bar":
+        return create_barchart(map,basefilename)
+    elif chart_type is "pie":
+        return create_piechart(map,basefilename)
+        
+def create_piechart(map,basefilename):
+    pass
+      
+def create_barchart(map,basefilename):
     now = datetime.datetime.now().strftime("%I-%M-%S%p-%d%b%Y")
     imgfilename = settings.IMAGE_FOLDER_PATH+"/"+basefilename+".png"
     docfilename = settings.IMAGE_FOLDER_PATH+"/"+basefilename+".pdf"
@@ -600,7 +634,7 @@ def create_chart(map,basefilename):
     figure = pylab.figure()
     ax = figure.add_subplot(1,1,1)
     barwidth = 0.25
-    ystep = 1
+    ystep =  maxduration/10
     pylab.grid(True)
     if xdata and ydata:
         ax.bar(xdata, ydata, width=barwidth,align='center',color='magenta')
@@ -612,7 +646,6 @@ def create_chart(map,basefilename):
         ax.set_xticklabels(xlabels)
         ax.set_yticks(range(0,maxduration+ystep,ystep))
         ax.set_ylim(0,max(ydata)+ystep)
-        
         for i in range(len(xdata)):
             if dates:
                 pylab.text(xdata[i], 0, dates[i], rotation='vertical',size='large',fontweight="bold",family='fantasy')

@@ -2,7 +2,7 @@ from django.contrib import admin
 from pomlogger.models import PomEntry,PomCategory
 
 class PomEntryAdmin(admin.ModelAdmin):
-	pass
+	ordering=['today']
 class PomCategoryAdmin(admin.ModelAdmin):	
 	ordering=['name']
 

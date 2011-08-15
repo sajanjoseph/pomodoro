@@ -1,8 +1,9 @@
 
 <table border="1" id="entries">
-
+<caption>{{page_title}}</caption>
 <tr>
 <th>ENTRY</th>
+
 <th></th>
 <th></th>
 <th>USERS SHAREDWITH</th>
@@ -10,6 +11,7 @@
 {% for anentry in object_list %}
 <tr> 
 <td> <a href="{{anentry.get_absolute_url }}" > {{anentry.description|truncatewords:2}}  </a> </td>
+
 <td> <a href="{% url pomlog_edit_entry anentry.id %}"> EDIT </a> </td>
 <td> <a href="{% url pomlog_delete_entry anentry.id %}"> DELETE </a> </td>
 

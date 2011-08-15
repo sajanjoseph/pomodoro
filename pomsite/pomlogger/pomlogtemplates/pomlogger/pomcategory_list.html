@@ -14,8 +14,9 @@ Today is :<b>{% now "d b, Y" %}</b>
 <h3>No categories created </h3><br/>
 {% else %}
 
-<h3>Categories are: </h3>
+
 <table border="1" id="cats">
+<caption>all categories</caption>
 {% for k in cats %}
 <tr>
 <td> <a href="{{k.get_absolute_url}}" > {{k.name}}</a></td>
