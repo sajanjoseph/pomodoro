@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.forms import ModelForm,Form,ValidationError
 from django.forms import CharField,Textarea,TimeField
 
+
 from django.template.defaultfilters import slugify
 from django.forms import RadioSelect,ChoiceField,ModelMultipleChoiceField
 
@@ -63,6 +64,19 @@ class PomEntryForm(ModelForm):
             raise ValidationError('end time must be greater than start time')			
         return cleaned_data
 
+class PomEntryEditForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(PomEntryEditForm, self).__init__(*args, **kwargs)
+        instance = getattr(self, 'instance', None)
+        if instance and instance.id:
+            self.fields['today'].widget.attrs['readonly'] = True
+            self.fields['start_time'].widget.attrs['readonly'] = True
+            self.fields['end_time'].widget.attrs['readonly'] = True
+
+    class Meta:
+        model=PomEntry
+        exclude = ('categories','author','sharedwith',)
+        
 class PomEntryDescForm(Form):
     description=CharField(max_length=200,widget=Textarea)
 '''    

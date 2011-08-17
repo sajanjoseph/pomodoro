@@ -1,6 +1,8 @@
 from pomlogger.models import PomEntry,PomCategory
 from pomlogger.models import PomEntryForm,PomCategoryForm,PomCategoryNameForm,PomEntryShareForm
 from pomlogger.models import PomEntryDescForm
+
+from pomlogger.models import PomEntryEditForm
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect,Http404
 from django.contrib.auth import authenticate,login,logout
@@ -37,10 +39,13 @@ def get_month_as_number(monthname):
     return mlist.index(title(monthname))
 
 def timediff(start,end):
+    #assumes that start,end times are within 24 hours of each other
+    logger.debug("start="+str(start)+"end="+str(end))
     delta_start=datetime.timedelta(hours=start.hour,minutes=start.minute,seconds=start.second)
     delta_end=datetime.timedelta(hours=end.hour,minutes=end.minute,seconds=end.second)
     diff=delta_end-delta_start
     diffminutes=diff.seconds/60
+    logger.debug("diffminutes="+str(diffminutes))
     return diffminutes
 
 def get_duration_for_categories(entryset):
@@ -61,6 +66,7 @@ def get_durations_for_entries(entryset):
     entry_duration_dict={}
     for anentry in entryset:
         duration_mts=timediff(anentry.start_time,anentry.end_time)
+        logger.debug("anentry="+str(anentry)+"duration_mts="+str(duration_mts))
         entry_duration_dict[anentry.__unicode__() ] = duration_mts
     return entry_duration_dict
 
@@ -70,30 +76,30 @@ def custom_render(request,context,template):
 
 @login_required
 def entry_archive_index(request,page_title,template_name):
-    entryset=PomEntry.objects.filter(author=request.user).order_by('-today','-start_time')
+    entryset=PomEntry.objects.filter(author=request.user).order_by('-today','-end_time')
     entry_duration_dict=get_duration_for_categories(entryset)
     now=datetime.datetime.now()
-    entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user).order_by('-today','-start_time')#added for sharing
+    entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user).order_by('-today','-end_time')#added for sharing
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
 def entry_archive_year(request,year,page_title,template_name):
-    entryset=PomEntry.objects.filter(today__year=year,author=request.user).order_by('-today','-start_time')
+    entryset=PomEntry.objects.filter(today__year=year,author=request.user).order_by('-today','-end_time')
     entry_duration_dict=get_duration_for_categories(entryset)
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
 def entry_archive_month(request,year,month,page_title,template_name):
-    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),author=request.user).order_by('-today','-start_time')
+    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),author=request.user).order_by('-today','-end_time')
     entry_duration_dict=get_duration_for_categories(entryset)
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'month':month,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
 def entry_archive_day(request,year,month,day,page_title,template_name):
-    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),today__day=day,author=request.user).order_by('-today','-start_time')
+    entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),today__day=day,author=request.user).order_by('-today','-end_time')
     entry_duration_dict=get_duration_for_categories(entryset)
     context={'entry_duration_dict':entry_duration_dict,'object_list':entryset,'year':year,'month':month,'day':day,'page_title':page_title}
     return custom_render(request,context,template_name)
@@ -148,53 +154,39 @@ def get_categories(catnames):
             cats.append(cat)
     return cats
 
+
+
 @login_required
 @transaction.commit_on_success
 def add_new_entry(request,template_name,page_title):
-    form_data=get_form_data(request)
-    form=PomEntryDescForm(form_data)
-    catnameform=PomCategoryNameForm(form_data)
-    errorlist=[]   
+    form_data = get_form_data(request)
+    form = PomEntryDescForm(form_data)
+    catnameform = PomCategoryNameForm(form_data)
+    errorlist = []
     context={'page_title':page_title,'entryform':form,'categoryform':catnameform,'errorlist':errorlist}
     if request.method=='POST' and form.is_valid() and catnameform.is_valid():
-        desc=form.cleaned_data['description']
-        start_time=request.POST[u'timerstarted']
-        stop_time=request.POST[u'timerstopped']
-        
+        desc = form.cleaned_data['description']
+        start_time_string = request.POST[u'timerstarted']
+        stop_time_string = request.POST[u'timerstopped']
+        start_time = long(start_time_string)
+        stop_time = long(stop_time_string)
+        if not (start_time < stop_time):
+            #need to put this in errors
+            errorlist.append('starttime should be less than endtime')
+            return custom_render(request,context,template_name)
         try:
-            logger.debug("start_time is="+start_time)
-            logger.debug("stop_time is="+stop_time)
             start_ttpl,stop_ttpl = get_timetuples(start_time,stop_time)
-            logger.debug("start_ttpl="+str(start_ttpl))
-            logger.debug("stop_ttpl="+str(stop_ttpl))
-            
             start_timeval=datetime.time(*start_ttpl)
             stop_timeval=datetime.time(*stop_ttpl)
-            
-            logger.debug("start_timeval="+str(start_timeval))
-            logger.debug("stop_timeval="+str(stop_timeval))
-            print 'start_timeval=',start_timeval
-            print 'stop_timeval=',stop_timeval
-            if not (start_timeval < stop_timeval):
-                #need to put this in errors
-                logger.debug('starttime should be less than endtime')
-                errorlist.append('starttime should be less than endtime')
-                return custom_render(request,context,template_name)
         except ValueError:
-            print 'add_new_entry()::format not correct'
-            logger.debug('add_new_entry()::format not correct')
-            #need to put this in errors
             errorlist.append('format of time entries not correct')
             return custom_render(request,context,template_name)
-        
         newentry=PomEntry(description=desc)
         newentry.save()
-        
         newentry.start_time=start_timeval
         newentry.end_time=stop_timeval
-        newentry.save()
         catnames=catnameform.cleaned_data['categories']
-        catnames=get_list_of_names(catnames)            
+        catnames=get_list_of_names(catnames)
         cats=get_categories(catnames)
         for x in cats:
             if request.user not in x.users.all():
@@ -202,21 +194,20 @@ def add_new_entry(request,template_name,page_title):
         newentry.categories=cats
         newentry.author=request.user
         newentry.save()
-        print 'redirecting to index'
         return redirect('pomlog_entry_archive_index')
     return custom_render(request,context,template_name)
+            
 
 def get_timetuples(starttime,endtime):
     try:
         #start_l = list(time.strptime(starttime,fmtstr)[3:6])
-        starttime = long(starttime)
+        #starttime = long(starttime)
         start_time = datetime.datetime.fromtimestamp(starttime/1000.0)
         start_l = list(start_time.timetuple()[3:6])
-        logger.debug("start_l="+str(start_l))
-        
+        logger.debug("start_l="+str(start_l))        
         print 'get_timetuples()::start_l=',start_l;
         #stop_l = list(time.strptime(endtime,fmtstr)[3:6])
-        endtime = long(endtime)
+        #endtime = long(endtime)
         stop_time = datetime.datetime.fromtimestamp(endtime/1000.0)
         stop_l = list(stop_time.timetuple()[3:6])
         logger.debug("stop_l="+str(stop_l))
@@ -225,7 +216,8 @@ def get_timetuples(starttime,endtime):
         logger.debug("start_ttpl="+str(start_ttpl))
         stop_ttpl = tuple(stop_l)
         logger.debug("stop_ttpl="+str(stop_ttpl))
-    except ValueError:
+    except ValueError as verr:
+        logger.debug("valueError in get_timetuples",verr)
         raise ValueError
     return (start_ttpl,stop_ttpl)
 
@@ -254,11 +246,13 @@ def remove_user_from_categories(categories,user):
 @transaction.commit_on_success
 def edit_entry(request,id,template_name,page_title):
     entry=get_object_or_404(PomEntry,id=id,author=request.user)
+    
     old_categorynames_list=[x.name for x in entry.categories.all()]    
     categorynames_as_one_string=get_category_names_as_one_string(old_categorynames_list)
     categorynamesdata={'categories':categorynames_as_one_string}
     form_data=get_form_data(request)
-    form=PomEntryForm(form_data,instance=entry)
+    #form=PomEntryForm(form_data,instance=entry)
+    form=PomEntryEditForm(form_data,instance=entry)#try not allowing today,start,end times eto be edited
     catnameform=PomCategoryNameForm(form_data,initial=categorynamesdata)
     context={'entryform':form,'categoryform':catnameform,'page_title':page_title}
     form_valid=form.is_valid()
@@ -301,44 +295,6 @@ def update_cats_with_editable_status(user,categories):
         cats[cat]=edit_status
     return cats
 
-'''
-def update_cats_with_editable_status(user,categories):
-    print 'update_cats_with_editable_status()::'
-    cats={}
-    for cat in categories:
-        usrcnt=cat.users.count()
-        allcatusrs=cat.users.all()
-        user_in_users=user in allcatusrs
-        entries_of_cat=PomEntry.objects.filter(categories=cat)
-        edit_status=False        
-        if usrcnt==1 and user in allcatusrs:
-            #print '1 usr only..setting edit=True'
-            edit_status=True
-        cats[cat]=edit_status
-    return cats
-'''
-'''
-def update_cats_with_editable_status_old(user,categories):
-    print 'update_cats_with_editable_status()::'
-    cats={}
-    for cat in categories:
-        usrcnt=cat.users.count()
-        allcatusrs=cat.users.all()
-        user_in_users=user in allcatusrs
-        entries_of_cat=PomEntry.objects.filter(categories=cat)
-        edit_delete_status=[False,False]
-        if entries_of_cat.count()==0:
-            #print 'entries_of_cat.count()==%d'%entries_of_cat.count()
-            #print 'setting edit=True,delete=True'
-            edit_delete_status[0]=True
-            edit_delete_status[1]=True
-        if usrcnt==1 and user in allcatusrs:
-            #print '1 usr only..setting edit=True'
-            edit_delete_status[0]=True
-        cats[cat]=edit_delete_status
-        #print 'for',cat,' edit_delete_status=',edit_delete_status
-    return cats
-'''
 
 def get_categories_of_user(user):
     ownentries=PomEntry.objects.filter(author=user)

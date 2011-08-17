@@ -26,7 +26,7 @@ LOGIN_REDIRECT_URL='/pomlog/entries/'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'sajanjoseph@gmail.com'
-EMAIL_HOST_PASSWORD = 'marykutty'
+EMAIL_HOST_PASSWORD = 'mypass'
 EMAIL_PORT = 587
 '''
 

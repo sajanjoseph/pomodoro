@@ -1,2 +1,7 @@
 *.pyc
 *.*~
+*log.txt.*
+*.pdf
+entriesof*.*
+allentries*.*
+allcategories*.*

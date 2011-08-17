@@ -8,10 +8,10 @@
 Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
 
-<h2>{{page_title}}</h2>
 
 <form method='post' action=".">
 <table>
+<caption>{{page_title}}</caption>
 {{categoryform.as_table}}
 </table>
 <input type="submit" value="Submit">
