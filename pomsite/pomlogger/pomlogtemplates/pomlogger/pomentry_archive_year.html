@@ -10,13 +10,7 @@
 Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
 {% if object_list %}
-<h3> total time spent on categories </h3>
-
-<ul>
-{% for k,v in entry_duration_dict.items %}
-	<li>{{k}} = {{v}} minutes </li>
-{% endfor %}
-</ul>
+{% include "pomlogger/includes/time_on_categories.html" %}
 
 <h3> {{page_title}} of {{year}} </h3>
 {% include "pomlogger/includes/entries_list.html" %}

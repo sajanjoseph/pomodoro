@@ -21,14 +21,6 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 LOGIN_URL='/pomlog/account/login/'
 LOGIN_REDIRECT_URL='/pomlog/entries/'
 
-'''
-#for gmail added by sajan
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'sajanjoseph@gmail.com'
-EMAIL_HOST_PASSWORD = 'mypass'
-EMAIL_PORT = 587
-'''
 
 #localhost's debugging mail server
 EMAIL_HOST = 'localhost'
@@ -71,6 +63,16 @@ LOGFILE_NAME = '/home/sajan/dev/python/django/pomodoro/pomodorolog.txt'
 #chart type to be created
 CHART_TYPE="bar"
 
+#barchart related constant values
+BAR_WIDTH = .25
+PLOT_OFFSET = .5
+BAR_COLOR = 'magenta'
+LABEL_COLOR = 'blue'
+TITLE_COLOR ='black'
+REPORT_IMG_FMT = 'png'
+REPORT_DOC_FMT = 'pdf'
+FIGURE_WIDTH_SCALE_FACTOR = 4
+YSTEP_FACTOR = 10
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
