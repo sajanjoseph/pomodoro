@@ -516,6 +516,7 @@ def report_entries_for_day(request,year,month,day,page_title,template_name):
     month = get_month_as_number(month)
     entryset=PomEntry.objects.filter(today__year=year,today__month=month,today__day=day,author=request.user)
     entry_duration_dict = get_durations_for_entries(entryset)
+    category_duration_dict = get_duration_for_categories(entryset)
     logger.info('entry_duration_dict size='+str(len(entry_duration_dict)));
     basefilename = "entriesofday%s-%s-%s"%(year,month,day)
     page_title = page_title+" "+day+"-"+monthname+"-"+year
@@ -523,7 +524,8 @@ def report_entries_for_day(request,year,month,day,page_title,template_name):
     if entry_duration_dict:
         imgfilename,docfilename = create_chart(CHART_TYPE,entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year,'month':monthname,'day':day}
-    report_data["entry_duration_dict"]=entry_duration_dict
+    report_data["number_of_entries"]=len(entry_duration_dict)
+    report_data["category_duration_dict"]= category_duration_dict
     return custom_render(request,report_data,template_name)
 
 @login_required
@@ -532,50 +534,56 @@ def report_entries_for_month(request,year,month,page_title,template_name):
     month = get_month_as_number(month)
     entryset=PomEntry.objects.filter(today__year=year,today__month=month,author=request.user)
     entry_duration_dict = get_durations_for_entries(entryset)
+    category_duration_dict = get_duration_for_categories(entryset)
     basefilename = "entriesofmonth%s-%s"%(monthname,year)
     page_title = page_title+" "+monthname+"-"+year
     imgfilename=docfilename=''
     if entry_duration_dict:
         imgfilename,docfilename = create_chart(CHART_TYPE,entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year,'month':monthname}
-    report_data["entry_duration_dict"]=entry_duration_dict
+    report_data["number_of_entries"]=len(entry_duration_dict)
+    report_data["category_duration_dict"]= category_duration_dict
     return custom_render(request,report_data,template_name)
 
 @login_required
 def report_entries_for_year(request,year,page_title,template_name):
     entryset=PomEntry.objects.filter(today__year=year,author=request.user)
     entry_duration_dict = get_durations_for_entries(entryset)
+    category_duration_dict = get_duration_for_categories(entryset)
     basefilename = "entriesofyear%s"%year
     page_title = page_title+" "+year
     imgfilename=docfilename=''
     if entry_duration_dict:
         imgfilename,docfilename = create_chart(CHART_TYPE,entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year}
-    report_data["entry_duration_dict"]=entry_duration_dict
+    report_data["number_of_entries"]=len(entry_duration_dict)
+    report_data["category_duration_dict"]= category_duration_dict
     return custom_render(request,report_data,template_name)
 
 @login_required
 def entries_report(request,page_title,template_name):
     entryset=PomEntry.objects.filter(author=request.user)
     entry_duration_dict = get_durations_for_entries(entryset)
+    category_duration_dict = get_duration_for_categories(entryset)
     basefilename = "allentriesreport"
     imgfilename=docfilename=''
     if entry_duration_dict:
         imgfilename,docfilename = create_chart(CHART_TYPE,entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
-    report_data["entry_duration_dict"]=entry_duration_dict
+    report_data["number_of_entries"]=len(entry_duration_dict)
+    report_data["category_duration_dict"]= category_duration_dict
     return custom_render(request,report_data,template_name)
 
 @login_required
 def categories_report(request,page_title,template_name):
     entryset=PomEntry.objects.filter(author=request.user)
-    entry_duration_dict = get_duration_for_categories(entryset)
+    category_duration_dict = get_duration_for_categories(entryset)
     basefilename = "allcategoriesreport"
     imgfilename=docfilename=''
-    if entry_duration_dict:
-        imgfilename,docfilename = create_chart(CHART_TYPE,entry_duration_dict,basefilename)
+    if category_duration_dict:
+        imgfilename,docfilename = create_chart(CHART_TYPE,category_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
-    report_data["entry_duration_dict"]=entry_duration_dict
+    report_data["category_duration_dict"]=category_duration_dict
     return custom_render(request,report_data,template_name)
     
 def create_chart(chart_type,map,basefilename):

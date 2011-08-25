@@ -10,3 +10,4 @@ def mts_to_hours(minutes_value):
         return str(duration_minutes/60) + ' hours, ' + str(duration_minutes%60) + ' minutes'
     else:
         return 0
+

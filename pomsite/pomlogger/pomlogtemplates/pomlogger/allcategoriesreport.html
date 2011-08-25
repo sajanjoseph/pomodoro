@@ -6,7 +6,7 @@
 {% block content %}
 {{block.super}}
 
-{%if entry_duration_dict %}
+{%if category_duration_dict %}
 <h3>{{page_title}}</h3>  
 <img src="{{ MEDIA_URL }}img/{{basefilename}}.png" alt="allcategories" >
 
@@ -25,5 +25,5 @@
 {% endblock %}
 
 {% block whatis %}
-Bar Plot of Time spent on {{entry_duration_dict.items|length}} categor{{ entry_duration_dict.items|length|pluralize:"y,ies"}} 
+Bar Plot of Time spent on {{category_duration_dict.items|length}} categor{{ category_duration_dict.items|length|pluralize:"y,ies"}} 
 {% endblock %}

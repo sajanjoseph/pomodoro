@@ -64,14 +64,14 @@ LOGFILE_NAME = '/home/sajan/dev/python/django/pomodoro/pomodorolog.txt'
 CHART_TYPE="bar"
 
 #barchart related constant values
-BAR_WIDTH = .25
-PLOT_OFFSET = .5
+BAR_WIDTH = .2
+PLOT_OFFSET = .3
 BAR_COLOR = 'magenta'
 LABEL_COLOR = 'blue'
 TITLE_COLOR ='black'
 REPORT_IMG_FMT = 'png'
 REPORT_DOC_FMT = 'pdf'
-FIGURE_WIDTH_SCALE_FACTOR = 4
+FIGURE_WIDTH_SCALE_FACTOR = 8
 YSTEP_FACTOR = 10
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.

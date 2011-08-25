@@ -1,76 +1,8 @@
-2011-08-25 16:40:30,891 - create_barchart - 718 - INFO - saving image
-2011-08-25 16:40:31,230 - create_barchart - 720 - INFO - saving pdf
-2011-08-25 16:40:31,443 - create_barchart - 722 - INFO - created barplot
-2011-08-25 16:40:40,931 - report_entries_for_day - 519 - INFO - entry_duration_dict size=10
-2011-08-25 16:40:40,931 - create_barchart - 670 - INFO - create_barchart()
-2011-08-25 16:40:40,931 - create_barchart - 678 - INFO - maxyvalue=59
-2011-08-25 16:40:40,931 - create_barchart - 680 - INFO - xdata=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-2011-08-25 16:40:40,932 - create_barchart - 681 - INFO - xdata len=10
-2011-08-25 16:40:40,932 - create_barchart - 683 - INFO - ydata=[16, 37, 25, 30, 41, 37, 30, 30, 30, 59]
-2011-08-25 16:40:40,932 - create_barchart - 684 - INFO - ydata len=10
-2011-08-25 16:40:40,932 - create_barchart - 690 - INFO - figsize=(16, 6)
-2011-08-25 16:40:41,007 - create_barchart - 694 - INFO - creating ystep
-2011-08-25 16:40:41,007 - create_barchart - 696 - INFO - ystep=5
-2011-08-25 16:40:41,007 - create_barchart - 699 - INFO - xdata and ydata are non empty
-2011-08-25 16:40:41,025 - create_barchart - 712 - INFO - dates len=10
-2011-08-25 16:40:41,025 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:41,026 - create_barchart - 712 - INFO - dates len=10
-2011-08-25 16:40:41,026 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:41,026 - create_barchart - 712 - INFO - dates len=10
-2011-08-25 16:40:41,026 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:41,026 - create_barchart - 712 - INFO - dates len=10
-2011-08-25 16:40:41,027 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:41,027 - create_barchart - 712 - INFO - dates len=10
-2011-08-25 16:40:41,027 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:41,027 - create_barchart - 712 - INFO - dates len=10
-2011-08-25 16:40:41,027 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:41,028 - create_barchart - 712 - INFO - dates len=10
-2011-08-25 16:40:41,028 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:41,028 - create_barchart - 712 - INFO - dates len=10
-2011-08-25 16:40:41,028 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:41,028 - create_barchart - 712 - INFO - dates len=10
-2011-08-25 16:40:41,029 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:41,029 - create_barchart - 712 - INFO - dates len=10
-2011-08-25 16:40:41,029 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:41,030 - create_barchart - 718 - INFO - saving image
-2011-08-25 16:40:41,345 - create_barchart - 720 - INFO - saving pdf
-2011-08-25 16:40:41,482 - create_barchart - 722 - INFO - created barplot
-2011-08-25 16:40:50,922 - report_entries_for_day - 519 - INFO - entry_duration_dict size=3
-2011-08-25 16:40:50,922 - create_barchart - 670 - INFO - create_barchart()
-2011-08-25 16:40:50,923 - create_barchart - 678 - INFO - maxyvalue=52
-2011-08-25 16:40:50,923 - create_barchart - 680 - INFO - xdata=[0, 1, 2]
-2011-08-25 16:40:50,923 - create_barchart - 681 - INFO - xdata len=3
-2011-08-25 16:40:50,923 - create_barchart - 683 - INFO - ydata=[52, 14, 24]
-2011-08-25 16:40:50,923 - create_barchart - 684 - INFO - ydata len=3
-2011-08-25 16:40:50,924 - create_barchart - 690 - INFO - figsize=(8, 6)
-2011-08-25 16:40:51,014 - create_barchart - 694 - INFO - creating ystep
-2011-08-25 16:40:51,014 - create_barchart - 696 - INFO - ystep=5
-2011-08-25 16:40:51,014 - create_barchart - 699 - INFO - xdata and ydata are non empty
-2011-08-25 16:40:51,023 - create_barchart - 712 - INFO - dates len=3
-2011-08-25 16:40:51,023 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:51,024 - create_barchart - 712 - INFO - dates len=3
-2011-08-25 16:40:51,024 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:51,024 - create_barchart - 712 - INFO - dates len=3
-2011-08-25 16:40:51,024 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:40:51,025 - create_barchart - 718 - INFO - saving image
-2011-08-25 16:40:51,176 - create_barchart - 720 - INFO - saving pdf
-2011-08-25 16:40:51,272 - create_barchart - 722 - INFO - created barplot
-2011-08-25 16:41:02,261 - report_entries_for_day - 519 - INFO - entry_duration_dict size=2
-2011-08-25 16:41:02,262 - create_barchart - 670 - INFO - create_barchart()
-2011-08-25 16:41:02,262 - create_barchart - 678 - INFO - maxyvalue=30
-2011-08-25 16:41:02,262 - create_barchart - 680 - INFO - xdata=[0, 1]
-2011-08-25 16:41:02,262 - create_barchart - 681 - INFO - xdata len=2
-2011-08-25 16:41:02,262 - create_barchart - 683 - INFO - ydata=[30, 30]
-2011-08-25 16:41:02,262 - create_barchart - 684 - INFO - ydata len=2
-2011-08-25 16:41:02,262 - create_barchart - 690 - INFO - figsize=(8, 6)
-2011-08-25 16:41:02,342 - create_barchart - 694 - INFO - creating ystep
-2011-08-25 16:41:02,342 - create_barchart - 696 - INFO - ystep=3
-2011-08-25 16:41:02,342 - create_barchart - 699 - INFO - xdata and ydata are non empty
-2011-08-25 16:41:02,352 - create_barchart - 712 - INFO - dates len=2
-2011-08-25 16:41:02,353 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:41:02,353 - create_barchart - 712 - INFO - dates len=2
-2011-08-25 16:41:02,353 - create_barchart - 714 - INFO - date label on entry
-2011-08-25 16:41:02,354 - create_barchart - 718 - INFO - saving image
-2011-08-25 16:41:02,497 - create_barchart - 720 - INFO - saving pdf
-2011-08-25 16:41:02,612 - create_barchart - 722 - INFO - created barplot
-2011-08-25 16:41:07,964 - report_entries_for_day - 519 - INFO - entry_duration_dict size=0
+2011-08-25 21:47:09,257 - report_entries_for_day - 520 - INFO - entry_duration_dict size=3
+2011-08-25 21:47:14,627 - report_entries_for_day - 520 - INFO - entry_duration_dict size=7
+2011-08-25 21:47:19,121 - report_entries_for_day - 520 - INFO - entry_duration_dict size=9
+2011-08-25 21:47:31,415 - report_entries_for_day - 520 - INFO - entry_duration_dict size=10
+2011-08-25 22:04:01,673 - report_entries_for_day - 520 - INFO - entry_duration_dict size=10
+2011-08-25 22:06:35,451 - report_entries_for_day - 520 - INFO - entry_duration_dict size=9
+2011-08-25 22:06:43,473 - report_entries_for_day - 520 - INFO - entry_duration_dict size=7
+2011-08-25 22:06:50,328 - report_entries_for_day - 520 - INFO - entry_duration_dict size=3
