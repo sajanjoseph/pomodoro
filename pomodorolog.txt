@@ -1,8 +1,0 @@
-2011-08-25 21:47:09,257 - report_entries_for_day - 520 - INFO - entry_duration_dict size=3
-2011-08-25 21:47:14,627 - report_entries_for_day - 520 - INFO - entry_duration_dict size=7
-2011-08-25 21:47:19,121 - report_entries_for_day - 520 - INFO - entry_duration_dict size=9
-2011-08-25 21:47:31,415 - report_entries_for_day - 520 - INFO - entry_duration_dict size=10
-2011-08-25 22:04:01,673 - report_entries_for_day - 520 - INFO - entry_duration_dict size=10
-2011-08-25 22:06:35,451 - report_entries_for_day - 520 - INFO - entry_duration_dict size=9
-2011-08-25 22:06:43,473 - report_entries_for_day - 520 - INFO - entry_duration_dict size=7
-2011-08-25 22:06:50,328 - report_entries_for_day - 520 - INFO - entry_duration_dict size=3

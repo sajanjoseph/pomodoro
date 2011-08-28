@@ -60,6 +60,9 @@ IMAGE_FOLDER_PATH = '/home/sajan/dev/python/django/pomodoro/pomsite/media/pomlog
 
 LOGFILE_NAME = '/home/sajan/dev/python/django/pomodoro/pomodorolog.txt'
 
+
+#Pagination-number of entries to be listed per page
+PAGINATE_BY=10
 #chart type to be created
 CHART_TYPE="bar"
 

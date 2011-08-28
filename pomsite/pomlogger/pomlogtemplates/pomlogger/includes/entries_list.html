@@ -8,7 +8,7 @@
 <th></th>
 <th>USERS SHAREDWITH</th>
 </tr>
-{% for anentry in object_list %}
+{% for anentry in entries.object_list %}
 <tr> 
 <td> <a href="{{anentry.get_absolute_url }}" > {{anentry.description|truncatewords:2}}  </a> </td>
 
@@ -24,3 +24,18 @@
 </tr>
 {% endfor %}
 </table>
+<div class="pagination">
+    <span class="step-links">
+        {% if entries.has_previous %}
+            <a href="?page={{ entries.previous_page_number }}">{{"<<"}}</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ entries.number }} of {{ entries.paginator.num_pages }}.
+        </span>
+
+        {% if entries.has_next %}
+            <a href="?page={{ entries.next_page_number }}">{{">>"}}</a>
+        {% endif %}
+    </span>
+</div>

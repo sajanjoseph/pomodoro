@@ -22,6 +22,8 @@ from django.contrib.auth.models import User
 #import settings
 from settings import CHART_TYPE,BAR_WIDTH,PLOT_OFFSET,BAR_COLOR,LABEL_COLOR,TITLE_COLOR,REPORT_IMG_FMT,REPORT_DOC_FMT,FIGURE_WIDTH_SCALE_FACTOR,YSTEP_FACTOR
 from settings import IMAGE_FOLDER_PATH
+from settings import PAGINATE_BY
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 import logging
 import matplotlib.pyplot as plt
 import pylab
@@ -81,29 +83,46 @@ def entry_archive_index(request,page_title,template_name):
     entryset=PomEntry.objects.filter(author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
     now=datetime.datetime.now()
+    entries = get_pagination_entries(request, entryset)
     entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user).order_by('-today','-end_time')#added for sharing
-    context={'category_duration_dict':category_duration_dict,'object_list':entryset,'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
+    context={'category_duration_dict':category_duration_dict,'entries':entries,'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
+
+def get_pagination_entries(request, entryset):
+    try:
+        page = int(request.GET.get('page', 1))
+    except ValueError:
+        page = 1
+    paginator = Paginator(entryset, PAGINATE_BY)
+    try:
+        entries = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        entries = paginator.page(paginator.num_pages)
+    return entries
+
 def entry_archive_year(request,year,page_title,template_name):
     entryset=PomEntry.objects.filter(today__year=year,author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
-    context={'category_duration_dict':category_duration_dict,'object_list':entryset,'year':year,'page_title':page_title}
+    entries = get_pagination_entries(request, entryset)
+    context={'category_duration_dict':category_duration_dict,'entries':entries,'year':year,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
 def entry_archive_month(request,year,month,page_title,template_name):
     entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
-    context={'category_duration_dict':category_duration_dict,'object_list':entryset,'year':year,'month':month,'page_title':page_title}
+    entries = get_pagination_entries(request, entryset)
+    context={'category_duration_dict':category_duration_dict,'entries':entries,'year':year,'month':month,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
 def entry_archive_day(request,year,month,day,page_title,template_name):
     entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),today__day=day,author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
-    context={'category_duration_dict':category_duration_dict,'object_list':entryset,'year':year,'month':month,'day':day,'page_title':page_title}
+    entries = get_pagination_entries(request, entryset)
+    context={'category_duration_dict':category_duration_dict,'entries':entries,'year':year,'month':month,'day':day,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required

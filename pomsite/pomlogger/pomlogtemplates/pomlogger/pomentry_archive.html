@@ -10,7 +10,7 @@ Today is :<b>{% now "Y b d" %}</b>
 <p>
 <a href="{% url pomlog_add_entry %}"><img src="{{ MEDIA_URL }}img/addentryanim2b.gif" alt="ADD NEW POMODORO ENTRY"> </a> 
 </p>
-{%if object_list %}
+{%if entries %}
 
 {% include "pomlogger/includes/time_on_categories.html" %}
 

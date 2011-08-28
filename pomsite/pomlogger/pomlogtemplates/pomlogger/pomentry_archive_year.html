@@ -9,7 +9,7 @@
 {{block.super}}
 Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
-{% if object_list %}
+{% if entries %}
 {% include "pomlogger/includes/time_on_categories.html" %}
 
 <h3> {{page_title}} of {{year}} </h3>
