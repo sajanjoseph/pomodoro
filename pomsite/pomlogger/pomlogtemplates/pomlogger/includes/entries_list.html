@@ -27,7 +27,7 @@
 <div class="pagination">
     <span class="step-links">
         {% if entries.has_previous %}
-            <a href="?page={{ entries.previous_page_number }}">{{"<<"}}</a>
+            <a href="?page={{ entries.previous_page_number }}"> <img src="{{ MEDIA_URL }}img/prev-small.png" alt="{{"<<"}}"/> </a>
         {% endif %}
 
         <span class="current">
@@ -35,7 +35,7 @@
         </span>
 
         {% if entries.has_next %}
-            <a href="?page={{ entries.next_page_number }}">{{">>"}}</a>
+            <a href="?page={{ entries.next_page_number }}"><img src="{{ MEDIA_URL }}img/next-small.png" alt="{{">>"}}"/></a>
         {% endif %}
     </span>
 </div>

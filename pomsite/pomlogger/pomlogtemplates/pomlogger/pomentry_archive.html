@@ -39,7 +39,7 @@ Today is :<b>{% now "Y b d" %}</b>
 
 {% block whatis %}
 <p>Listing of all Entries &
-Time spent on {{entry_duration_dict.items|length}} categor{{ entry_duration_dict.items|length|pluralize:"y,ies"}} till now 
+Time spent on {{category_duration_dict.items|length}} categor{{ category_duration_dict.items|length|pluralize:"y,ies"}} till now 
 </p>
 {% endblock %}
 

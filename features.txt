@@ -3,3 +3,4 @@
     2.1.user should only see his entries(edit,delete)
     2.2.user should only see his categories(edit,delete)
 3.report generation and barchart
+4.pagination in listing of entries
