@@ -7,19 +7,28 @@
 {% block content %}{{block.super}}
 Today is :<b>{{now|date:"j F, Y"}}</b>
 <h3> Welcome {{user.username}} </h3>
+<div class="cat-detail">
+	<table border="1">
+	<caption>{{page_title}}</caption>
+	<tr>  
+	<th>name </th> <td>{{ object.name}} </td>
+	</tr>
+	<tr>
+	<th>description </th> <td>{{object.description }} </td>
+	</tr>
+	</table>
+</div>
+{% if entries %}
+{% include "pomlogger/includes/entries_list.html" %}
+{% include "pomlogger/includes/time_on_categories.html" %}
 
-<table border="1">
-<caption>{{page_title}}</caption>
-<tr>  
-<th>name </th> <td>{{ object.name}} </td>
-</tr>
-<tr>
-<th>description </th> <td>{{object.description }} </td>
-</tr>
-</table>
+{% else %}
+
+<h3>No Entries in {{ object.name}} </h3> 
+{% endif %}
 
 {% endblock %}
 
 {% block whatis %}
-Details of the category {{object.name}}
+Details of the category {{object.name}} and {{category_duration_dict|length}} Entr{{category_duration_dict|length|pluralize:"y,ies" }} in it
 {% endblock %}

@@ -26,9 +26,11 @@ class PomCategoryTest(PomTestCase):
         self.assertEqual(expectedvalue,result)
 
     def test_category_list_view(self):
+        print 'reverse=',reverse('pomlog_category_list')
         response=self.client.get(reverse('pomlog_category_list'))
         status_code=response.status_code
-        cats=ol=get_context_variable(response,'cats')
+        print 'st code=',status_code
+        cats=get_context_variable(response,'cats')
         self.assertEqual(3,len(cats))
         self.assertEqual(200,status_code)
 

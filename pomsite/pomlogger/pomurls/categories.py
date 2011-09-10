@@ -18,6 +18,12 @@ url(r'^editcategory/(?P<slug>[-\w]+)/$','pomlogger.views.edit_category',
     },
     name='pomlog_edit_category'),
 
+url(r'^listentries/(?P<slug>[-\w]+)/$','pomlogger.views.list_entries_of_category',
+    {
+    'page_title':'ListEntriesOfCategory',
+    'template_name':'pomlogger/list_entries_of_category.html'
+    },
+    name='pomlog_list_entries_of_category'),
 
 url(r'^deletecategory/(?P<slug>[-\w]+)/$','pomlogger.views.delete_category',name='pomlog_delete_category'),
 

@@ -332,13 +332,20 @@ def category_list(request,template_name,page_title):
     #cats_with_status=update_cats_with_editable_status(request.user,categories)
     #category_list_dict={'page_title':page_title ,'cats_status':cats_with_status}
     category_list_dict={'page_title':page_title ,'cats':categories}
+    print 'category_list()::template=',template_name
+    print 'category_list()::',category_list_dict.get("cats")
     return custom_render(request,category_list_dict,template_name)
 
 @login_required
 def category_detail(request,slug,template_name,page_title):
     category=get_object_or_404(PomCategory,slug=slug,users=request.user)
+    print("category=",category);
     now=datetime.datetime.now()
-    context={'object':category,'now':now, 'page_title': page_title}
+    entryset=PomEntry.objects.filter(categories=category,author=request.user).order_by('-today','-end_time')
+    category_duration_dict=get_duration_for_categories(entryset)
+    print 'category_duration_dict=',len(category_duration_dict)
+    entries = get_pagination_entries(request, entryset)
+    context={'object':category,'now':now,'category_duration_dict':category_duration_dict,'entries':entries,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 
@@ -408,6 +415,14 @@ def edit_category(request,slug,template_name,page_title):
         #print 'edit_category()::user has no permission..raising 404'
         raise Http404
 
+@login_required
+def list_entries_of_category(request,slug,template_name,page_title):
+    cat = get_object_or_404(PomCategory,slug=slug)
+    entryset=PomEntry.objects.filter(categories=cat,author=request.user).order_by('-today','-end_time')
+    category_duration_dict=get_duration_for_categories(entryset)
+    entries = get_pagination_entries(request, entryset)
+    context={'category_duration_dict':category_duration_dict,'entries':entries,'page_title':page_title}
+    return custom_render(request,context,template_name)
 
 @login_required
 def get_form_data(request):
@@ -615,7 +630,7 @@ def create_piechart(map,basefilename):
     pass
 
 def create_barchart(map,basefilename):
-    now = datetime.datetime.now().strftime("%I-%M-%S%p-%d%b%Y")
+    now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
     imgfilename = ''
     docfilename = ''
     xvalues = map.keys()
@@ -629,16 +644,17 @@ def create_barchart(map,basefilename):
     xlabels = [x[0] for x in splitxdata]
     dates = [x[1] for x in splitxdata if len(x)>1]
     figsize= calculate_plotfigure_size(len(xvalues))
-    figure = pylab.figure(figsize = figsize)
+    figure = plt.figure(figsize = figsize)
     ax = figure.add_subplot(1,1,1)
     barwidth = BAR_WIDTH
     ystep = create_ystep(maxyvalue)
-    pylab.grid(True)
+    plt.grid(True)
+    print 'BAR_COLOR=',BAR_COLOR
     if xdata and ydata:
         ax.bar(xdata, ydata, width=barwidth,align='center',color=BAR_COLOR)
         ax.set_xlabel('categories',color=LABEL_COLOR)
         ax.set_ylabel('duration in  minutes',color=LABEL_COLOR)
-        ax.set_title('duration for categories-created at :'+now,color=TITLE_COLOR)
+        ax.set_title('duration plot created at :'+now,color=TITLE_COLOR)
         ax.set_xticks(xdata)
         ax.set_xlim([min_x - PLOT_OFFSET, max_x + PLOT_OFFSET])
         ax.set_xticklabels(xlabels)
@@ -647,17 +663,21 @@ def create_barchart(map,basefilename):
             ax.set_ylim(0,max(ydata)+ystep)
         for i in range(len(xdata)):
             if dates:
-                pylab.text(xdata[i], 0, dates[i], rotation='vertical',size='large',fontweight="bold",family='fantasy')
+                plt.text(xdata[i], 0, dates[i], rotation='vertical',size='large',fontweight="bold",family='fantasy')
         figure.autofmt_xdate(rotation=30)
         imgfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".png")
         docfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".pdf")
         figure.savefig(imgfilename,format=REPORT_IMG_FMT)
         figure.savefig(docfilename,format=REPORT_DOC_FMT)
+        plt.close(figure)
         return imgfilename,docfilename
     else:
+        plt.close(figure)
         logger.info("xdata or ydata empty..returning empty strings")
         return imgfilename,docfilename
     
+
+ 
 def create_ystep(maxvalue):
     return  maxvalue if maxvalue < YSTEP_FACTOR else maxvalue/YSTEP_FACTOR
         

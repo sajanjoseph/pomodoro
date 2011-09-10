@@ -1,0 +1,25 @@
+{% extends "pomlogger/base_entries.html" %}
+
+{% block title %}
+{{block.super}}|{{page_title }}
+{% endblock %}
+{% block content %}
+{{block.super}}
+Today is :<b>{% now "Y b d" %}</b>
+<h3> Welcome {{user.username}} </h3>
+{% if entries %}
+{% include "pomlogger/includes/time_on_categories.html" %}
+
+<h3> {{page_title}}</h3>
+{% include "pomlogger/includes/entries_list.html" %}
+{% else %}
+
+<h3>No Entries  </h3> 
+{% endif %}
+
+{% endblock %}
+
+
+{% block whatis %}
+entries of category
+{% endblock %}
