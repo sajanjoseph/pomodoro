@@ -12,10 +12,11 @@
 Today is :<b>{% now "Y b d" %} </b>
 <h3> Welcome {{user.username}} </h3>
 
-
 <img src="{{ MEDIA_URL }}img/addentryanim2b.gif" alt="ADD NEW POMODORO ENTRY">
 
+
 <form name="timeform" id="timeform" method="POST" action ="." >
+<span  id='start_time_show_always'></span>
 <table >
 <tr>
     <td>

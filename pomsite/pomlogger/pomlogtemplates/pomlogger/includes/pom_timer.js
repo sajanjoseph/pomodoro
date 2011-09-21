@@ -33,7 +33,11 @@ var changeBtnStatus=function(){
         //timerstartedfield.attr("value",str_time);
         timerstartedfield.attr("value",start_time_millis);
         
-        //alert('start time set as'+start_time_millis);
+        var startshowfield =$('#start_time_show_always');
+        showElement("start_time_show_always");
+        startshowfield.html("timer started at :"+str_time);
+        
+       
        
     }
     else if (timebtnvalue=="stop"){
@@ -50,7 +54,7 @@ var changeBtnStatus=function(){
         var timerstoppedshowfield =$('#stop_time_show');
         timerstoppedshowfield.html(stp_time);
         //alert('stop time set as'+stp_time_millis);
-        
+        hideElement("start_time_show_always");
         showElement("entrydata");
     }
 };
