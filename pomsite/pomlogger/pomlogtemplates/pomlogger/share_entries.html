@@ -11,7 +11,7 @@ Today is :<b>{% now "Y b d" %}</b>
 <script type="text/javascript">
 	{% include "pomlogger/includes/share_entries.js" %}
 </script>
-<FORM action="." method="POST">
+<FORM action="." method="POST">{% csrf_token %}
 <table>
 <tr>
 <INPUT TYPE="radio" NAME="sharing_options" VALUE= "allentries" >"All Entries" </p>

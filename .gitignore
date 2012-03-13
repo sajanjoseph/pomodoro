@@ -1,6 +1,7 @@
 *.pyc
 *.*~
-*log.txt.*
+*log.txt
+*.log
 *.pdf
 entriesof*.*
 allentries*.*

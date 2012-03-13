@@ -15,7 +15,7 @@ Today is :<b>{% now "Y b d" %} </b>
 <img src="{{ MEDIA_URL }}img/addentryanim2b.gif" alt="ADD NEW POMODORO ENTRY">
 
 
-<form name="timeform" id="timeform" method="POST" action ="." >
+<form name="timeform" id="timeform" method="POST" action ="." >{% csrf_token %}
 <span  id='start_time_show_always'></span>
 <table >
 <tr>
@@ -62,7 +62,7 @@ Today is :<b>{% now "Y b d" %} </b>
 <input type="hidden" name="timerstopped" id="timerstopped"/>
 
 <input type="submit" id="submitBtn" value="Submit"/>
-</form>
+
 </div>
 </form>
 {% endblock %}

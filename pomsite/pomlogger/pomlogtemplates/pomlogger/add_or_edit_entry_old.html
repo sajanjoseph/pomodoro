@@ -12,7 +12,7 @@ Today is :<b>{% now "Y b d" %} </b>
 
 <h2>{{page_title}}</h2>
 
-<form action="." method="post">
+<form action="." method="post">{% csrf_token %}
 <table>
 {{entryform.as_table }}
 </table>

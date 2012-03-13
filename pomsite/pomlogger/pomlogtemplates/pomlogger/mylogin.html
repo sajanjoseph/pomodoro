@@ -10,7 +10,7 @@ login
 <div id="login"> 
 <center>
 <h2>user login </h2>
-<form method="post" action=".">
+<form method="post" action=".">{% csrf_token %}
 
 <table>
 {{form.as_table}}

@@ -4,3 +4,6 @@
     2.2.user should only see his categories(edit,delete)
 3.report generation and barchart
 4.pagination in listing of entries
+
+5.min pie chart view for listing of category-time spent in entries listing page
+ideally split into many pie chart diagrams so that no clutter occurs

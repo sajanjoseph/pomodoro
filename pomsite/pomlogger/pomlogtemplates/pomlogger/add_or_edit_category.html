@@ -9,7 +9,7 @@ Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
 
 
-<form method='post' action=".">
+<form method='post' action=".">{% csrf_token %}
 <table>
 <caption>{{page_title}}</caption>
 {{categoryform.as_table}}

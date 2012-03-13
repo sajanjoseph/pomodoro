@@ -573,7 +573,7 @@ def report_entries_for_month(request,year,month,page_title,template_name):
     page_title = page_title+" "+monthname+"-"+year
     imgfilename=docfilename=''
     if entry_duration_dict:
-        imgfilename,docfilename = create_chart(CHART_TYPE,entry_duration_dict,basefilename)
+        imgfilename,docfilename = create_linechart(entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year,'month':monthname}
     report_data["number_of_entries"]=len(entry_duration_dict)
     report_data["category_duration_dict"]= category_duration_dict
@@ -588,7 +588,7 @@ def report_entries_for_year(request,year,page_title,template_name):
     page_title = page_title+" "+year
     imgfilename=docfilename=''
     if entry_duration_dict:
-        imgfilename,docfilename = create_chart(CHART_TYPE,entry_duration_dict,basefilename)
+        imgfilename,docfilename = create_linechart(entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year}
     report_data["number_of_entries"]=len(entry_duration_dict)
     report_data["category_duration_dict"]= category_duration_dict
@@ -602,7 +602,7 @@ def entries_report(request,page_title,template_name):
     basefilename = "allentriesreport"
     imgfilename=docfilename=''
     if entry_duration_dict:
-        imgfilename,docfilename = create_chart(CHART_TYPE,entry_duration_dict,basefilename)
+        imgfilename,docfilename = create_linechart(entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
     report_data["number_of_entries"]=len(entry_duration_dict)
     report_data["category_duration_dict"]= category_duration_dict
@@ -615,7 +615,7 @@ def categories_report(request,page_title,template_name):
     basefilename = "allcategoriesreport"
     imgfilename=docfilename=''
     if category_duration_dict:
-        imgfilename,docfilename = create_chart(CHART_TYPE,category_duration_dict,basefilename)
+        imgfilename,docfilename = create_piechart(category_duration_dict,basefilename,chartsize=(8,8))
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
     report_data["category_duration_dict"]=category_duration_dict
     return custom_render(request,report_data,template_name)
@@ -625,9 +625,86 @@ def create_chart(chart_type,map,basefilename):
         return create_barchart(map,basefilename)
     elif chart_type is "pie":
         return create_piechart(map,basefilename)
-        
-def create_piechart(map,basefilename):
-    pass
+    
+def create_piechart(map,basefilename,chartsize=(16,16)):
+    now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
+    imgfilename = ''
+    docfilename = ''
+    xvalues = map.keys()
+    xvalues.sort()
+    yvalues = map.values()
+    sum_y = sum(yvalues)
+    sum_y = float(sum_y)
+    xdata = range(len(xvalues))
+    ydata = [map[x] for x in xvalues]
+    if xdata and ydata:
+        splitxdata = [x.split('-',1) for x in xvalues]
+        xlabels = [x[0] for x in splitxdata]
+        dates = [x[1] for x in splitxdata if len(x)>1]
+        figsize= chartsize
+        figure = plt.figure(figsize = figsize)
+        ax = figure.add_subplot(1,1,1)
+        fracs=[x*100/sum_y for x in ydata]
+        labels=[x for x in xlabels]
+        #need to add text with dates
+        plt.pie(fracs, labels=labels, autopct='%1.1f%%', shadow=True)
+        title('duration pie plot')
+        imgfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".png")
+        docfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".pdf")
+        figure.savefig(imgfilename,format=REPORT_IMG_FMT)
+        figure.savefig(docfilename,format=REPORT_DOC_FMT)
+        plt.close(figure)
+        return imgfilename,docfilename
+    else:
+        plt.close(figure)
+        logger.info("xdata or ydata empty..returning empty strings")
+        return imgfilename,docfilename
+
+def create_linechart(map,basefilename):
+    now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
+    imgfilename = ''
+    docfilename = ''
+    xvalues = map.keys()
+    xvalues.sort()
+    yvalues = map.values()
+    maxyvalue = get_max_value(yvalues)
+    xdata = range(len(xvalues))
+    ydata = [map[x] for x in xvalues]
+    min_x,max_x = get_extreme_values(xdata)
+    splitxdata = [x.split('-',1) for x in xvalues]
+    xlabels = [x[0] for x in splitxdata]
+    dates = [x[1] for x in splitxdata if len(x)>1]
+    figsize= calculate_plotfigure_size(len(xvalues))
+    figure = plt.figure(figsize = figsize)
+#    figure = plt.figure(figsize = (70,8))
+    ax = figure.add_subplot(1,1,1)
+    ystep = create_ystep(maxyvalue)
+    plt.grid(True)
+    if xdata and ydata:
+        plt.plot(xdata,ydata)
+        ax.set_xlabel('categories',color=LABEL_COLOR)
+        ax.set_ylabel('duration in  minutes',color=LABEL_COLOR)
+        ax.set_title('duration plot created at :'+now,color=TITLE_COLOR)
+        ax.set_xticks(xdata)
+        ax.set_xlim([min_x - PLOT_OFFSET, max_x + PLOT_OFFSET])
+        ax.set_xticklabels(xlabels)
+        if ystep:
+            ax.set_yticks(range(0,maxyvalue+ystep,ystep))
+            ax.set_ylim(0,max(ydata)+ystep)
+        for i in range(len(xdata)):
+            if dates:
+                plt.text(xdata[i], 0, dates[i], rotation='vertical',size='large',fontweight="bold",family='fantasy')
+        figure.autofmt_xdate(rotation=30)
+        imgfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".png")
+        docfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".pdf")
+        figure.savefig(imgfilename,format=REPORT_IMG_FMT)
+        figure.savefig(docfilename,format=REPORT_DOC_FMT)
+        plt.close(figure)
+        return imgfilename,docfilename
+    else:
+        plt.close(figure)
+        logger.info("xdata or ydata empty..returning empty strings")
+        return imgfilename,docfilename
 
 def create_barchart(map,basefilename):
     now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
@@ -649,7 +726,6 @@ def create_barchart(map,basefilename):
     barwidth = BAR_WIDTH
     ystep = create_ystep(maxyvalue)
     plt.grid(True)
-    print 'BAR_COLOR=',BAR_COLOR
     if xdata and ydata:
         ax.bar(xdata, ydata, width=barwidth,align='center',color=BAR_COLOR)
         ax.set_xlabel('categories',color=LABEL_COLOR)

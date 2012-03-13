@@ -9,7 +9,7 @@
 Today is :<b>{% now "Y b d" %}</b>
 <h3> Welcome {{user.username}} </h3>
 
-<FORM action="." method="POST">
+<FORM action="." method="POST">{% csrf_token %}
 
 SHARE
 <p><INPUT TYPE="radio" NAME="sharing_options" VALUE="allentries"  CHECKED>All Entries </p>
