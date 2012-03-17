@@ -29,12 +29,30 @@ import matplotlib.pyplot as plt
 import pylab
 from matplotlib.backends.backend_pdf import PdfPages
 
+from django.core.mail import send_mail,EmailMessage
+from settings import DEFAULT_FROM_EMAIL
+
 logger = logging.getLogger("pomodoro")
+
+
+#def sendmail(request):
+#    subject='test mail2'
+#    message='sajan sending message2'
+#    toaddress='glorrfindel@yahoo.com'
+#    #send_mail(subject,message,None,[toaddress])
+#    email=EmailMessage(subject,message,from_email=None,to=[toaddress])
+#    email.send()
+#    print 'sendmail()::sent email'
+#    return redirect('home')
+    
 
 @login_required
 def index(request, template_name):
     print 'index()::template=',template_name
-    return custom_render(request, {},template_name )
+    print 'index::request.path=',request.path
+    print 'index::request.user=',request.user
+    path=request.path
+    return custom_render(request, {'path':path},template_name )
 
 def get_month_as_number(monthname):
     if title(monthname) not in calendar.month_abbr:
@@ -217,7 +235,6 @@ def add_new_entry(request,template_name,page_title):
         newentry.save()
         return redirect('pomlog_entry_archive_index')
     return custom_render(request,context,template_name)
-            
 
 def get_timetuples(starttime,endtime):
     try:

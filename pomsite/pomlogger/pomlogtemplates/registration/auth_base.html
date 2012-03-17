@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>PomLog{% block title %} {% endblock %}</title>
+<LINK REL=StyleSheet HREF="{{MEDIA_URL}}css/newlook.css" TYPE="text/css" MEDIA="screen, print"/>
+<link rel="shortcut icon" href="{{ MEDIA_URL }}img/pomodoro-icon.ico"/>
+</head>
+<body>
+<div id="header">
+    <img class="centerpage" src="{{ MEDIA_URL }}img/pomodorologgeranim1.gif" alt="POMODORO LOGGER">
+   
+
+ </div>
+
+<div id="content">
+   {% block content %}
+<table>
+<tr>
+<td><a href="{% url pomlog_logout %}" > Logout </a> 
+</td>
+<td>
+<a href="{% url pomlog_login %}" > Login </a> 
+</td>
+</tr>
+</table>
+   {% endblock %}
+ </div>
+ 
+<div id="sidebar"> 
+	<h3> page info </h3>
+	{% block whatis %}
+	{% endblock %}
+	
+</div>
+<div id="homelnk">
+<a href="{% url home %}">home</a>
+</div>
+</body>
+</html>

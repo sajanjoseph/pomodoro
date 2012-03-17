@@ -22,13 +22,15 @@ LOGIN_URL='/pomlog/account/login/'
 LOGIN_REDIRECT_URL='/pomlog/entries/'
 
 
-#localhost's debugging mail server
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'testing@example.com'
+# mail server
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'pomodoroadmn@gmail.com'
+EMAIL_HOST_PASSWORD = 'agameofcode'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'pomodoroadmn@gmail.com'
+#EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
+
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -41,7 +43,7 @@ TIME_ZONE = 'Asia/Calcutta'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-SITE_ID = 1
+SITE_ID = 2
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -113,5 +115,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'registration',
     'pomlogger',
 )
+#account activation open for a week
+ACCOUNT_ACTIVATION_DAYS = 2

@@ -44,13 +44,21 @@
 	<li id="main-nav-categories">
         <a href="{% url pomlog_reports   %}"> Reports </a>
     </li>
+    
+     {% url home as home_url %}
+     {% ifnotequal path  home_url %}
+    
+		<li id="main-nav-categories">
+	        <a href="{{ home_url }}"> Home </a>
+	    </li>
      </ul>
+   	{% endifnotequal %}
 
-   
+</div>
+<div>
 <h3> page info </h3>
 {% block whatis %}
 {% endblock %}
 </div>
-
 </body>
 </html>
