@@ -11,7 +11,6 @@ h2{
     }
 
 h3{
-    
     color :green;
     font-family: courier;
 }
@@ -20,16 +19,6 @@ h4{
     
     color :red;
     font-family: courier;
-}
-
-div {
-    margin: 0.5em;
-    padding: 0.5em;
-    border: 1px solid blue;
-    -moz-border-radius: 10px;
-	-webkit-border-radius: 10px;
-    background-color: #e0e0e0;
-    width: 90%;
 }
 
 
@@ -42,21 +31,21 @@ img.centerpage {
 #header h2 {
     font-style: italic;
     text-align: center;
-    border: 1px solid white;
+    
     padding: .2em;
     margin: 0em;
     
     vertical-align: middle;
+   
 }
 
 #content{
-    border-color: blue;
-    
+   
+    text-align:center;
 }
 
 #sidebar{
-
-    border: 1px solid blue;
+	width:40%;
 }
 
 ul.report{
@@ -88,47 +77,373 @@ li.report{
     border-left: 2px solid #CCCCCC;
 }
 
-th{
-    border-bottom:1px solid #FFFFFF;
-    border-top:4px solid #AABCFE;
-    color:black;
-    font-size:20px;
-    font-weight:bold;
-    padding:8px;
-    background:none repeat scroll 0 0 #B9C9FE
+
+/** modified **/
+.subtitle {
+	clear:both;
+    background: #6A942F;
+	background: -moz-linear-gradient(top, #A1E048, #6A942F);
+	background: -ms-linear-gradient(top, #A1E048, #6A942F);
+	background: -o-linear-gradient(top, #A1E048, #6A942F);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#A1E048), to(#6A942F));
+	background: -moz-linear-gradient(linear, 0% 0%, 0% 100%, from(#A1E048), to(#6A942F));
+	background: -webkit-linear-gradient(top, #A1E048, #6A942F);
+	background: linear-gradient(top, #A1E048, #6A942F);
+	padding: 10px 20px;
+	color:white;
+	margin:auto;
+	text-align:center;
+	text-decoration:none;
+	text-transform: uppercase;
+	letter-spacing: .2em;
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
 }
-table#entries{
-    border-collapse:collapse;
-    background:none repeat scroll 0 0 #E8EDFF    
-    
-    font-family:"Lucida Sans Unicode","Lucida Grande",Sans-Serif;
-    font-size:20px;
-    margin:20px;
-    text-align:left;
-    width:800px;
+.hstrip{
+	
+	
+	height: 1px;
+	border-style: solid;
+	border-color: white;
+	background-color:white;
+    clear:both;
 }
 
-table#cats{
-    border-collapse:collapse;
-    background:none repeat scroll 0 0 #E8EDFF    
-    
-    font-family:"Lucida Sans Unicode","Lucida Grande",Sans-Serif;
-    font-size:20px;
-    margin:20px;
-    text-align:left;
-    width:500px;
-    
+hr#strip{
+	color:blue;
+ 	border:none;
+ 	height:3px;
+	
 }
 
-td{
-    background:none repeat scroll 0 0 #E8EDFF;
-    border-bottom:1px solid #FFFFFF;
-    border-top:1px solid transparent;
+.short{
+	width:47%;
+	
+}
+.rightcorner{
+	float:right;
+	
+}
+
+.leftfloat{
+	float:left;
+}
+.errortext{
+	color:red;
+}
+
+ul.errorlist{
+	color:red;
+}
+
+#error_message {
+    border: 2px solid #FAAFBE;
+    margin: auto;
+    padding: 0.5em;
+    color: #fff;
+    width: 25em;
+    font-weight: bold;
+    background: #FAAFBE;
+}
+#message {
+    border: 2px solid #73C553;
+    padding: 0.5em;
+    margin:auto;
+    color: #fff;
     
-    color:black;
-    padding:8px;
+    font-weight: bold;
+    background: #73C553;
+}
+
+div#loginform{
+	margin-left:auto;
+    margin-right:auto;
+    margin-top:10px;
+    min-width:300px;
+    text-align:center;
+    width:50%;
+}
+div#registerform,#passchangeform,#resetpassform{
+	margin-left:auto;
+    margin-right:auto;
+    margin-top:10px;
+    min-width:400px;
+    width:50%;
+}
+fieldset.login,.registerfields,.passchangefields,.resetpassfields {
+    background: #d9d7c7 ;
+    
+    float: center;
+    border: 5px solid white;
+    padding-top: 0.5em;
+}
+
+
+label {
+  float:left;
+  width:25%;
+  margin-right:0.5em;
+  padding-top:0.2em;
+  text-align:right;
+  font-weight:bold;
+}
+
+a {
+	text-decoration:none;
+}
+.white{
+	color:white;
+}
+
+a.btnlink{
+	clear:both;
+	border: 2px outset;
+  	padding: 10px;
+  	display:block;
+  	text-decoration: none;
+  	border-color : white white white #A1E048;
+}
+
+.center{
+	text-align:center;
+}
+.maintitle{
+	
+}
+
+#logo{
+	display: block;
+    height: 49px;
+    margin-left: 20px;
+    color: white;
+    font-size: 48px;
+    font-weight: bold;
+    letter-spacing: -4px;
+    text-shadow: 1px 2px 2px #000;
+}
+
+.sectionhead{
+	display: block;
+    height: 31px;
+    margin-left: 20px;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    letter-spacing: -2px;
+    text-shadow: 1px 2px 2px #000;
+}
+
+#welcome{
+	font-size: 30px;
+	
+}
+div#category-duration{
+	clear:both;
+	margin:auto;
+	text-align:center;
+}
+.duration-list,.shared{
+	clear:both;
+	text-align:center;
+	margin:auto;
+	overflow:auto;
+	font-weight:bold;
+	background-color:#D8D8D8;
+	background: -moz-linear-gradient(right, #D8D8D8, #E3E0D1);
+	background: -webkit-linear-gradient(right, #D8D8D8, #E3E0D1);
+}
+.duration-list{
+	width:50%;
+	height:7em;
+}
+.shared{
+	width:100%;
+	height:10em;
+	
+}
+p#change-pass,#reset-pass,#sharelink{
+	width:15em;
+	margin-top:.5em;
+	margin-bottom:.5em;
+}
+
+.entry-list{
+	clear:both;
+	margin:auto;
+	text-align:center;
+	background: -moz-linear-gradient(top, #D8D8D8, #E3E0D1);
+	background: -webkit-linear-gradient(top, #D8D8D8, #E3E0D1);
+}
+
+span#entry-name{
+	background-color:#BDBDBD;
+	margin-right:1.5em;
+}
+span#edit-entry{
+	background-color:#E6F8E0;
+	margin-right:1em;
+}
+span#delete-entry{
+	background-color:#F8E6E0;
+	margin-right:1em;
+}
+p#entry-list-row{
+	
+	text-align:left;
+	border-style:solid;
+	border-color:#BDBDBD;
+	display:block;
+}
+
+div .pagination{
+	background: transparent;
+}
+
+span .step-links{
+	
+}
+span .current{
+	background-color: #D8D8D8;
+  	font-weight: bold;
+  	color: #000;
+}
+
+div .shared{
+	clear:both;
+}
+/**
+table .shared-entries{
+	
+	
+}
+**/
+table {
+    border: 1px solid #aaa;
+    border-right: none;
+    border-bottom: 5px solid white;
+    padding: 0;
+    border-spacing: 0;
+    margin: auto;
+    width: auto;
+    font-size: 0.95em;
+    
 }
 caption{
-    font-weight:bold;
-    background:none repeat scroll 0 0 #B9C9FE;
+	font-weight: bold;
+	background: #BDBDBD;
+}
+thead { background: #D8D8D8; }
+
+tr.even { background-color: #D8D8D8; }
+tr.odd  { background-color: #E3E0D1;}
+td,th {
+    padding: 0.25em;
+    padding-top: 0.4em;
+    padding-bottom: 0.4em;
+    border: 1px solid #aaa;
+    min-width: 2.75em;
+}
+td,tr{
+	text-align:left;
+}
+th { 
+	border-top: none;
+    background: #BDBDBD;
+	border-left: none;
+}
+p#share-allentries,#share-selectedentries,#share-entriesofcat{
+	width:10em;
+	background: #BDBDBD;
+	text-align:left;
+}
+div#shareform{
+	clear:both;
+	text-align:center;
+}
+
+div#some_entries_selected{
+	display:none;
+}
+div#categories_selected{
+	display:none;
+}
+div#users_selected{
+	display:none;
+}
+div#noentries{
+	clear:both;
+}
+form{
+	clear:both;
+}
+.share{
+	background: linear-gradient(top, #fff, #f8f8f8);
+	border: none;
+	border-bottom: 3px solid white;
+	border-radius: 4px;
+	margin: auto;
+	padding: 20px;
+	width: 212px;
+}
+
+.error-title{
+	clear:both;
+    background: #F6CECE;
+	background: -moz-linear-gradient(top, #DF0101, #F6CECE);
+	background: -ms-linear-gradient(top, #DF0101, #F6CECE);
+	background: -o-linear-gradient(top, #DF0101, #F6CECE);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#DF0101), to(#F6CECE));
+	background: -moz-linear-gradient(linear, 0% 0%, 0% 100%, from(#DF0101), to(#F6CECE));
+	background: -webkit-linear-gradient(top, #DF0101, #F6CECE);
+	background: linear-gradient(top, #DF0101, #F6CECE);
+	padding: 10px 20px;
+	color:white;
+	margin:auto;
+	text-align:center;
+	text-decoration:none;
+	text-transform: uppercase;
+	letter-spacing: .2em;
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+.server-error{
+	text-align:center;
+}
+
+span#start_time_show_always,#currenttime{
+	background:#BDBDBD;
+	border: 1px white;
+	border-bottom: 2px solid white;
+	border-radius: 4px;
+	
+}
+form#timeform{
+	width:70%;
+	margin:auto;
+}
+span#ctimefld{
+	display:none;
+}
+div#entrydata{
+	display:none;
+}
+p#p_start_time label{
+	margin:auto;
+	text-align:center;
+}
+
+table#entry-details{
+	border: 0px ;
+	
+	border-top: 5px solid white;
+	border-radius: 4px;
+}
+table#entry-details tr,td{
+	border: 0px ;
+	border-bottom: 2px solid white;
+	
+}
+div#reports{
+	clear:both;
+	width:30em;
+	margin:auto;
+	text-margin:center;
 }

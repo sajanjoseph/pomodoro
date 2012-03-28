@@ -11,28 +11,26 @@
 </head>
 <body {% block load_js %}{% endblock %} >
 
-<div id="header">
-    <img class="centerpage" src="{{ MEDIA_URL }}img/pomodorologgeranim1.gif" alt="POMODORO LOGGER">
-   
 
- </div>
-
+<span id="logo"> Pomodoro Logger</span>
+<div class="hstrip"/>
 <div id="content">
    {% block content %}
-<table>
-<tr>
-<td><a href="{% url pomlog_logout %}" > Logout </a> 
-</td>
-<td>
-<a href="{% url pomlog_login %}" > Login </a> 
-</td>
-</tr>
-</table>
+   
+   <p class="subtitle">
+   {% if user %}
+   Welcome {{user.username}}
+   {% endif %}
+   </p>
+   <p class="rightcorner">
+   <span>{% now "jS o\f F Y" %}</span><a class="btnlink" href="{% url pomlog_logout %}" > Logout </a>
+   </p>
    {% endblock %}
  </div>
 
 <div id="sidebar"> 
-<img src="{{ MEDIA_URL }}img/navigation1.png" alt="NAVIGATION">
+<span class="sectionhead"> Navigation</span>
+
      <ul id ="main-nav">
 	<li id="main-nav-entries">
 	    <a href="{%url pomlog_entry_archive_index  %}"> Entries </a>
@@ -56,7 +54,7 @@
 
 </div>
 <div>
-<h3> page info </h3>
+<span class="sectionhead"> page info </span>
 {% block whatis %}
 {% endblock %}
 </div>

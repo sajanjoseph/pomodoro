@@ -9,62 +9,78 @@
 
 
 {% block content %}
-Today is :<b>{% now "Y b d" %} </b>
-<h3> Welcome {{user.username}} </h3>
-
-<img src="{{ MEDIA_URL }}img/addentryanim2b.gif" alt="ADD NEW POMODORO ENTRY">
 
 
-<form name="timeform" id="timeform" method="POST" action ="." >{% csrf_token %}
+<span class="sectionhead">click to add an entry</span>
+<br>
+
+<form name="timeform" id="timeform" class="addentry" method="POST" action ="." >{% csrf_token %}
 <span  id='start_time_show_always'></span>
-<table >
-<tr>
-    <td>
-        <button type="button" name="timebtn" id="timebtn" value="start"  >
+<br><br>
+	<span>
+		<button type="button" name="timebtn" id="timebtn" value="start"  >
             <img src="{{ MEDIA_URL }}img/Play1.png" id="btnimg" align="middle" alt="start" >
         </button>    
-    </td>
-
-    <td> <div id="ctimefld" style="display:none;">
-            Time is:<span class="result" id="currenttime"></span>
-         </div>
-    </td>
-</tr>
-</table><div id="entrydata" style="display:none;">
-
-  {% if entryform.non_field_errors %}
-      <p class="nonfielderror">{{ entryform.non_field_errors|join:", " }}</p>
-  {% endif %}
-<p>
-    <label for="id_start_time">timer started at:</label>
-   
+	</span>
+	<span id="ctimefld" >
+            Time is:<span  id="currenttime"></span>
+    </span>
     
-    <span  id='start_time_show'></span>
-    
-</p>
-<p>
- <label for="id_stop_time">timer stopped at:</label>
- 
-  
-  <span  id='stop_time_show'></span>
-  
-</p>
-<p>
- <label for="id_categories">Enter description:</label>
- {{entryform.description}}
-</p>
-
-<p>
- <label for="id_categories">Enter Categories:</label>
-{{categoryform.categories}}
-</p>
-<input type="hidden" name="timerstarted" id="timerstarted"/>
-<input type="hidden" name="timerstopped" id="timerstopped"/>
-
-<input type="submit" id="submitBtn" value="Submit"/>
-
-</div>
+    <div id="entrydata">
+    	{% if entryform.non_field_errors %}
+      		<p class="nonfielderror">{{ entryform.non_field_errors|join:", " }}</p>
+  		{% endif %}
+  		<table id="entry-details">
+  		<tr>
+  		<td>
+  		<label for="id_start_time"> <span id="timer-start"> Timer started at:</span></label>
+  		</td>
+  		<td>
+  		<span  id='start_time_show'></span>
+  		</td>
+  		</tr>
+  		
+  		<tr>
+  		<td>
+  		<label for="id_stop_time"> <span id="timer-stop"> Timer stopped at:</span></label>
+  		</td>
+  		<td>
+  		<span  id='stop_time_show'></span>
+  		</td>
+  		</tr>
+  		
+  		<tr>
+  		<td>
+  		<label for="id_description"><span id="entry-description">Enter Description:</span></label>
+  		</td>
+  		
+  		<td>
+  		{{entryform.description}}
+  		</td>
+  		</tr>
+  		
+  		<tr>
+  		<td>
+  		<label for="id_categories"><span id="entry-categories">Enter Categories:</span></label>
+  		</td>  		
+  		<td>
+  		{{categoryform.categories}}
+  		</td>
+  		</tr>
+  		
+  		<tr>
+  		<td>
+  		<input type="submit" id="submitBtn" value="Submit"/>
+  		</td>
+  		</tr>
+  		
+  		</table>
+  		<input type="hidden" name="timerstarted" id="timerstarted"/>
+		<input type="hidden" name="timerstopped" id="timerstopped"/>
+		
+    </div>
 </form>
+
 {% endblock %}
 {% block whatis %}
 {{page_title}} page

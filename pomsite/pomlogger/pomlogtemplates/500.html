@@ -1,5 +1,5 @@
 <html>
-<head> <title>404 </title>
+<head> <title>500 </title>
 <LINK REL=StyleSheet HREF="{{MEDIA_URL}}css/newlook.css" TYPE="text/css" MEDIA="screen, print"/>
  </head>
 <body>
@@ -7,9 +7,9 @@
 <span id="logo"> Pomodoro Logger</span>
 <div class="hstrip"/>
 <div class="server-error">
-<p class="error-title">sorry..we couldn't find that page</p>
+<p class="error-title">sorry..server error!</p>
 
-<a href="{{ home_url }}"> <img src="{{ MEDIA_URL }}img/404Dg.png"> </a>
+<a href="{{ home_url }}"> <img src="{{ MEDIA_URL }}img/500.jpg"> </a>
 </div>
 
 <div id="sidebar"> 
@@ -26,7 +26,6 @@
 	<li id="main-nav-categories">
         <a href="{% url pomlog_reports   %}"> Reports </a>
     </li>
-    
      
      {% ifnotequal path  home_url %}
     

@@ -1,11 +1,12 @@
 {% extends "pomlogger/base.html" %}
 {% block content %}{{block.super}}
-<h3> Welcome {{user.username}} </h3>
-<a href="{% url auth_password_change %}"><img src="{{ MEDIA_URL }}img/keysmall.png">Change your password</a>
 
-<br/>
-
-<a href="{% url auth_password_reset %}"><img src="{{ MEDIA_URL }}img/keysmall.png">Forgot your password?</a>
+<p id="change-pass">
+<a class="btnlink" href="{% url auth_password_change %}"><img src="{{ MEDIA_URL }}img/keysmall.png">Change your password</a>
+</p>
+<p id="reset-pass">
+<a class="btnlink" href="{% url auth_password_reset %}"><img src="{{ MEDIA_URL }}img/keysmall.png">Forgot your password?</a>
+</p>
 {% endblock %}
 {%block whatis %}
 Pomodoro App Home Page

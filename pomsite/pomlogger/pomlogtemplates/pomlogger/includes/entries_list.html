@@ -1,29 +1,30 @@
-<div class = "entry-list">
-	<table border="1" id="entries">
-	<caption>{{page_title}}</caption>
-	<tr>
-	<th>ENTRY</th>
+{% if entries.object_list %}
+<div class = "entry-list short">
+
+<div class="hstrip"></div>
 	
-	<th></th>
-	<th></th>
-	<th>USERS SHAREDWITH</th>
-	</tr>
 	{% for anentry in entries.object_list %}
-	<tr> 
-	<td> <a href="{{anentry.get_absolute_url }}" > {{anentry.description|truncatewords:2}}  </a> </td>
+	<p id="entry-list-row">
+       
+	<span id="entry-name">
+	<a href="{{anentry.get_absolute_url }}" > {{anentry.description|truncatewords:2}}  </a>
+	</span>
+	<span id="edit-entry">
+	<a href="{% url pomlog_edit_entry anentry.id %}"> EDIT </a>
+	</span>
+	<span id="delete-entry">
+	<a href="{% url pomlog_delete_entry anentry.id %}"> DELETE </a>
+	</span>
 	
-	<td> <a href="{% url pomlog_edit_entry anentry.id %}"> EDIT </a> </td>
-	<td> <a href="{% url pomlog_delete_entry anentry.id %}"> DELETE </a> </td>
-	
-	<td>  
+	<span id="unshare-entry">
 	{% for sh_user in anentry.sharedwith.all %}
 	{{ sh_user.username }}<a href="{% url pomlog_unshare_entry anentry.id sh_user.id %}" > unshare </a> <br/>
 	{%endfor %}
-	
-	</td>
-	</tr>
-	{% endfor %}
-	</table>
+	</span>
+	</p>
+	{%endfor %}
+
+
 </div>
 <div class="pagination">
     <span class="step-links">
@@ -40,3 +41,4 @@
         {% endif %}
     </span>
 </div>
+{% endif %}

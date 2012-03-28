@@ -5,28 +5,35 @@
 
 {% block content %}
 {{block.super}}
-Today is :<b>{% now "Y b d" %}</b>
-<h3> Welcome {{user.username}} </h3>
-<p>
-<a href="{% url pomlog_add_entry %}"><img src="{{ MEDIA_URL }}img/addentryanim2b.gif" alt="ADD NEW POMODORO ENTRY"> </a> 
-</p>
-{%if entries %}
+
+<br>
+<a href="{% url pomlog_add_entry %}"> 
+<span class="sectionhead leftfloat">ADD NEW POMODORO ENTRY</span>
+</a>
+
+
+{% if entries.object_list %}
 
 {% include "pomlogger/includes/time_on_categories.html" %}
 
+<br>
+<span class="subtitle">ALL ENTRIES </span>
 
 {% include "pomlogger/includes/entries_list.html" %}
-<br/>
-<p>
-<a href="{% url pomlog_share_entries  %}">Share</a>
+
+<div class="hstrip"></div>
+<p id="sharelink">
+<a class="btnlink" href="{% url pomlog_share_entries  %}">Share Entries to Others</a>
 </p>
 
 {% else %}
+<div id="noentries">
 <h3> You have not created any entry  yet</h3>
+</div>
 {% endif %}
 
 {% if entries_sharedto_me %}
-<h3>Other Peoples' Entries shared to me </h3>
+
 <br/>
 {% include "pomlogger/includes/entries_shared.html" %}
 
@@ -39,7 +46,7 @@ Today is :<b>{% now "Y b d" %}</b>
 
 {% block whatis %}
 <p>Listing of all Entries &
-Time spent on {{category_duration_dict.items|length}} categor{{ category_duration_dict.items|length|pluralize:"y,ies"}} till now 
+Time spent on {{sorteddurations|length}} categor{{ sorteddurations|length|pluralize:"y,ies"}} till now 
 </p>
 {% endblock %}
 

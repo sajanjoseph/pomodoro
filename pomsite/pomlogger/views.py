@@ -1,56 +1,47 @@
 from pomlogger.models import PomEntry,PomCategory
-from pomlogger.models import PomEntryForm,PomCategoryForm,PomCategoryNameForm,PomEntryShareForm
-from pomlogger.models import PomEntryDescForm
+from pomlogger.models import PomCategoryForm,PomCategoryNameForm
+from pomlogger.models import PomEntryForm,PomEntryEditForm
+from pomlogger.models import PomEntryDescForm,PomEntryShareForm
 
-from pomlogger.models import PomEntryEditForm
 from django.core.urlresolvers import reverse
+
 from django.http import HttpResponse,HttpResponseRedirect,Http404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.template.defaultfilters import title
+from django.http import Http404
+from django.template import RequestContext
+from django.shortcuts import render_to_response,get_object_or_404,redirect
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.contrib.auth.models import User
+from django.core.mail import send_mail,EmailMessage
 import datetime
 import time
 import string
 import calendar
 import os.path
-from django.template.defaultfilters import title
-from django.http import Http404
-from django.template import RequestContext
-from django.shortcuts import render_to_response,get_object_or_404,redirect
+import logging
+from operator import itemgetter
 
-from django.contrib.auth.models import User
 #import settings
 from settings import CHART_TYPE,BAR_WIDTH,PLOT_OFFSET,BAR_COLOR,LABEL_COLOR,TITLE_COLOR,REPORT_IMG_FMT,REPORT_DOC_FMT,FIGURE_WIDTH_SCALE_FACTOR,YSTEP_FACTOR
 from settings import IMAGE_FOLDER_PATH
 from settings import PAGINATE_BY
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
-import logging
+
+
 import matplotlib.pyplot as plt
 import pylab
 from matplotlib.backends.backend_pdf import PdfPages
 
-from django.core.mail import send_mail,EmailMessage
+
 from settings import DEFAULT_FROM_EMAIL
 
 logger = logging.getLogger("pomodoro")
 
 
-#def sendmail(request):
-#    subject='test mail2'
-#    message='sajan sending message2'
-#    toaddress='glorrfindel@yahoo.com'
-#    #send_mail(subject,message,None,[toaddress])
-#    email=EmailMessage(subject,message,from_email=None,to=[toaddress])
-#    email.send()
-#    print 'sendmail()::sent email'
-#    return redirect('home')
-    
-
 @login_required
 def index(request, template_name):
-    print 'index()::template=',template_name
-    print 'index::request.path=',request.path
-    print 'index::request.user=',request.user
     path=request.path
     return custom_render(request, {'path':path},template_name )
 
@@ -100,14 +91,21 @@ def custom_render(request,context,template):
 def entry_archive_index(request,page_title,template_name):
     entryset=PomEntry.objects.filter(author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
+    
+    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
+    #sorteddurations=get_pagination_entries(request, sorteddurations)#do we need this?or a simple scrollable area?
     now=datetime.datetime.now()
     entries = get_pagination_entries(request, entryset)
     entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user).order_by('-today','-end_time')#added for sharing
-    context={'category_duration_dict':category_duration_dict,'entries':entries,'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
+    #entries_sharedto_me=get_pagination_entries(request,entries_sharedto_me)
+    #print 'entries_sharedto_me=',entries_sharedto_me
+    context={'sorteddurations':sorteddurations,'entries':entries,'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
+    #context={'sorteddurations':sorteddurations,'category_duration_dict':category_duration_dict,'entries':entries,'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
+    #print 'sorteddurations',sorteddurations
+    #print 'category_duration_dict',category_duration_dict
     return custom_render(request,context,template_name)
 
 @login_required
-
 def get_pagination_entries(request, entryset):
     try:
         page = int(request.GET.get('page', 1))
@@ -123,8 +121,10 @@ def get_pagination_entries(request, entryset):
 def entry_archive_year(request,year,page_title,template_name):
     entryset=PomEntry.objects.filter(today__year=year,author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
+    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
     entries = get_pagination_entries(request, entryset)
-    context={'category_duration_dict':category_duration_dict,'entries':entries,'year':year,'page_title':page_title}
+    context={'sorteddurations':sorteddurations,'entries':entries,'year':year,'page_title':page_title}
+    #context={'category_duration_dict':category_duration_dict,'sorteddurations':sorteddurations,'entries':entries,'year':year,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
@@ -132,7 +132,9 @@ def entry_archive_month(request,year,month,page_title,template_name):
     entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
     entries = get_pagination_entries(request, entryset)
-    context={'category_duration_dict':category_duration_dict,'entries':entries,'year':year,'month':month,'page_title':page_title}
+    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
+    context={'sorteddurations':sorteddurations,'entries':entries,'year':year,'month':month,'page_title':page_title}
+    #context={'category_duration_dict':category_duration_dict,'entries':entries,'year':year,'month':month,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
@@ -140,7 +142,9 @@ def entry_archive_day(request,year,month,day,page_title,template_name):
     entryset=PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),today__day=day,author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
     entries = get_pagination_entries(request, entryset)
-    context={'category_duration_dict':category_duration_dict,'entries':entries,'year':year,'month':month,'day':day,'page_title':page_title}
+    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
+    context={'sorteddurations':sorteddurations,'entries':entries,'year':year,'month':month,'day':day,'page_title':page_title}
+    #context={'category_duration_dict':category_duration_dict,'entries':entries,'year':year,'month':month,'day':day,'page_title':page_title}
     return custom_render(request,context,template_name)
 
 @login_required
@@ -349,19 +353,25 @@ def category_list(request,template_name,page_title):
     #cats_with_status=update_cats_with_editable_status(request.user,categories)
     #category_list_dict={'page_title':page_title ,'cats_status':cats_with_status}
     category_list_dict={'page_title':page_title ,'cats':categories}
-    print 'category_list()::template=',template_name
-    print 'category_list()::',category_list_dict.get("cats")
+    #print 'category_list()::template=',template_name
+    #print 'category_list()::',category_list_dict.get("cats")
     return custom_render(request,category_list_dict,template_name)
 
 @login_required
 def category_detail(request,slug,template_name,page_title):
+    print 'category_detail()::slug=',slug
+    print 'category_detail()::user=',request.user
+    print 'category_detail()::page_title=',page_title
+    
     category=get_object_or_404(PomCategory,slug=slug,users=request.user)
-    print("category=",category);
+    print 'category_detail()::obj=',category
+    #print("category=",category);
     now=datetime.datetime.now()
     entryset=PomEntry.objects.filter(categories=category,author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
-    print 'category_duration_dict=',len(category_duration_dict)
+    #print 'category_duration_dict=',len(category_duration_dict)
     entries = get_pagination_entries(request, entryset)
+    
     context={'object':category,'now':now,'category_duration_dict':category_duration_dict,'entries':entries,'page_title':page_title}
     return custom_render(request,context,template_name)
 
@@ -376,7 +386,7 @@ def delete_category(request,slug):
         #print 'cat deleted'
     else:
         logger.info('cannot delete category')
-        print 'cannot delete category'       
+        #print 'cannot delete category'       
     return redirect('pomlog_category_list')
 
 
@@ -577,6 +587,9 @@ def report_entries_for_day(request,year,month,day,page_title,template_name):
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year,'month':monthname,'day':day}
     report_data["number_of_entries"]=len(entry_duration_dict)
     report_data["category_duration_dict"]= category_duration_dict
+    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
+    report_data["sorteddurations"]= sorteddurations
+    
     return custom_render(request,report_data,template_name)
 
 @login_required
@@ -594,6 +607,8 @@ def report_entries_for_month(request,year,month,page_title,template_name):
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year,'month':monthname}
     report_data["number_of_entries"]=len(entry_duration_dict)
     report_data["category_duration_dict"]= category_duration_dict
+    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
+    report_data["sorteddurations"]= sorteddurations
     return custom_render(request,report_data,template_name)
 
 @login_required
@@ -609,6 +624,8 @@ def report_entries_for_year(request,year,page_title,template_name):
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year}
     report_data["number_of_entries"]=len(entry_duration_dict)
     report_data["category_duration_dict"]= category_duration_dict
+    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
+    report_data["sorteddurations"]= sorteddurations
     return custom_render(request,report_data,template_name)
 
 @login_required
@@ -622,7 +639,10 @@ def entries_report(request,page_title,template_name):
         imgfilename,docfilename = create_linechart(entry_duration_dict,basefilename)
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
     report_data["number_of_entries"]=len(entry_duration_dict)
-    report_data["category_duration_dict"]= category_duration_dict
+    #report_data["category_duration_dict"]= category_duration_dict
+    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
+    report_data["sorteddurations"]= sorteddurations
+    
     return custom_render(request,report_data,template_name)
 
 @login_required
@@ -792,5 +812,4 @@ def calculate_plotfigure_size(number_of_entries):
         widthscale = number_of_entries/FIGURE_WIDTH_SCALE_FACTOR
         figsize = (8*widthscale,6)
         return figsize
-    
 

@@ -7,16 +7,17 @@
 
 {% block content %}
 {{block.super}}
-Today is :<b>{% now "Y b d" %}</b>
-<h3> Welcome {{user.username}} </h3>
-{% if entries %}
+
+{% if entries.object_list %}
 {% include "pomlogger/includes/time_on_categories.html" %}
 
-<h3> {{page_title}} of {{year}} </h3>
+<h3> Entries for the year {{year}} </h3>
+
 {% include "pomlogger/includes/entries_list.html" %}
 {% else %}
+<div id="noentries">
 <h3>No Entries in {{year}} </h3> <br/>
-
+</div>
 {% endif %}
 
 
@@ -24,5 +25,5 @@ Today is :<b>{% now "Y b d" %}</b>
 
 
 {% block whatis %}
-Time spent on {{category_duration_dict.items|length}} categor{{ category_duration_dict.items|length|pluralize:"y,ies"}} in  {{year}}
+Time spent on {{sorteddurations|length}} categor{{ sorteddurations|length|pluralize:"y,ies"}} in  {{year}}
 {% endblock %}

@@ -7,23 +7,12 @@
 <link rel="shortcut icon" href="{{ MEDIA_URL }}img/pomodoro-icon.ico"/>
 </head>
 <body>
-<div id="header">
-    <img class="centerpage" src="{{ MEDIA_URL }}img/pomodorologgeranim1.gif" alt="POMODORO LOGGER">
-   
 
- </div>
-
+<span id="logo"> Pomodoro Logger</span>
+<div id="hstrip"/>
 <div id="content">
    {% block content %}
-<table>
-<tr>
-<td><a href="{% url pomlog_logout %}" > Logout </a> 
-</td>
-<td>
-<a href="{% url pomlog_login %}" > Login </a> 
-</td>
-</tr>
-</table>
+
    {% endblock %}
  </div>
  
@@ -34,7 +23,7 @@
 	
 </div>
 <div id="homelnk">
-<a href="{% url home %}">home</a>
+<a href="{% url home %}"><img class="centerpage" src="{{ MEDIA_URL }}img/homegreen.png"></a>
 </div>
 </body>
 </html>

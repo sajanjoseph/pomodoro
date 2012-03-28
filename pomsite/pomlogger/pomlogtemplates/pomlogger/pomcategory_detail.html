@@ -5,20 +5,24 @@
 {% endblock %}
 
 {% block content %}{{block.super}}
-Today is :<b>{{now|date:"j F, Y"}}</b>
-<h3> Welcome {{user.username}} </h3>
+
+<br><br/>
 <div class="cat-detail">
-	<table border="1">
+	<table >
 	<caption>{{page_title}}</caption>
 	<tr>  
-	<th>name </th> <td>{{ object.name}} </td>
+	<th>Name </th> <td>{{ object.name}} </td>
 	</tr>
 	<tr>
-	<th>description </th> <td>{{object.description }} </td>
+	<th>Description </th> <td>{{object.description }} </td>
 	</tr>
 	</table>
 </div>
 {% if entries %}
+
+<br><br/>
+<span class="subtitle">ENTRIES IN THIS CATEGORY</span>
+<br><br/>
 {% include "pomlogger/includes/entries_list.html" %}
 {% include "pomlogger/includes/time_on_categories.html" %}
 

@@ -6,17 +6,15 @@
 
 
 {% block content %}{{block.super}}
-Today is :<b>{% now "d b, Y" %}</b>
-<h3> Welcome {{user.username}} </h3>
-
+<br>
 
 {% if cats|length_is:"0" %}
 <h3>No categories created </h3><br/>
 {% else %}
 
 
-<table border="1" id="cats">
-<caption>all categories</caption>
+<table id="cats">
+<caption>All Categories</caption>
 {% for k in cats %}
 <tr>
 <td> <a href="{{k.get_absolute_url}}" > {{k.name}}</a></td>

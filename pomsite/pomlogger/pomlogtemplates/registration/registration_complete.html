@@ -1,7 +1,10 @@
 {% extends "registration/auth_base.html" %}
 {% block content %}{{block.super}}
-<h2>Registration Complete!</h2>
-<a href="{% url home %}" > Home </a>
+<!-- <div class="subtitle">Registration Complete!</div> -->
+<p id="message">Registration Complete! Check your email</p> 
+
 {% endblock %}
 
-
+{% block whatis %}
+Resistration complete message 
+{% endblock %}

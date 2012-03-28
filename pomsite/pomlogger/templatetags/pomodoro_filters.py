@@ -1,4 +1,5 @@
 from django import template
+from django.conf import settings
 
 register = template.Library()
 
@@ -11,3 +12,8 @@ def mts_to_hours(minutes_value):
     else:
         return 0
 
+@register.filter
+def adjust_for_pagination(value, page):
+    value, page = int(value), int(page)
+    adjusted_value = value + ((page - 1) * settings.PAGINATE_BY)
+    return adjusted_value

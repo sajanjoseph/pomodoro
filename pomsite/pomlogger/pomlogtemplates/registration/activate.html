@@ -1,7 +1,12 @@
 {% extends "registration/auth_base.html" %}
 {% block content %}{{block.super}}
-<h2>Your account is now active!</h2>
-        <a href="{% url pomlog_login %}" > Login </a> 
-{% endblock %}
 
+
+<span id="message">Your account is now active!</span>  
+<p class="center">  <a class="btnlnk" href="{% url pomlog_login %}" > Login </a> </p> 
+
+{% endblock %}
+{% block whatis %}
+Activation complete message
+{% endblock %}
 

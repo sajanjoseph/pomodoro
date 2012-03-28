@@ -1,14 +1,20 @@
-<table border="1">
+
+<span class="subtitle">Following {{entries_sharedto_me|length}} Entr{{entries_sharedto_me|length|pluralize:"y is,ies are"}} shared to you </span>
+<br></br>
+<div class="shared">
+
+
+<table class="shared-entries">
 <tr>
-<th>entry </th>
-<th>author </th>
-<th>entry date </th>
-<th> categories</th>
-<th>start time </th>
-<th> end time</th>
+<th>Entry </th>
+<th>Author </th>
+<th>Entry Date </th>
+<th> Categories</th>
+<th>Start Time </th>
+<th> End Time</th>
 </tr>
 {% for anentry in entries_sharedto_me %}
-<tr> 
+	<tr> 
 <td><a href="{{anentry.get_absolute_url }}" > {{anentry.description|truncatewords:10}}  </a></td>
 <td> {{anentry.author}}   </td>
 <td> {{anentry.today}}   </td>
@@ -22,3 +28,19 @@
 </tr>
 {% endfor %}
 </table>
+</div>
+<!-- <div class="pagination">
+    <span class="step-links">
+        {% if entries_sharedto_me.has_previous %}
+            <a href="?page={{ entries_sharedto_me.previous_page_number }}"> <img src="{{ MEDIA_URL }}img/prev-small.png" alt="{{"<<"}}"/> </a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ entries_sharedto_me.number }} of {{ entries_sharedto_me.paginator.num_pages }}.
+        </span>
+
+        {% if entries_sharedto_me.has_next %}
+            <a href="?page={{ entries.next_page_number }}"><img src="{{ MEDIA_URL }}img/next-small.png" alt="{{">>"}}"/></a>
+        {% endif %}
+    </span>
+</div> -->
