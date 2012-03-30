@@ -4,7 +4,7 @@
 <div class="hstrip"></div>
 	
 	{% for anentry in entries.object_list %}
-	
+	<form method="post" action="{% url pomlog_delete_entry anentry.id %}" id="delete-entry-form">{%csrf_token%}
 	<p id="entry-list-row">
        
 	<span id="entry-name">
@@ -19,13 +19,14 @@
 	{{ sh_user.username }}<a href="{% url pomlog_unshare_entry anentry.id sh_user.id %}" > unshare </a> <br/>
 	{%endfor %}
 	</span>
-	<form method="post" action="{% url pomlog_delete_entry anentry.id %}" id="delete-entry-form">{%csrf_token%}
-		<input id="entry-delete-button" type="submit" value="DELETE {{anentry.description|truncatewords:2}}" />
-	</form>
+	
+		<input id="entry-delete-button" type="submit" value="DELETE" />
+	
 	
 	
 	
 	</p>
+	</form>
 	{%endfor %}
 
 

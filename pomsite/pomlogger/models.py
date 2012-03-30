@@ -44,11 +44,12 @@ class PomEntry(models.Model):
     class Meta:
 	    verbose_name_plural="PomEntries"
 
-    def __unicode__(self):       
-        return "%s-%s-%s"%(",".join(str(x.name) for x in self.categories.all()),self.today,self.start_time)
-    
 #    def __unicode__(self):       
-#        return truncatewords(description,3)
+#        return "%s-%s-%s"%(",".join(str(x.name) for x in self.categories.all()),self.today,self.start_time)
+    
+    def __unicode__(self):
+        shortdescription=truncatewords(self.description,2)
+        return shortdescription+unicode(self.today)
     @models.permalink
     def get_absolute_url(self):
         return ('pomlog_entry_detail',(),{'id':self.id})

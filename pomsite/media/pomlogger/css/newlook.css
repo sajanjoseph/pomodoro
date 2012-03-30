@@ -283,7 +283,7 @@ span#edit-entry{
 	margin-right:1em;
 }
 
-input#logout-button{
+input#logout-button,#entry-delete-button{
 	background-color:#F8E6E0;
 	border-radius:4px;
 }
@@ -461,5 +461,5 @@ form#logoutform{
 }
 
 form#delete-entry-form{
-	text-align:right;
+	text-align:center;
 }
