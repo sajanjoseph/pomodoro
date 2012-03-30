@@ -282,8 +282,15 @@ span#edit-entry{
 	background-color:#E6F8E0;
 	margin-right:1em;
 }
+
+input#logout-button{
+	background-color:#F8E6E0;
+	border-radius:4px;
+}
+
 span#delete-entry{
 	background-color:#F8E6E0;
+	
 	margin-right:1em;
 }
 p#entry-list-row{
@@ -451,4 +458,8 @@ div#reports{
 form#logoutform{
 	width:10%;
 	float:right;
+}
+
+form#delete-entry-form{
+	text-align:right;
 }

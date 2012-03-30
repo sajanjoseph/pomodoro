@@ -159,8 +159,9 @@ def entry_archive_day(request,year,month,day,page_title,template_name):
 
 @login_required
 def entry_detail(request,id,page_title,template_name):
-    print 'entry_detail()::'
+    #print 'entry_detail()::id=',id
     entry=get_object_or_404(PomEntry,id=id)
+    #print 'entry_detail()::entry=',entry
     if not canview(entry,request.user):    
         raise Http404
     duration=timediff(entry.start_time,entry.end_time)

@@ -23,18 +23,13 @@
 	    <a href="{% url pomlog_category_list   %}"> Categories </a>
 	</li>
 	
-	<li id="main-nav-categories">
+	<li id="main-nav-reports">
         <a href="{% url pomlog_reports   %}"> Reports </a>
     </li>
-    
-     
-     {% ifnotequal path  home_url %}
-    
-		<li id="main-nav-categories">
-	        <a href="{{ home_url }}"> Home </a>
-	    </li>
-     </ul>
-   	{% endifnotequal %}
+	<li id="main-nav-home">
+        <a href="{{ home_url }}"> Home </a>
+    </li>
+    </ul>
 
 </div>
 </body>

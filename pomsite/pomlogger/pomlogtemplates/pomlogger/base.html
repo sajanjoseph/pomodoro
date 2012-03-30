@@ -27,7 +27,7 @@
    <form id="logoutform" method="post" action="{% url pomlog_logout %}">{% csrf_token %}
    	<input type="hidden" name="next" value="{{next|escape}}" />
         <input type="hidden" name="confirm" value="true" />
-        <input type="submit" value="Logout" />
+        <input type="submit" value="Logout" id="logout-button"/>
    </form>
    </p>
    {% endblock %}

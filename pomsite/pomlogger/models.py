@@ -6,6 +6,7 @@ from django.forms import CharField,Textarea,TimeField
 
 
 from django.template.defaultfilters import slugify
+from django.template.defaultfilters import truncatewords
 from django.forms import RadioSelect,ChoiceField,ModelMultipleChoiceField
 
 class PomCategory(models.Model):
@@ -45,6 +46,9 @@ class PomEntry(models.Model):
 
     def __unicode__(self):       
         return "%s-%s-%s"%(",".join(str(x.name) for x in self.categories.all()),self.today,self.start_time)
+    
+#    def __unicode__(self):       
+#        return truncatewords(description,3)
     @models.permalink
     def get_absolute_url(self):
         return ('pomlog_entry_detail',(),{'id':self.id})
