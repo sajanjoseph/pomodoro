@@ -3,6 +3,9 @@
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
+#client-side JavaScript will not to be able to access the session cookie
+SESSION_COOKIE_HTTPONLY=True
+
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
@@ -96,8 +99,8 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
 ROOT_URLCONF = 'pomsite.urls'

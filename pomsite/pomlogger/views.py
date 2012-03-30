@@ -5,6 +5,11 @@ from pomlogger.models import PomEntryDescForm,PomEntryShareForm
 
 from django.core.urlresolvers import reverse
 
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.http import require_POST
+from django.contrib.auth.views import logout_then_login
+
 from django.http import HttpResponse,HttpResponseRedirect,Http404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
@@ -39,6 +44,11 @@ from settings import DEFAULT_FROM_EMAIL
 
 logger = logging.getLogger("pomodoro")
 
+@require_POST
+@never_cache
+def logout(request):
+    nxt=request.POST.get('next')
+    return logout_then_login(request, nxt)
 
 @login_required
 def index(request, template_name):

@@ -23,7 +23,12 @@
    {% endif %}
    </p>
    <p class="rightcorner">
-   <span>{% now "jS o\f F Y" %}</span><a class="btnlink" href="{% url pomlog_logout %}" > Logout </a>
+   <span>{% now "jS o\f F Y" %}
+   <form id="logoutform" method="post" action="{% url pomlog_logout %}">{% csrf_token %}
+   	<input type="hidden" name="next" value="{{next|escape}}" />
+        <input type="hidden" name="confirm" value="true" />
+        <input type="submit" value="Logout" />
+   </form>
    </p>
    {% endblock %}
  </div>

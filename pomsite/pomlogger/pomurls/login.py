@@ -1,8 +1,8 @@
 from django.conf.urls.defaults import *
 from registration.urls import urlpatterns as regurlpatterns
-urlpatterns=patterns('django.contrib.auth.views',
-url(r'^login/$','login',{'template_name':'pomlogger/mylogin.html'},name='pomlog_login'),
-url(r'^logout/$', 'logout_then_login', {}, name = 'pomlog_logout'),
+urlpatterns=patterns('',
+url(r'^login/$','django.contrib.auth.views.login',{'template_name':'pomlogger/mylogin.html'},name='pomlog_login'),
+url(r'^logout/$', 'pomlogger.views.logout', {}, name = 'pomlog_logout'),
 )
 
 urlpatterns+=regurlpatterns
