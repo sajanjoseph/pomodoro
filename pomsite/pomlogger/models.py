@@ -49,7 +49,8 @@ class PomEntry(models.Model):
     
     def __unicode__(self):
         shortdescription=truncatewords(self.description,2)
-        return shortdescription+unicode(self.today)
+        return shortdescription+'-'+unicode(self.today)+'-'+unicode(self.start_time)
+    
     @models.permalink
     def get_absolute_url(self):
         return ('pomlog_entry_detail',(),{'id':self.id})

@@ -24,12 +24,34 @@ LOGIN_REDIRECT_URL='/pomodoro/pomlog/entries/'
 
 
 #localhost's debugging mail server
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 1025
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_USE_TLS = False
-DEFAULT_FROM_EMAIL = 'testing@example.com'
+#EMAIL_HOST = 'localhost'
+#EMAIL_PORT = 1025
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
+#EMAIL_USE_TLS = False
+#DEFAULT_FROM_EMAIL = 'testing@example.com'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'pomodoroadmn@gmail.com'
+EMAIL_HOST_PASSWORD = 'agameofcode'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'pomodoroadmn@gmail.com'
+
+
+
+CHART_TYPE="bar"
+
+#barchart related constant values
+BAR_WIDTH = .2
+PLOT_OFFSET = .3
+BAR_COLOR = '#52E4FF'
+LABEL_COLOR = 'blue'
+TITLE_COLOR ='black'
+REPORT_IMG_FMT = 'png'
+REPORT_DOC_FMT = 'pdf'
+FIGURE_WIDTH_SCALE_FACTOR = 8
+YSTEP_FACTOR = 10
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -42,7 +64,7 @@ TIME_ZONE = 'Asia/Calcutta'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-SITE_ID = 1
+SITE_ID = 2
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -50,12 +72,16 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+#MEDIA_ROOT = ''
+MEDIA_ROOT = '/home/sajan/dev/python/django/pomodoro/pomsite/media/pomlogger/'
+IMAGE_FOLDER_PATH = '/home/sajan/dev/python/django/pomodoro/pomsite/media/pomlogger/img'
+
+LOGFILE_NAME = '/home/sajan/dev/python/django/pomodoro/pomodorolog.txt'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/site_media/pomlogger/'
+MEDIA_URL = '/site_media/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -75,6 +101,7 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
@@ -93,5 +120,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.admin',
+    'registration',
     'pomlogger',
 )
+#account activation open for a week
+ACCOUNT_ACTIVATION_DAYS = 2

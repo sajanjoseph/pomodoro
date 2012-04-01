@@ -35,6 +35,8 @@ from settings import IMAGE_FOLDER_PATH
 from settings import PAGINATE_BY
 
 
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pylab
 from matplotlib.backends.backend_pdf import PdfPages
@@ -42,7 +44,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 from settings import DEFAULT_FROM_EMAIL
 
-logger = logging.getLogger("pomodoro")
+#logger = logging.getLogger("pomodoro")
 
 @require_POST
 @never_cache
@@ -270,7 +272,7 @@ def get_timetuples(starttime,endtime):
         stop_ttpl = tuple(stop_l)
         #logger.debug("stop_ttpl="+str(stop_ttpl))
     except ValueError as verr:
-        logger.debug("valueError in get_timetuples",verr)
+        #logger.debug("valueError in get_timetuples",verr)
         raise ValueError
     return (start_ttpl,stop_ttpl)
 
@@ -396,7 +398,8 @@ def delete_category(request,slug):
         cat.delete()
         #print 'cat deleted'
     else:
-        logger.info('cannot delete category')
+        pass
+        #logger.info('cannot delete category')
         #print 'cannot delete category'       
     return redirect('pomlog_category_list')
 
@@ -589,7 +592,7 @@ def report_entries_for_day(request,year,month,day,page_title,template_name):
     entryset=PomEntry.objects.filter(today__year=year,today__month=month,today__day=day,author=request.user)
     entry_duration_dict = get_durations_for_entries(entryset)
     category_duration_dict = get_duration_for_categories(entryset)
-    logger.info('entry_duration_dict size='+str(len(entry_duration_dict)));
+    #logger.info('entry_duration_dict size='+str(len(entry_duration_dict)));
     basefilename = "entriesofday%s-%s-%s"%(year,month,day)
     page_title = page_title+" "+day+"-"+monthname+"-"+year
     imgfilename=docfilename=''
@@ -665,7 +668,8 @@ def categories_report(request,page_title,template_name):
     if category_duration_dict:
         imgfilename,docfilename = create_piechart(category_duration_dict,basefilename,chartsize=(8,8))
     report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
-    report_data["category_duration_dict"]=category_duration_dict
+    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
+    report_data["sorteddurations"]=sorteddurations
     return custom_render(request,report_data,template_name)
     
 def create_chart(chart_type,map,basefilename):
@@ -673,6 +677,8 @@ def create_chart(chart_type,map,basefilename):
         return create_barchart(map,basefilename)
     elif chart_type is "pie":
         return create_piechart(map,basefilename)
+    elif chart_type is "line":
+        return create_linechart(map,basefilename)
     
 def create_piechart(map,basefilename,chartsize=(16,16)):
     now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
@@ -705,7 +711,7 @@ def create_piechart(map,basefilename,chartsize=(16,16)):
         return imgfilename,docfilename
     else:
         plt.close(figure)
-        logger.info("xdata or ydata empty..returning empty strings")
+        #logger.info("xdata or ydata empty..returning empty strings")
         return imgfilename,docfilename
 
 def create_linechart(map,basefilename):
@@ -720,8 +726,9 @@ def create_linechart(map,basefilename):
     ydata = [map[x] for x in xvalues]
     min_x,max_x = get_extreme_values(xdata)
     splitxdata = [x.split('-',1) for x in xvalues]
-    xlabels = [x[0] for x in splitxdata]
-    dates = [x[1] for x in splitxdata if len(x)>1]
+    #xlabels = [x[0] for x in splitxdata]
+    xlabels = [x[0].split()[0] for x in splitxdata] 
+    #dates = [x[1] for x in splitxdata if len(x)>1]
     figsize= calculate_plotfigure_size(len(xvalues))
     figure = plt.figure(figsize = figsize)
 #    figure = plt.figure(figsize = (70,8))
@@ -739,9 +746,9 @@ def create_linechart(map,basefilename):
         if ystep:
             ax.set_yticks(range(0,maxyvalue+ystep,ystep))
             ax.set_ylim(0,max(ydata)+ystep)
-        for i in range(len(xdata)):
-            if dates:
-                plt.text(xdata[i], 0, dates[i], rotation='vertical',size='large',fontweight="bold",family='fantasy')
+#        for i in range(len(xdata)):
+#            if dates:
+#                plt.text(xdata[i], 0, dates[i], rotation='vertical',size='large',fontweight="bold",family='fantasy')
         figure.autofmt_xdate(rotation=30)
         imgfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".png")
         docfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".pdf")
@@ -751,10 +758,11 @@ def create_linechart(map,basefilename):
         return imgfilename,docfilename
     else:
         plt.close(figure)
-        logger.info("xdata or ydata empty..returning empty strings")
+        #logger.info("xdata or ydata empty..returning empty strings")
         return imgfilename,docfilename
 
 def create_barchart(map,basefilename):
+    print 'create_barchart()::map=',map
     now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
     imgfilename = ''
     docfilename = ''
@@ -765,8 +773,12 @@ def create_barchart(map,basefilename):
     xdata = range(len(xvalues))
     ydata = [map[x] for x in xvalues]
     min_x,max_x = get_extreme_values(xdata)
+    print 'xvalues=',xvalues
     splitxdata = [x.split('-',1) for x in xvalues]
-    xlabels = [x[0] for x in splitxdata]
+    print 'splitxdata=',splitxdata
+    xlabels = [x[0].split()[0] for x in splitxdata] 
+    #xlabels = [x[0] for x in splitxdata]#find something better!
+    print 'xlabels=',xlabels
     dates = [x[1] for x in splitxdata if len(x)>1]
     figsize= calculate_plotfigure_size(len(xvalues))
     figure = plt.figure(figsize = figsize)
@@ -785,9 +797,9 @@ def create_barchart(map,basefilename):
         if ystep:
             ax.set_yticks(range(0,maxyvalue+ystep,ystep))
             ax.set_ylim(0,max(ydata)+ystep)
-        for i in range(len(xdata)):
-            if dates:
-                plt.text(xdata[i], 0, dates[i], rotation='vertical',size='large',fontweight="bold",family='fantasy')
+#        for i in range(len(xdata)):
+#            if dates:
+#                plt.text(xdata[i], 0, dates[i], rotation='vertical',size='large',fontweight="bold",family='fantasy')
         figure.autofmt_xdate(rotation=30)
         imgfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".png")
         docfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".pdf")
@@ -797,7 +809,7 @@ def create_barchart(map,basefilename):
         return imgfilename,docfilename
     else:
         plt.close(figure)
-        logger.info("xdata or ydata empty..returning empty strings")
+        #logger.info("xdata or ydata empty..returning empty strings")
         return imgfilename,docfilename
     
 

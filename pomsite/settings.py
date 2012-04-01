@@ -68,7 +68,7 @@ LOGFILE_NAME = '/home/sajan/dev/python/django/pomodoro/pomodorolog.txt'
 
 #Pagination-number of entries to be listed per page
 PAGINATE_BY=10
-#chart type to be created
+#chart type to be created bar,line or pie
 CHART_TYPE="bar"
 
 #barchart related constant values

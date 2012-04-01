@@ -3,35 +3,35 @@
 <title>
 login
 </title>
-<LINK REL="StyleSheet" HREF="{{MEDIA_URL}}css/newlook.css" TYPE="text/css" MEDIA="screen, print">
+<LINK REL="StyleSheet" HREF="{{MEDIA_URL}}css/loginform.css" TYPE="text/css" MEDIA="screen, print">
 </head>
 
 <body>
-
-
 <div class="subtitle">
 login to Pomodoro Logger
 
-<span class="rightcorner">
+</div>
+<span id="registerlink">
 	{% if not user.is_authenticated %} 
-	<a class="white" href="{% url registration_register %}" title="Become a User by Registering" >Register</a>
+	<a  href="{% url registration_register %}" title="Become a User by Registering" >Register</a>
 	{% endif %}
 </span>
-</div>
-<div id="loginform">
-<form method="post" action=".">{% csrf_token %}
+
 {% if form.errors %}
-            <p id="error_message">Login failed! Check your username and password.</p>
-             
+ <p id="error_message">Login failed! Check your username and password.</p>
 {% endif %}
-<fieldset class="login">
-<p><label for="id_username">Username:</label> {{ form.username }}</p>
-<p><label for="id_password">Password:</label> {{ form.password }}</p>
-<input type="hidden" name="next" value="{{next}}" />
-<input  type="submit" name="submit" value="Login"/>
-</fieldset>
-</form>
-</div>
+<form method="post" action=".">{% csrf_token %}
+
+	
+		<label>Username:</label>
+			<input id="id_username" type="text" name="username" />
+		<label>Password:</label>
+			<input id="id_password" type="password" name="password"  />
+			<input type="hidden" name="next" value="{{next}}" />
+			<input type="submit" value="login" name="submit" class="submit" />
+</form>	
+
+
 
 
 </body>

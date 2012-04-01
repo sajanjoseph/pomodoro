@@ -6,8 +6,8 @@
 {% block content %}
 {{block.super}}
 
-{%if category_duration_dict %}
-<h3>{{page_title}}</h3>  
+{%if sorteddurations %}
+<h3>ALL CATEGORIES</h3>  
 <img src="{{ MEDIA_URL }}img/{{basefilename}}.png" alt="allcategories" >
 
 <p>
@@ -25,5 +25,7 @@
 {% endblock %}
 
 {% block whatis %}
-Bar Plot of Time spent on {{category_duration_dict.items|length}} categor{{ category_duration_dict.items|length|pluralize:"y,ies"}} 
+<p>
+Plot of Time spent on {{sorteddurations|length}} categor{{ sorteddurations|length|pluralize:"y,ies"}} 
+</p>
 {% endblock %}
