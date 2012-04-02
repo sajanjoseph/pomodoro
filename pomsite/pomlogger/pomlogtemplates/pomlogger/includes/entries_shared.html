@@ -8,9 +8,8 @@
 
 
 
+{% if entries_sharedto_me %}
 <div class="shared">
-
-
 <table class="shared-entries">
 <caption>Following {{entries_sharedto_me|length}} Entr{{entries_sharedto_me|length|pluralize:"y is,ies are"}} shared to you</caption>
 <tr>
@@ -37,7 +36,9 @@
 {% endfor %}
 </table>
 </div>
-
+{% else %}
+<h3> No entries shared to you  </h3>
+{% endif %}
 
 {% endblock %}
 

@@ -34,13 +34,11 @@
 </div>
 {% endif %}
 
-{% if entries_sharedto_me %}
+
 <p class="sharelink">
 <a class="btnlink" id="view_shared_entries" href="{% url pomlog_entries_shared %}">View Entries Shared To Me</a>
 </p>
-{% else %}
-<h3> No entries shared to you  </h3>
-{% endif %}
+
 
 {% endblock %}
 

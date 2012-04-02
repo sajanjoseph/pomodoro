@@ -13,16 +13,16 @@
 	<span id="edit-entry">
 	<a href="{% url pomlog_edit_entry anentry.id %}"> EDIT </a>
 	</span>
+	
+	
+		<input id="entry-delete-button" type="submit" value="DELETE" />
+	
 	<span id="unshare-entry">
 	
 	{% for sh_user in anentry.sharedwith.all %}
 	{{ sh_user.username }}<a href="{% url pomlog_unshare_entry anentry.id sh_user.id %}" > unshare </a> <br/>
 	{%endfor %}
 	</span>
-	
-		<input id="entry-delete-button" type="submit" value="DELETE" />
-	
-	
 	
 	
 	</p>

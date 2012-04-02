@@ -118,10 +118,10 @@ def entry_archive_index(request,page_title,template_name):
     #sorteddurations=get_pagination_entries(request, sorteddurations)#do we need this?or a simple scrollable area?
     now=datetime.datetime.now()
     entries = get_pagination_entries(request, entryset)
-    entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user).order_by('-today','-end_time')#added for sharing
+    #entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user).order_by('-today','-end_time')#added for sharing
     #entries_sharedto_me=get_pagination_entries(request,entries_sharedto_me)
     #print 'entries_sharedto_me=',entries_sharedto_me
-    context={'sorteddurations':sorteddurations,'entries':entries,'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
+    context={'sorteddurations':sorteddurations,'entries':entries,'page_title':page_title}
     #context={'sorteddurations':sorteddurations,'category_duration_dict':category_duration_dict,'entries':entries,'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
     #print 'sorteddurations',sorteddurations
     #print 'category_duration_dict',category_duration_dict
