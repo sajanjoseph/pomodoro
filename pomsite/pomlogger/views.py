@@ -33,7 +33,7 @@ from operator import itemgetter
 from settings import CHART_TYPE,BAR_WIDTH,PLOT_OFFSET,BAR_COLOR,LABEL_COLOR,TITLE_COLOR,REPORT_IMG_FMT,REPORT_DOC_FMT,FIGURE_WIDTH_SCALE_FACTOR,YSTEP_FACTOR
 from settings import IMAGE_FOLDER_PATH
 from settings import PAGINATE_BY
-
+from settings import MEDIA_URL
 
 import matplotlib
 matplotlib.use('Agg')
@@ -49,8 +49,11 @@ from settings import DEFAULT_FROM_EMAIL
 @require_POST
 @never_cache
 def logout(request):
-    nxt=request.POST.get('next')
-    return logout_then_login(request, nxt)
+    #nxt=request.POST.get('next')
+    return logout_then_login(request)
+
+def server_error(request,template_name="500.html"):
+    return custom_render(request,{},template_name)
 
 @login_required
 def index(request, template_name):
@@ -97,6 +100,7 @@ def get_durations_for_entries(entryset):
 
 def custom_render(request,context,template):
     req_context=RequestContext(request,context)
+    #print 'req_context=',req_context
     return render_to_response(template,req_context)
 
 @login_required
