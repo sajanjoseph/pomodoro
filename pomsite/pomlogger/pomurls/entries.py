@@ -80,6 +80,12 @@ url(r'^share/$','pomlogger.views.share_entries',
 url(r'^unshare/(?P<entryid>\d+)/(?P<userid>\d+)/$','pomlogger.views.unshare_entry',
     
     name='pomlog_unshare_entry'),
+                     
+url(r'^entries_shared/$','pomlogger.views.entries_shared',
+    {'template_name':'pomlogger/includes/entries_shared.html',
+        'page_title':'Entries Shared'  
+    },
+    name='pomlog_entries_shared'),                     
 
 
 

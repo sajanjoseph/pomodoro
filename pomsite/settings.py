@@ -1,6 +1,6 @@
 # Django settings for pomsite project.
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 #client-side JavaScript will not to be able to access the session cookie

@@ -238,8 +238,8 @@ a.btnlink{
 }
 div#category-duration{
 	clear:both;
-	margin:auto;
-	text-align:center;
+	margin:left;
+	text-align:auto;
 }
 .duration-list,.shared{
 	clear:both;
@@ -260,12 +260,16 @@ div#category-duration{
 	height:10em;
 
 }
-p#change-pass,#reset-pass,#sharelink{
+p#change-pass,#reset-pass{
 	width:15em;
 	margin-top:.5em;
 	margin-bottom:.5em;
 }
-
+p.sharelink{
+	width:15em;
+	margin-top:.5em;
+	margin-bottom:.5em;
+}
 .entry-list{
 	clear:both;
 	margin:auto;
@@ -336,6 +340,8 @@ table {
 }
 caption{
 	font-weight: bold;
+	color:white;
+	text-transform: uppercase;
 	background: #BDBDBD;
 }
 thead { background: #D8D8D8; }

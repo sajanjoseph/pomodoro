@@ -6,10 +6,12 @@
 {% block content %}
 {{block.super}}
 
-<br>
+
+
 <a href="{% url pomlog_add_entry %}"> 
 <span class="sectionhead leftfloat">ADD NEW POMODORO ENTRY</span>
 </a>
+
 
 
 {% if entries.object_list %}
@@ -22,7 +24,7 @@
 {% include "pomlogger/includes/entries_list.html" %}
 
 <div class="hstrip"></div>
-<p id="sharelink">
+<p class="sharelink">
 <a class="btnlink" href="{% url pomlog_share_entries  %}">Share Entries to Others</a>
 </p>
 
@@ -33,10 +35,9 @@
 {% endif %}
 
 {% if entries_sharedto_me %}
-
-<br/>
-{% include "pomlogger/includes/entries_shared.html" %}
-
+<p class="sharelink">
+<a class="btnlink" id="view_shared_entries" href="{% url pomlog_entries_shared %}">View Entries Shared To Me</a>
+</p>
 {% else %}
 <h3> No entries shared to you  </h3>
 {% endif %}

@@ -10,9 +10,9 @@
 
 {% block content %}
 
-
-<span class="sectionhead">click to add an entry</span>
 <br>
+<span class="sectionhead">click to add an entry</span>
+
 
 <form name="timeform" id="timeform" class="addentry" method="POST" action ="." >{% csrf_token %}
 <span  id='start_time_show_always'></span>
@@ -83,5 +83,7 @@
 
 {% endblock %}
 {% block whatis %}
+<p>
 {{page_title}} page
+</p>
 {% endblock %}

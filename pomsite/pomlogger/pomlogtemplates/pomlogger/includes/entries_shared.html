@@ -1,10 +1,18 @@
+{% extends "pomlogger/base_entries.html" %}
+{% block title %}
+{{block.super}}|{{page_title}}
+{% endblock %}
 
-<span class="subtitle">Following {{entries_sharedto_me|length}} Entr{{entries_sharedto_me|length|pluralize:"y is,ies are"}} shared to you </span>
-<br></br>
+{% block content %}
+{{block.super}}
+
+
+
 <div class="shared">
 
 
 <table class="shared-entries">
+<caption>Following {{entries_sharedto_me|length}} Entr{{entries_sharedto_me|length|pluralize:"y is,ies are"}} shared to you</caption>
 <tr>
 <th>Entry </th>
 <th>Author </th>
@@ -29,18 +37,11 @@
 {% endfor %}
 </table>
 </div>
-<!-- <div class="pagination">
-    <span class="step-links">
-        {% if entries_sharedto_me.has_previous %}
-            <a href="?page={{ entries_sharedto_me.previous_page_number }}"> <img src="{{ MEDIA_URL }}img/prev-small.png" alt="{{"<<"}}"/> </a>
-        {% endif %}
 
-        <span class="current">
-            Page {{ entries_sharedto_me.number }} of {{ entries_sharedto_me.paginator.num_pages }}.
-        </span>
 
-        {% if entries_sharedto_me.has_next %}
-            <a href="?page={{ entries.next_page_number }}"><img src="{{ MEDIA_URL }}img/next-small.png" alt="{{">>"}}"/></a>
-        {% endif %}
-    </span>
-</div> -->
+{% endblock %}
+
+
+{% block whatis %}
+<p>shared entries</p>
+{% endblock %}

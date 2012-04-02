@@ -66,6 +66,12 @@ def get_month_as_number(monthname):
     mlist=list(calendar.month_abbr)
     return mlist.index(title(monthname))
 
+def entries_shared(request,page_title,template_name):
+    print 'entries_shared',request.user,page_title,template_name
+    entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user).order_by('-today','-end_time')#added for sharing
+    context={'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
+    return custom_render(request,context,template_name)
+    
 def timediff(start,end):
     #assumes that start,end times are within 24 hours of each other
     #logger.debug("start="+str(start)+"end="+str(end))
