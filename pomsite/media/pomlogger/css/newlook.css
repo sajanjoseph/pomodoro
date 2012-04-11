@@ -469,3 +469,7 @@ form#logoutform{
 form#delete-entry-form{
 	text-align:center;
 }
+
+div#calendarspace{
+	width:50%;
+}

@@ -41,6 +41,8 @@ import matplotlib.pyplot as plt
 import pylab
 from matplotlib.backends.backend_pdf import PdfPages
 
+import simplejson
+
 
 from settings import DEFAULT_FROM_EMAIL
 
@@ -58,7 +60,24 @@ def server_error(request,template_name="500.html"):
 @login_required
 def index(request, template_name):
     path=request.path
-    return custom_render(request, {'path':path},template_name )
+    entries_count=[]
+    now=datetime.datetime.now()
+    current_day=now.day
+    current_month=now.month
+    current_year=now.year
+    for i in range(1,current_day+1):
+        entries_count.append({
+                              'title':str(PomEntry.objects.filter(today__year=current_year,today__month=current_month,today__day=i).count()),
+                              'start':now.strftime("%Y-%m-"+str(i)),
+                              'end':now.strftime("%Y-%m-"+str(i))
+                              })
+    #print 'entries_count=',entries_count
+    entry_count_dump=simplejson.dumps(entries_count)
+    #ev1=str(12)
+    #dummy=[{"start": "2012-04-01", "end": "2012-04-01", "title":ev1 }]
+    
+    #print 'entry_count_dump=',entry_count_dump
+    return custom_render(request, {'path':path,'entry_count':entry_count_dump },template_name)
 
 def get_month_as_number(monthname):
     if title(monthname) not in calendar.month_abbr:
@@ -90,10 +109,8 @@ def get_duration_for_categories(entryset):
         for acat in categories.all():
             if acat.name in entry_duration_dict:
                 entry_duration_dict[acat.name]+=duration_mts
-                #print 'cat:%s already in dict. durn=%s'%(acat.name,entry_duration_dict[acat.name])
             else:
                 entry_duration_dict[acat.name]=duration_mts
-                #print 'new cat:%s ,durn=%s'%(acat.name,duration_mts)
     return entry_duration_dict
 
 def get_durations_for_entries(entryset):
@@ -106,7 +123,6 @@ def get_durations_for_entries(entryset):
 
 def custom_render(request,context,template):
     req_context=RequestContext(request,context)
-    #print 'req_context=',req_context
     return render_to_response(template,req_context)
 
 @login_required
@@ -120,11 +136,8 @@ def entry_archive_index(request,page_title,template_name):
     entries = get_pagination_entries(request, entryset)
     #entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user).order_by('-today','-end_time')#added for sharing
     #entries_sharedto_me=get_pagination_entries(request,entries_sharedto_me)
-    #print 'entries_sharedto_me=',entries_sharedto_me
     context={'sorteddurations':sorteddurations,'entries':entries,'page_title':page_title}
     #context={'sorteddurations':sorteddurations,'category_duration_dict':category_duration_dict,'entries':entries,'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
-    #print 'sorteddurations',sorteddurations
-    #print 'category_duration_dict',category_duration_dict
     return custom_render(request,context,template_name)
 
 @login_required
@@ -171,10 +184,8 @@ def entry_archive_day(request,year,month,day,page_title,template_name):
 
 @login_required
 def entry_detail(request,id,page_title,template_name):
-    #print 'entry_detail()::id=',id
     entry=get_object_or_404(PomEntry,id=id)
-    #print 'entry_detail()::entry=',entry
-    if not canview(entry,request.user):    
+    if not canview(entry,request.user):
         raise Http404
     duration=timediff(entry.start_time,entry.end_time)
     context={'object':entry,'duration':duration,'page_title':page_title}
@@ -190,13 +201,12 @@ def canview(entry,user):
 @transaction.commit_on_success
 def delete_entry(request,id):
     entry=get_object_or_404(PomEntry,id=id,author=request.user )
-    print 'delete_entry()::entry=',entry
     #need to remove user from its categories
     cats=entry.categories.all()
     print 'delete_entry()::cats=',cats
     remove_user_from_categories(cats,request.user)
     entry.delete()
-    print 'entry deleted'
+    logger.debug("entry deleted")
     #remove categories that have no entries associated
     remove_lone_categories()
     return redirect('pomlog_entry_archive_index')
@@ -270,13 +280,11 @@ def get_timetuples(starttime,endtime):
         start_time = datetime.datetime.fromtimestamp(starttime/1000.0)
         start_l = list(start_time.timetuple()[3:6])
         #logger.debug("start_l="+str(start_l))        
-        #print 'get_timetuples()::start_l=',start_l;
         #stop_l = list(time.strptime(endtime,fmtstr)[3:6])
         #endtime = long(endtime)
         stop_time = datetime.datetime.fromtimestamp(endtime/1000.0)
         stop_l = list(stop_time.timetuple()[3:6])
         #logger.debug("stop_l="+str(stop_l))
-        #print 'get_timetuples()::stop_l=',stop_l;
         start_ttpl = tuple(start_l)
         #logger.debug("start_ttpl="+str(start_ttpl))
         stop_ttpl = tuple(stop_l)
@@ -346,7 +354,6 @@ def edit_entry(request,id,template_name,page_title):
     return custom_render(request,context,template_name)
 
 def update_cats_with_editable_status(user,categories):
-    #print 'update_cats_with_editable_status()::'
     cats={}
     for cat in categories:
         usrcnt=cat.users.count()
@@ -372,27 +379,17 @@ def get_categories_of_user(user):
 @login_required
 def category_list(request,template_name,page_title):
     categories=get_categories_of_user(request.user)
-    #print 'categories=',categories
     #cats_with_status=update_cats_with_editable_status(request.user,categories)
     #category_list_dict={'page_title':page_title ,'cats_status':cats_with_status}
     category_list_dict={'page_title':page_title ,'cats':categories}
-    #print 'category_list()::template=',template_name
-    #print 'category_list()::',category_list_dict.get("cats")
     return custom_render(request,category_list_dict,template_name)
 
 @login_required
 def category_detail(request,slug,template_name,page_title):
-    print 'category_detail()::slug=',slug
-    print 'category_detail()::user=',request.user
-    print 'category_detail()::page_title=',page_title
-    
     category=get_object_or_404(PomCategory,slug=slug,users=request.user)
-    print 'category_detail()::obj=',category
-    #print("category=",category);
     now=datetime.datetime.now()
     entryset=PomEntry.objects.filter(categories=category,author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
-    #print 'category_duration_dict=',len(category_duration_dict)
     entries = get_pagination_entries(request, entryset)
     
     context={'object':category,'now':now,'category_duration_dict':category_duration_dict,'entries':entries,'page_title':page_title}
@@ -406,11 +403,10 @@ def delete_category(request,slug):
     cat=get_object_or_404(PomCategory,slug=slug)
     if cat.users.count()==1 and request.user in cat.users.all():
         cat.delete()
-        #print 'cat deleted'
+        logger.info('deleted category:'+slug)
     else:
         pass
         #logger.info('cannot delete category')
-        #print 'cannot delete category'       
     return redirect('pomlog_category_list')
 
 
@@ -430,13 +426,11 @@ def add_or_edit(request,page_title,template_name,instance=None):
         name=name.strip()
         if is_duplicate_cat(name):
             if instance!=None:
-                #print 'we want to edit %s'%name
                 form.save()
                 return redirect('pomlog_category_list')
             else:
                 return custom_render(request,context,template_name)
         else:
-            #print 'we are adding a new cat %s'%name
             form.save()
             return redirect('pomlog_category_list') 
     return custom_render(request,context,template_name)
@@ -460,10 +454,8 @@ def has_permission(user,category):
 def edit_category(request,slug,template_name,page_title):
     cat=get_object_or_404(PomCategory,slug=slug)
     if has_permission(request.user,cat):
-        #print 'edit_category()::user has permission'
         return add_or_edit(request,page_title,template_name,instance=cat)
     else:
-        #print 'edit_category()::user has no permission..raising 404'
         raise Http404
 
 @login_required
@@ -483,20 +475,15 @@ def get_form_data(request):
 def get_categories_from_idstring(cat_id_list):
     cats=[]
     for id in cat_id_list:
-        #print 'id is=',id,type(id)
         cat=PomCategory.objects.get(id=id)
-        #print 'cat=',cat,type(cat)
         cats.append(cat)
 
-    #print 'cats=',cats
     return cats
 
 def get_entries_from_idstring(entry_id_list):
     entries=[]
     for id in entry_id_list:
-        #print 'id is=',id,type(id)
         entry=PomEntry.objects.get(id=id)
-        #print 'entry=',entry,type(entry)
         entries.append(entry)
     return entries
 
@@ -511,7 +498,6 @@ def get_own_entries_with_cats(cats,user):
 
 @login_required
 def share_entries(request,template_name,page_title):
-    #print 'share_entries()::'  
     allusers=User.objects.all()
     others=User.objects.exclude(username=request.user.username)
     ownentries=PomEntry.objects.filter(author=request.user)
@@ -521,33 +507,21 @@ def share_entries(request,template_name,page_title):
     context={'ownentries':ownentries,'otherusers':others,'allusers':allusers,'page_title':page_title,'sharemyentryform':form}
     selected_entries=None
     if request.method=='POST' and form.is_valid():
-        #print 'POST::form.cleaned_data:',form.cleaned_data
-        #print 'you selected radio option:%s'% form.cleaned_data['sharing_options']
         if form.cleaned_data['sharing_options']==u'selectedentries':
-            #print 'you chose the share multiple entries..'
             selected_entries=form.cleaned_data['entries_selected']
-            #print 'your selection=' ,selected_entries,type(selected_entries)
             
         elif form.cleaned_data['sharing_options']==u'allentries':
-            #print 'you chose the share all entries..'
             selected_entries=ownentries
-            #print 'your selection=' ,selected_entries,type(selected_entries)
 
         elif form.cleaned_data['sharing_options']==u'entriesofcat':
-            #print 'you chose the share entries with categories..'
             selected_cats=form.cleaned_data['categories_selected']
-            #print 'your selection of cats=',selected_cats
             selected_entries=get_own_entries_with_cats(selected_cats,request.user)
-            #print 'your selection of entries=',selected_entries
         
         users_to_sharewith=form.cleaned_data['users_selected']
         
-        #print 'you have chosen to share:' ,selected_entries,type(selected_entries)
-        #print 'with these users:' ,users_to_sharewith,type(users_to_sharewith)
         share_entries_with_users(selected_entries,users_to_sharewith)
         return redirect('pomlog_entry_archive_index')
 
-    #print 'GET or invalid post data'
     return custom_render(request,context,template_name)
 
 def share_entries_with_users(entries,users):

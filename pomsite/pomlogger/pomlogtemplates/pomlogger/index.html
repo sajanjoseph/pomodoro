@@ -1,4 +1,22 @@
 {% extends "pomlogger/base.html" %}
+{% block js %}
+<script type="text/javascript">
+    {% include "pomlogger/includes/jquery-1.7.1.min.js" %}
+    {% include "pomlogger/includes/fullcalendar.js" %}
+    
+    $(document).ready(function() {
+
+        // page is now ready, initialize the calendar...
+
+        $('#calendar').fullCalendar({
+        	events: {{entry_count|safe}}
+        });
+
+    });
+</script>
+
+ {% endblock %}
+
 {% block content %}{{block.super}}
 
 <p id="change-pass">
@@ -7,6 +25,10 @@
 <p id="reset-pass">
 <a class="btnlink" href="{% url auth_password_reset %}"><img src="{{ MEDIA_URL }}img/keysmall.png">Forgot your password?</a>
 </p>
+
+<div id="calendarspace">
+<div id='calendar'></div>
+</div>
 {% endblock %}
 {%block whatis %}
 <p>
