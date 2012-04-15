@@ -1,17 +1,18 @@
 {% extends "pomlogger/base.html" %}
 {% block js %}
+
+
 <script type="text/javascript">
-    {% include "pomlogger/includes/jquery-1.7.1.min.js" %}
-    {% include "pomlogger/includes/fullcalendar.js" %}
+{% include "pomlogger/includes/jquery-1.7.1.min.js" %}
+{% include "pomlogger/includes/fullcalendar.js" %}
+
     
     $(document).ready(function() {
-
-        // page is now ready, initialize the calendar...
-
-        $('#calendar').fullCalendar({
+    	$('#calendar').fullCalendar({
         	events: {{entry_count|safe}}
         });
-
+        
+        
     });
 </script>
 
@@ -29,6 +30,12 @@
 <div id="calendarspace">
 <div id='calendar'></div>
 </div>
+
+<div id="calendarspace">
+<div id='calendar2'></div>
+</div>
+
+
 {% endblock %}
 {%block whatis %}
 <p>

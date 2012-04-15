@@ -14,6 +14,7 @@ from django.http import HttpResponse,HttpResponseRedirect,Http404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import Count
 from django.template.defaultfilters import title
 from django.http import Http404
 from django.template import RequestContext
@@ -35,6 +36,7 @@ from settings import IMAGE_FOLDER_PATH
 from settings import PAGINATE_BY
 from settings import MEDIA_URL
 
+from django.http import HttpResponse
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -57,27 +59,25 @@ def logout(request):
 def server_error(request,template_name="500.html"):
     return custom_render(request,{},template_name)
 
+
+
 @login_required
 def index(request, template_name):
     path=request.path
     entries_count=[]
-    now=datetime.datetime.now()
-    current_day=now.day
-    current_month=now.month
-    current_year=now.year
-    for i in range(1,current_day+1):
+    entries_dict=PomEntry.objects.filter(author=request.user).values('today').annotate(dcount=Count('today'))
+    for record in entries_dict:
+        count=record['dcount']
+        datevalue=record['today']
         entries_count.append({
-                              'title':str(PomEntry.objects.filter(today__year=current_year,today__month=current_month,today__day=i).count()),
-                              'start':now.strftime("%Y-%m-"+str(i)),
-                              'end':now.strftime("%Y-%m-"+str(i))
+                              'title':str(count),
+                              'start':datevalue.strftime("%Y-%m-%d"),
+                              'end':datevalue.strftime("%Y-%m-%d")
                               })
-    #print 'entries_count=',entries_count
     entry_count_dump=simplejson.dumps(entries_count)
-    #ev1=str(12)
-    #dummy=[{"start": "2012-04-01", "end": "2012-04-01", "title":ev1 }]
-    
-    #print 'entry_count_dump=',entry_count_dump
-    return custom_render(request, {'path':path,'entry_count':entry_count_dump },template_name)
+    #print 'index()::entry_count_dump[0]=',entry_count_dump[0:70]
+    cr=custom_render(request, {'path':path,'entry_count':entry_count_dump },template_name)
+    return cr
 
 def get_month_as_number(monthname):
     if title(monthname) not in calendar.month_abbr:
@@ -746,7 +746,7 @@ def create_linechart(map,basefilename):
         return imgfilename,docfilename
 
 def create_barchart(map,basefilename):
-    print 'create_barchart()::map=',map
+    #print 'create_barchart()::map=',map
     now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
     imgfilename = ''
     docfilename = ''
@@ -757,12 +757,12 @@ def create_barchart(map,basefilename):
     xdata = range(len(xvalues))
     ydata = [map[x] for x in xvalues]
     min_x,max_x = get_extreme_values(xdata)
-    print 'xvalues=',xvalues
+    #print 'xvalues=',xvalues
     splitxdata = [x.split('-',1) for x in xvalues]
-    print 'splitxdata=',splitxdata
+    #print 'splitxdata=',splitxdata
     xlabels = [x[0].split()[0] for x in splitxdata] 
     #xlabels = [x[0] for x in splitxdata]#find something better!
-    print 'xlabels=',xlabels
+    #print 'xlabels=',xlabels
     dates = [x[1] for x in splitxdata if len(x)>1]
     figsize= calculate_plotfigure_size(len(xvalues))
     figure = plt.figure(figsize = figsize)
