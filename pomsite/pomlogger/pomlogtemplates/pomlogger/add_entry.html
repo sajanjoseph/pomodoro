@@ -1,11 +1,11 @@
 {% extends "pomlogger/base_entries.html" %}
 {% block title %}{{block.super}}|{{ page_title }}{% endblock %}
 {% block js %}
+{{block.super}}
+<script type="text/javascript"  src="{{MEDIA_URL}}js/jquery-1.7.1.min.js" ></script>
+<script type="text/javascript"  src="{{MEDIA_URL}}js/pom_timer.js" ></script>
+    
 
-<script type="text/javascript">
-    {% include "pomlogger/includes/jquery-1.7.1.min.js" %}
-    {% include "pomlogger/includes/pom_timer.js" %}
-</script>
  {% endblock %}
 
 

@@ -7,10 +7,14 @@
 <LINK REL=StyleSheet HREF="{{MEDIA_URL}}css/fullcalendar.css" TYPE="text/css" MEDIA="screen, print"/>
 <link rel="shortcut icon" href="{{ MEDIA_URL }}img/pomodoro-icon.ico"/>
 
-{% block js %} {% endblock %}
+{% block js %} 
+<script>
+var M_URL = "{{MEDIA_URL}}";
+</script>
+{% endblock %}
 
 </head>
-<body {% block load_js %}{% endblock %} >
+<body{% block load_js %}{% endblock %}>
 
 
 <span id="logo"> Pomodoro Logger</span>

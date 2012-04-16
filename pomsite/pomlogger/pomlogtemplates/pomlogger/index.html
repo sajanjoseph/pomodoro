@@ -1,12 +1,10 @@
 {% extends "pomlogger/base.html" %}
 {% block js %}
-
-
+{{block.super}}
+<script type="text/javascript"  src="{{MEDIA_URL}}js/jquery-1.7.1.min.js" ></script> 
+<script type="text/javascript"  src="{{MEDIA_URL}}js/fullcalendar.js" > </script>
 <script type="text/javascript">
-{% include "pomlogger/includes/jquery-1.7.1.min.js" %}
-{% include "pomlogger/includes/fullcalendar.js" %}
-
-    
+	
     $(document).ready(function() {
     	$('#calendar').fullCalendar({
         	events: {{entry_count|safe}}
