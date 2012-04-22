@@ -1,7 +1,28 @@
-{% extends "pomlogger/allentriesreport.html" %}
+{% extends "pomlogger/base_reports.html" %}
+{% block title %}
+{{block.super}}|{{page_title}}
+{% endblock %}
+
+{% block content %}
+{{block.super}}
+
+{%if entrycount > 0 %}
+<img src="{% url pomlog_render_graph_for_day year month day%}"
+			
+			alt="graph for a day"
+			width="900" height="600"/>
+
+
+{% else %} 
+<h3> You have not created any entry  yet</h3>
+
+{% endif %}
+
+{% endblock %}
+
 
 {% block whatis %}
 <p>
-Bar Plot of Time spent on {{number_of_entries}} entr{{ number_of_entries|pluralize:"y,ies"}} on:  {{day}}-{{month}}-{{year}} 
+Bar Plot of Entries for:  {{day}}-{{month}}-{{year}} 
 </p>
 {% endblock %}

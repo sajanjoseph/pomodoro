@@ -22,7 +22,7 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 
 #login url added by sajan
 LOGIN_URL='/pomlog/account/login/'
-LOGIN_REDIRECT_URL='/pomlog/entries/'
+LOGIN_REDIRECT_URL='/pomlog/'
 
 
 # mail server
@@ -101,7 +101,23 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    
 )
+
+#for debug-toolbar
+#INTERNAL_IPS = ('127.0.0.1',)
+
+#DEBUG_TOOLBAR_PANELS = (
+#    'debug_toolbar.panels.version.VersionDebugPanel',
+#    'debug_toolbar.panels.timer.TimerDebugPanel',
+#    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+#    'debug_toolbar.panels.headers.HeaderDebugPanel',
+#    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+#    'debug_toolbar.panels.template.TemplateDebugPanel',
+#    'debug_toolbar.panels.sql.SQLDebugPanel',
+#    'debug_toolbar.panels.signals.SignalDebugPanel',
+#    'debug_toolbar.panels.logger.LoggingPanel',
+#)
 
 ROOT_URLCONF = 'pomsite.urls'
 
@@ -120,6 +136,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'registration',
     'pomlogger',
+   
 )
 #account activation open for a week
 ACCOUNT_ACTIVATION_DAYS = 2

@@ -43,6 +43,8 @@ import matplotlib.pyplot as plt
 import pylab
 from matplotlib.backends.backend_pdf import PdfPages
 
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
 import simplejson
 
 
@@ -203,10 +205,10 @@ def delete_entry(request,id):
     entry=get_object_or_404(PomEntry,id=id,author=request.user )
     #need to remove user from its categories
     cats=entry.categories.all()
-    print 'delete_entry()::cats=',cats
+    #print 'delete_entry()::cats=',cats
     remove_user_from_categories(cats,request.user)
     entry.delete()
-    logger.debug("entry deleted")
+    #logger.debug("entry deleted")
     #remove categories that have no entries associated
     remove_lone_categories()
     return redirect('pomlog_entry_archive_index')
@@ -318,26 +320,37 @@ def remove_user_from_categories(categories,user):
 @login_required
 @transaction.commit_on_success
 def edit_entry(request,id,template_name,page_title):
+    print 'edit_entry()::id=',id
     entry=get_object_or_404(PomEntry,id=id,author=request.user)
-    
-    old_categorynames_list=[x.name for x in entry.categories.all()]    
+    print 'edit_entry()::entry=',entry
+    old_categorynames_list=[x.name for x in entry.categories.all()]
+    print 'edit_entry()::old_categorynames_list=',old_categorynames_list    
     categorynames_as_one_string=get_category_names_as_one_string(old_categorynames_list)
     categorynamesdata={'categories':categorynames_as_one_string}
     form_data=get_form_data(request)
-    #form=PomEntryForm(form_data,instance=entry)
-    form=PomEntryEditForm(form_data,instance=entry)#try not allowing today,start,end times eto be edited
+    form=PomEntryEditForm(form_data,instance=entry)#try not allowing today,start,end times etc be edited
+    
     catnameform=PomCategoryNameForm(form_data,initial=categorynamesdata)
     context={'entryform':form,'categoryform':catnameform,'page_title':page_title}
     form_valid=form.is_valid()
     catnameform_valid=catnameform.is_valid()
+    print 'edit_entry()::catnameform_valid=',catnameform_valid
+    print 'edit_entry()::form_valid=',form_valid
+    print 'edit_entry()::request.method=',request.method
     if request.method=='POST' and form_valid and catnameform_valid:
+        print 'edit_entry()::POST:today=',request.POST['today']
+        print 'edit_entry()::POST:start_time=',request.POST['start_time']
+        print 'edit_entry()::POST:end_time=',request.POST['end_time']
         edited_entry=form.save()
+        print 'edit_entry()::edited_entry=',edited_entry
         catnames=catnameform.cleaned_data['categories']
+        print 'edit_entry()::catnames=',catnames
         new_categorynames_list=get_list_of_names(catnames)
         newlyaddedcatnames=set(new_categorynames_list)-set(old_categorynames_list)
         newlyaddedcatnames=list(newlyaddedcatnames)
         removedcatnames=set(old_categorynames_list)-set(new_categorynames_list)
         removedcatnames=list(removedcatnames)
+        print 'edit_entry()::removedcatnames=',removedcatnames
         #for each name in newlyaddedcatnames,get or create category object, add this user in its users field
         if newlyaddedcatnames:
             newlyaddedcats=get_categories(newlyaddedcatnames)
@@ -345,6 +358,7 @@ def edit_entry(request,id,template_name,page_title):
         #for each name in removedcatnames ,get category object ,remove this user from its users field
         if removedcatnames:
             removedcats=get_categories(removedcatnames)
+            print 'edit_entry()::removedcats=',removedcats
             remove_user_from_categories(removedcats,request.user)
         cats=get_categories(get_list_of_names(catnames))
         edited_entry.categories=cats
@@ -403,7 +417,7 @@ def delete_category(request,slug):
     cat=get_object_or_404(PomCategory,slug=slug)
     if cat.users.count()==1 and request.user in cat.users.all():
         cat.delete()
-        logger.info('deleted category:'+slug)
+        #logger.info('deleted category:'+slug)
     else:
         pass
         #logger.info('cannot delete category')
@@ -563,111 +577,90 @@ def reports(request,page_title,template_name):
     day = request.GET.get('day')
     if day:
         return redirect('pomlog_report_entries_for_day',year=year,month=month,day=day)
-    elif month:
-        return redirect('pomlog_report_entries_for_month',year=year,month=month)
-    elif year :
-        return redirect('pomlog_report_entries_year',year=year)
     return custom_render(request,datemap,template_name)
+
 
 @login_required
 def report_entries_for_day(request,year,month,day,page_title,template_name):
     monthname = month
     month = get_month_as_number(month)
+    page_title = page_title+" "+day+"-"+monthname+"-"+year
+    entrycount=PomEntry.objects.filter(author=request.user,today__year=year,today__month=month,today__day=day).count()
+    print 'entrycount=',entrycount
+    context=dict(year=year,month=monthname,day=day,page_title=page_title,entrycount=entrycount)
+    return custom_render(request,context,template_name)
+
+@login_required
+def render_graph_for_day(request,year,month,day):
+    month = get_month_as_number(month)
     entryset=PomEntry.objects.filter(today__year=year,today__month=month,today__day=day,author=request.user)
     entry_duration_dict = get_durations_for_entries(entryset)
     category_duration_dict = get_duration_for_categories(entryset)
-    #logger.info('entry_duration_dict size='+str(len(entry_duration_dict)));
-    basefilename = "entriesofday%s-%s-%s"%(year,month,day)
-    page_title = page_title+" "+day+"-"+monthname+"-"+year
-    imgfilename=docfilename=''
-    if entry_duration_dict:
-        imgfilename,docfilename = create_chart(CHART_TYPE,entry_duration_dict,basefilename)
-    report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year,'month':monthname,'day':day}
-    report_data["number_of_entries"]=len(entry_duration_dict)
-    report_data["category_duration_dict"]= category_duration_dict
-    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
-    report_data["sorteddurations"]= sorteddurations
+    canvas=create_chart(CHART_TYPE,entry_duration_dict)
+    response = HttpResponse(content_type = 'image/png')
+    canvas.print_png(response)
+    return response
     
-    return custom_render(request,report_data,template_name)
+def create_chart(chart_type,map):
+    if chart_type is "bar":
+        return create_barchart(map)
+    elif chart_type is "pie":
+        return create_piechart(map)
 
-@login_required
-def report_entries_for_month(request,year,month,page_title,template_name):
-    monthname = month
-    month = get_month_as_number(month)
-    entryset=PomEntry.objects.filter(today__year=year,today__month=month,author=request.user)
-    entry_duration_dict = get_durations_for_entries(entryset)
-    category_duration_dict = get_duration_for_categories(entryset)
-    basefilename = "entriesofmonth%s-%s"%(monthname,year)
-    page_title = page_title+" "+monthname+"-"+year
-    imgfilename=docfilename=''
-    if entry_duration_dict:
-        imgfilename,docfilename = create_linechart(entry_duration_dict,basefilename)
-    report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year,'month':monthname}
-    report_data["number_of_entries"]=len(entry_duration_dict)
-    report_data["category_duration_dict"]= category_duration_dict
-    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
-    report_data["sorteddurations"]= sorteddurations
-    return custom_render(request,report_data,template_name)
-
-@login_required
-def report_entries_for_year(request,year,page_title,template_name):
-    entryset=PomEntry.objects.filter(today__year=year,author=request.user)
-    entry_duration_dict = get_durations_for_entries(entryset)
-    category_duration_dict = get_duration_for_categories(entryset)
-    basefilename = "entriesofyear%s"%year
-    page_title = page_title+" "+year
-    imgfilename=docfilename=''
-    if entry_duration_dict:
-        imgfilename,docfilename = create_linechart(entry_duration_dict,basefilename)
-    report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title,'year':year}
-    report_data["number_of_entries"]=len(entry_duration_dict)
-    report_data["category_duration_dict"]= category_duration_dict
-    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
-    report_data["sorteddurations"]= sorteddurations
-    return custom_render(request,report_data,template_name)
-
-@login_required
-def entries_report(request,page_title,template_name):
-    entryset=PomEntry.objects.filter(author=request.user)
-    entry_duration_dict = get_durations_for_entries(entryset)
-    category_duration_dict = get_duration_for_categories(entryset)
-    basefilename = "allentriesreport"
-    imgfilename=docfilename=''
-    if entry_duration_dict:
-        imgfilename,docfilename = create_linechart(entry_duration_dict,basefilename)
-    report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
-    report_data["number_of_entries"]=len(entry_duration_dict)
-    #report_data["category_duration_dict"]= category_duration_dict
-    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
-    report_data["sorteddurations"]= sorteddurations
-    
-    return custom_render(request,report_data,template_name)
+def create_barchart(map):
+    #print 'create_barchart()::map=',map
+    now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
+    xvalues = map.keys()
+    xvalues.sort()
+    yvalues = map.values()
+    maxyvalue = get_max_value(yvalues)
+    xdata = range(len(xvalues))
+    ydata = [map[x] for x in xvalues]
+    min_x,max_x = get_extreme_values(xdata)
+    splitxdata = [x.split('-',1) for x in xvalues]
+    xlabels = [x[0].split()[0] for x in splitxdata] 
+    dates = [x[1] for x in splitxdata if len(x)>1]
+    figsize= calculate_plotfigure_size(len(xvalues))
+    figure = plt.figure(figsize = figsize, facecolor = "white")
+    ax = figure.add_subplot(1,1,1)
+    barwidth = BAR_WIDTH
+    ystep = create_ystep(maxyvalue)
+    plt.grid(True)
+    if xdata and ydata:
+        ax.bar(xdata, ydata, width=barwidth,align='center',color=BAR_COLOR)
+        ax.set_xlabel('categories',color=LABEL_COLOR)
+        ax.set_ylabel('duration in  minutes',color=LABEL_COLOR)
+        ax.set_title('duration plot created at :'+now,color=TITLE_COLOR)
+        ax.set_xticks(xdata)
+        ax.set_xlim([min_x - PLOT_OFFSET, max_x + PLOT_OFFSET])
+        ax.set_xticklabels(xlabels)
+        if ystep:
+            ax.set_yticks(range(0,maxyvalue+ystep,ystep))
+            ax.set_ylim(0,max(ydata)+ystep)
+        figure.autofmt_xdate(rotation=30)
+        canvas = FigureCanvas(figure)
+        plt.close(figure)
+        return canvas
 
 @login_required
 def categories_report(request,page_title,template_name):
+    report_data={'page_title':page_title}
+    entrycount=PomEntry.objects.filter(author=request.user).count()
+    report_data["entrycount"]=entrycount
+    return custom_render(request,report_data,template_name)
+
+@login_required
+def render_categories_chart(request):
     entryset=PomEntry.objects.filter(author=request.user)
     category_duration_dict = get_duration_for_categories(entryset)
-    basefilename = "allcategoriesreport"
-    imgfilename=docfilename=''
     if category_duration_dict:
-        imgfilename,docfilename = create_piechart(category_duration_dict,basefilename,chartsize=(8,8))
-    report_data={'basefilename':basefilename,'report_image':imgfilename,'report_doc':docfilename,'page_title':page_title}
-    sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
-    report_data["sorteddurations"]=sorteddurations
-    return custom_render(request,report_data,template_name)
-    
-def create_chart(chart_type,map,basefilename):
-    if chart_type is "bar":
-        return create_barchart(map,basefilename)
-    elif chart_type is "pie":
-        return create_piechart(map,basefilename)
-    elif chart_type is "line":
-        return create_linechart(map,basefilename)
-    
-def create_piechart(map,basefilename,chartsize=(16,16)):
+        canvas = create_piechart(category_duration_dict,chartsize=(8,8))
+    response = HttpResponse(content_type = 'image/png')
+    canvas.print_png(response)
+    return response
+
+def create_piechart(map,chartsize=(16,16)):
     now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
-    imgfilename = ''
-    docfilename = ''
     xvalues = map.keys()
     xvalues.sort()
     yvalues = map.values()
@@ -687,117 +680,10 @@ def create_piechart(map,basefilename,chartsize=(16,16)):
         #need to add text with dates
         plt.pie(fracs, labels=labels, autopct='%1.1f%%', shadow=True)
         title('duration pie plot')
-        imgfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".png")
-        docfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".pdf")
-        figure.savefig(imgfilename,format=REPORT_IMG_FMT)
-        figure.savefig(docfilename,format=REPORT_DOC_FMT)
+        canvas = FigureCanvas(figure)
         plt.close(figure)
-        return imgfilename,docfilename
-    else:
-        plt.close(figure)
-        #logger.info("xdata or ydata empty..returning empty strings")
-        return imgfilename,docfilename
+        return canvas
 
-def create_linechart(map,basefilename):
-    now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
-    imgfilename = ''
-    docfilename = ''
-    xvalues = map.keys()
-    xvalues.sort()
-    yvalues = map.values()
-    maxyvalue = get_max_value(yvalues)
-    xdata = range(len(xvalues))
-    ydata = [map[x] for x in xvalues]
-    min_x,max_x = get_extreme_values(xdata)
-    splitxdata = [x.split('-',1) for x in xvalues]
-    #xlabels = [x[0] for x in splitxdata]
-    xlabels = [x[0].split()[0] for x in splitxdata] 
-    #dates = [x[1] for x in splitxdata if len(x)>1]
-    figsize= calculate_plotfigure_size(len(xvalues))
-    figure = plt.figure(figsize = figsize)
-#    figure = plt.figure(figsize = (70,8))
-    ax = figure.add_subplot(1,1,1)
-    ystep = create_ystep(maxyvalue)
-    plt.grid(True)
-    if xdata and ydata:
-        plt.plot(xdata,ydata)
-        ax.set_xlabel('categories',color=LABEL_COLOR)
-        ax.set_ylabel('duration in  minutes',color=LABEL_COLOR)
-        ax.set_title('duration plot created at :'+now,color=TITLE_COLOR)
-        ax.set_xticks(xdata)
-        ax.set_xlim([min_x - PLOT_OFFSET, max_x + PLOT_OFFSET])
-        ax.set_xticklabels(xlabels)
-        if ystep:
-            ax.set_yticks(range(0,maxyvalue+ystep,ystep))
-            ax.set_ylim(0,max(ydata)+ystep)
-#        for i in range(len(xdata)):
-#            if dates:
-#                plt.text(xdata[i], 0, dates[i], rotation='vertical',size='large',fontweight="bold",family='fantasy')
-        figure.autofmt_xdate(rotation=30)
-        imgfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".png")
-        docfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".pdf")
-        figure.savefig(imgfilename,format=REPORT_IMG_FMT)
-        figure.savefig(docfilename,format=REPORT_DOC_FMT)
-        plt.close(figure)
-        return imgfilename,docfilename
-    else:
-        plt.close(figure)
-        #logger.info("xdata or ydata empty..returning empty strings")
-        return imgfilename,docfilename
-
-def create_barchart(map,basefilename):
-    #print 'create_barchart()::map=',map
-    now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
-    imgfilename = ''
-    docfilename = ''
-    xvalues = map.keys()
-    xvalues.sort()
-    yvalues = map.values()
-    maxyvalue = get_max_value(yvalues)
-    xdata = range(len(xvalues))
-    ydata = [map[x] for x in xvalues]
-    min_x,max_x = get_extreme_values(xdata)
-    #print 'xvalues=',xvalues
-    splitxdata = [x.split('-',1) for x in xvalues]
-    #print 'splitxdata=',splitxdata
-    xlabels = [x[0].split()[0] for x in splitxdata] 
-    #xlabels = [x[0] for x in splitxdata]#find something better!
-    #print 'xlabels=',xlabels
-    dates = [x[1] for x in splitxdata if len(x)>1]
-    figsize= calculate_plotfigure_size(len(xvalues))
-    figure = plt.figure(figsize = figsize)
-    ax = figure.add_subplot(1,1,1)
-    barwidth = BAR_WIDTH
-    ystep = create_ystep(maxyvalue)
-    plt.grid(True)
-    if xdata and ydata:
-        ax.bar(xdata, ydata, width=barwidth,align='center',color=BAR_COLOR)
-        ax.set_xlabel('categories',color=LABEL_COLOR)
-        ax.set_ylabel('duration in  minutes',color=LABEL_COLOR)
-        ax.set_title('duration plot created at :'+now,color=TITLE_COLOR)
-        ax.set_xticks(xdata)
-        ax.set_xlim([min_x - PLOT_OFFSET, max_x + PLOT_OFFSET])
-        ax.set_xticklabels(xlabels)
-        if ystep:
-            ax.set_yticks(range(0,maxyvalue+ystep,ystep))
-            ax.set_ylim(0,max(ydata)+ystep)
-#        for i in range(len(xdata)):
-#            if dates:
-#                plt.text(xdata[i], 0, dates[i], rotation='vertical',size='large',fontweight="bold",family='fantasy')
-        figure.autofmt_xdate(rotation=30)
-        imgfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".png")
-        docfilename =os.path.join(IMAGE_FOLDER_PATH,basefilename+".pdf")
-        figure.savefig(imgfilename,format=REPORT_IMG_FMT)
-        figure.savefig(docfilename,format=REPORT_DOC_FMT)
-        plt.close(figure)
-        return imgfilename,docfilename
-    else:
-        plt.close(figure)
-        #logger.info("xdata or ydata empty..returning empty strings")
-        return imgfilename,docfilename
-    
-
- 
 def create_ystep(maxvalue):
     return  maxvalue if maxvalue < YSTEP_FACTOR else maxvalue/YSTEP_FACTOR
         

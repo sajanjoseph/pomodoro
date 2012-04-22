@@ -6,15 +6,16 @@
 {% block content %}
 {{block.super}}
 
-{%if sorteddurations %}
+{%if entrycount > 0 %}
 <h3>ALL CATEGORIES</h3>  
-<img src="{{ MEDIA_URL }}img/{{basefilename}}.png" alt="allcategories" >
+<img src="{% url pomlog_render_categories_chart %}"
+			
+			alt="categories chart"
+			width="700" height="700"
+			/>
 
-<p>
 
-<a href="{{ MEDIA_URL }}img/{{basefilename}}.pdf" >get as pdf <img src="{{ MEDIA_URL }}img/pdf.png" alt="pdfreport" ></a>
-</p>
-{% include "pomlogger/includes/time_on_categories.html" %}
+
 {% else %} 
 <h3> You have not created any entry  yet</h3>
 
@@ -26,6 +27,6 @@
 
 {% block whatis %}
 <p>
-Plot of Time spent on {{sorteddurations|length}} categor{{ sorteddurations|length|pluralize:"y,ies"}} 
+Chart of Time spent on {{sorteddurations|length}} categor{{ sorteddurations|length|pluralize:"y,ies"}} 
 </p>
 {% endblock %}

@@ -32,8 +32,6 @@ class PomCategory(models.Model):
 
 class PomEntry(models.Model):
     today=models.DateField(default=date.today)
-    #start_time=models.TimeField(default=(lambda:datetime.now().time))
-    #end_time=models.TimeField(default=(lambda:datetime.now().time))
     start_time=models.TimeField(null=True)
     end_time=models.TimeField(null=True)
     description=models.TextField()
@@ -44,9 +42,6 @@ class PomEntry(models.Model):
     class Meta:
 	    verbose_name_plural="PomEntries"
 
-#    def __unicode__(self):       
-#        return "%s-%s-%s"%(",".join(str(x.name) for x in self.categories.all()),self.today,self.start_time)
-    
     def __unicode__(self):
         shortdescription=truncatewords(self.description,2)
         return shortdescription+'-'+unicode(self.today)+'-'+unicode(self.start_time)
