@@ -35,6 +35,6 @@
 
 {% block whatis %}
 <p>
-Details of the category {{object.name}} and {{category_duration_dict|length}} Entr{{category_duration_dict|length|pluralize:"y,ies" }} in it
+Details of the category {{object.name}} and {{entries.paginator.count}} Entr{{entries.paginator.count|pluralize:"y,ies" }} in it
 </p>
 {% endblock %}
