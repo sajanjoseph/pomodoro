@@ -114,3 +114,17 @@ span#registerlink a {
 	font-weight: bold;
 	letter-spacing: 1px;
 }
+
+p#reset-pass{
+	width:15em;
+	margin-top:.5em;
+	margin-bottom:.5em;
+}
+a.btnlink{
+	clear:both;
+	border: 2px outset;
+  	padding: 10px;
+  	display:block;
+  	text-decoration: none;
+  	border-color : white white white #A1E048;
+}

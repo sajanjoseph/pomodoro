@@ -28,7 +28,7 @@ var M_URL = "{{MEDIA_URL}}";
    {% endif %}
    </p>
    <p class="rightcorner">
-   <span>{% now "jS o\f F Y" %}
+   <span>{% now "jS  F Y - f A" %}
    <form id="logoutform" method="post" action="{% url pomlog_logout %}">{% csrf_token %}
    	<input type="hidden" name="next" value="{{next|escape}}" />
         <input type="hidden" name="confirm" value="true" />

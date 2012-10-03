@@ -12,15 +12,19 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'postgresql_psycopg2'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'pomdb'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'sajan'             # Not used with sqlite3.
-DATABASE_PASSWORD = ''         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2' , # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'pomdb',                      # Or path to database file if using sqlite3.
+        'USER': 'sajan',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    }
+}
 
 
-#login url added by sajan
+#login url 
 LOGIN_URL='/pomlog/account/login/'
 LOGIN_REDIRECT_URL='/pomlog/'
 
@@ -91,9 +95,9 @@ SECRET_KEY = 'q3!2+$t%263z%q#5(f)%0o-hh%_7zttp9bz*m5fr+mtxb9#+^h'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+#     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -139,4 +143,4 @@ INSTALLED_APPS = (
    
 )
 #account activation open for a week
-ACCOUNT_ACTIVATION_DAYS = 2
+ACCOUNT_ACTIVATION_DAYS = 7

@@ -105,7 +105,7 @@ class PomEntryShareForm(Form):
         self.fields['users_selected']=ModelMultipleChoiceField(queryset=User.objects.exclude(username=request.user.username))
 
     def clean_sharing_options(self):
-        print 'PomEntryShareForm::clean_sharing_options()'
+        #print 'PomEntryShareForm::clean_sharing_options()'
         try:
             share_options=self.cleaned_data['sharing_options']
                         
@@ -115,7 +115,7 @@ class PomEntryShareForm(Form):
         return share_options
 
     def clean_entries_selected(self):
-        print 'PomEntryShareForm::clean_entries_selected()'
+        #print 'PomEntryShareForm::clean_entries_selected()'
         try:
             entries_selected=self.cleaned_data['entries_selected']
                         

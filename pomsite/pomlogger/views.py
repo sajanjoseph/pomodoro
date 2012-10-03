@@ -88,7 +88,7 @@ def get_month_as_number(monthname):
     return mlist.index(title(monthname))
 
 def entries_shared(request,page_title,template_name):
-    print 'entries_shared',request.user,page_title,template_name
+    #print 'entries_shared',request.user,page_title,template_name
     entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user).order_by('-today','-end_time')#added for sharing
     context={'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
     return custom_render(request,context,template_name)
@@ -215,13 +215,13 @@ def delete_entry(request,id):
 
 
 def remove_lone_categories():
-    print 'remove_lone_categories()'
+    #print 'remove_lone_categories()'
     allcats=PomCategory.objects.all()
     for acat in allcats:
         entries_of_acat=PomEntry.objects.filter(categories=acat)
         if entries_of_acat.count()==0:
             acat.delete()
-            print 'deleted ',acat
+            #print 'deleted ',acat
 
 
 def get_categories(catnames):
@@ -320,11 +320,11 @@ def remove_user_from_categories(categories,user):
 @login_required
 @transaction.commit_on_success
 def edit_entry(request,id,template_name,page_title):
-    print 'edit_entry()::id=',id
+    #print 'edit_entry()::id=',id
     entry=get_object_or_404(PomEntry,id=id,author=request.user)
-    print 'edit_entry()::entry=',entry
+    #print 'edit_entry()::entry=',entry
     old_categorynames_list=[x.name for x in entry.categories.all()]
-    print 'edit_entry()::old_categorynames_list=',old_categorynames_list    
+    #print 'edit_entry()::old_categorynames_list=',old_categorynames_list    
     categorynames_as_one_string=get_category_names_as_one_string(old_categorynames_list)
     categorynamesdata={'categories':categorynames_as_one_string}
     form_data=get_form_data(request)
@@ -334,23 +334,24 @@ def edit_entry(request,id,template_name,page_title):
     context={'entryform':form,'categoryform':catnameform,'page_title':page_title}
     form_valid=form.is_valid()
     catnameform_valid=catnameform.is_valid()
-    print 'edit_entry()::catnameform_valid=',catnameform_valid
-    print 'edit_entry()::form_valid=',form_valid
-    print 'edit_entry()::request.method=',request.method
+    #print 'edit_entry()::catnameform_valid=',catnameform_valid
+    #print 'edit_entry()::form_valid=',form_valid
+    #print 'for errors=',form.errors
+    #print 'edit_entry()::request.method=',request.method
     if request.method=='POST' and form_valid and catnameform_valid:
-        print 'edit_entry()::POST:today=',request.POST['today']
-        print 'edit_entry()::POST:start_time=',request.POST['start_time']
-        print 'edit_entry()::POST:end_time=',request.POST['end_time']
+        #print 'edit_entry()::POST:today=',request.POST['today']
+        #print 'edit_entry()::POST:start_time=',request.POST['start_time']
+        #print 'edit_entry()::POST:end_time=',request.POST['end_time']
         edited_entry=form.save()
-        print 'edit_entry()::edited_entry=',edited_entry
+        #print 'edit_entry()::edited_entry=',edited_entry
         catnames=catnameform.cleaned_data['categories']
-        print 'edit_entry()::catnames=',catnames
+        #print 'edit_entry()::catnames=',catnames
         new_categorynames_list=get_list_of_names(catnames)
         newlyaddedcatnames=set(new_categorynames_list)-set(old_categorynames_list)
         newlyaddedcatnames=list(newlyaddedcatnames)
         removedcatnames=set(old_categorynames_list)-set(new_categorynames_list)
         removedcatnames=list(removedcatnames)
-        print 'edit_entry()::removedcatnames=',removedcatnames
+        #print 'edit_entry()::removedcatnames=',removedcatnames
         #for each name in newlyaddedcatnames,get or create category object, add this user in its users field
         if newlyaddedcatnames:
             newlyaddedcats=get_categories(newlyaddedcatnames)
@@ -358,7 +359,7 @@ def edit_entry(request,id,template_name,page_title):
         #for each name in removedcatnames ,get category object ,remove this user from its users field
         if removedcatnames:
             removedcats=get_categories(removedcatnames)
-            print 'edit_entry()::removedcats=',removedcats
+            #print 'edit_entry()::removedcats=',removedcats
             remove_user_from_categories(removedcats,request.user)
         cats=get_categories(get_list_of_names(catnames))
         edited_entry.categories=cats
@@ -547,7 +548,8 @@ def share_entry_with_user(entry,user):
     if not is_shared(entry,user):
         entry.sharedwith.add(user)
     else:
-        print 'the entry:',entry,' is already shared with user:',user
+        #print 'the entry:',entry,' is already shared with user:',user
+        pass
 
 def is_shared(entry,user):
     if user in entry.sharedwith.all():
@@ -583,10 +585,11 @@ def reports(request,page_title,template_name):
 @login_required
 def report_entries_for_day(request,year,month,day,page_title,template_name):
     monthname = month
+    print 'report_entries_for_day=',monthname
     month = get_month_as_number(month)
     page_title = page_title+" "+day+"-"+monthname+"-"+year
     entrycount=PomEntry.objects.filter(author=request.user,today__year=year,today__month=month,today__day=day).count()
-    print 'entrycount=',entrycount
+    #print 'entrycount=',entrycount
     context=dict(year=year,month=monthname,day=day,page_title=page_title,entrycount=entrycount)
     return custom_render(request,context,template_name)
 

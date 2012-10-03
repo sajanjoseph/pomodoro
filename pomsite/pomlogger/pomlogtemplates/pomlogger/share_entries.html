@@ -4,13 +4,14 @@
 {{block.super}}|{{page_title}}
 {% endblock %}
 
+{% block js %}
+<script type="text/javascript"  src="{{MEDIA_URL}}js/share_entries.js" ></script>
+{% endblock %}
 {% block content %}
 {{block.super}}
 
 
-<script type="text/javascript">
-	{% include "pomlogger/includes/share_entries.js" %}
-</script>
+
 <div id="shareform">
 <FORM class="share" action="." method="POST">{% csrf_token %}
 <h3>Share</h3>
