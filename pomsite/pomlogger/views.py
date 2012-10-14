@@ -585,11 +585,9 @@ def reports(request,page_title,template_name):
 @login_required
 def report_entries_for_day(request,year,month,day,page_title,template_name):
     monthname = month
-    print 'report_entries_for_day=',monthname
-    month = get_month_as_number(month)
+    month = get_month_as_number(monthname)
     page_title = page_title+" "+day+"-"+monthname+"-"+year
     entrycount=PomEntry.objects.filter(author=request.user,today__year=year,today__month=month,today__day=day).count()
-    #print 'entrycount=',entrycount
     context=dict(year=year,month=monthname,day=day,page_title=page_title,entrycount=entrycount)
     return custom_render(request,context,template_name)
 

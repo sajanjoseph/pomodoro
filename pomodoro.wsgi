@@ -1,5 +1,5 @@
 import os, sys
-sys.path.append('/home/sajan/Django-1.3.1/')
+sys.path.append('/home/sajan/Django-1.4/')
 sys.path.append('/home/sajan/dev/python/django/')
 sys.path.append('/home/sajan/dev/python/django/pomodoro/')
 sys.path.append('/home/sajan/dev/python/django/pomodoro/pomsite/')
