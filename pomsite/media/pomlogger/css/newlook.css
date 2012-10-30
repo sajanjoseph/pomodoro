@@ -89,7 +89,7 @@ li.report{
 	background: -moz-linear-gradient(linear, 0% 0%, 0% 100%, from(#A1E048), to(#6A942F));
 	background: -webkit-linear-gradient(top, #A1E048, #6A942F);
 	background: linear-gradient(top, #A1E048, #6A942F);
-	padding: 10px 20px;
+	padding: 10px 10px;
 	color:white;
 	margin:auto;
 	text-align:center;
@@ -97,6 +97,10 @@ li.report{
 	text-transform: uppercase;
 	letter-spacing: .2em;
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+p.timecatslist{
+   
+    width:50%;
 }
 .hstrip{
 

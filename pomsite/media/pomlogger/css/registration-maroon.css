@@ -1,0 +1,97 @@
+@CHARSET "UTF-8";
+body{
+    font-family: georgia;
+    background-color:#E3E0D1;
+}
+
+
+.subtitle {
+	clear:both;
+    background: #6A942F;
+	background: -moz-linear-gradient(top, #fa951e, #950f04);
+	background: -ms-linear-gradient(top, #fa951e, #950f04);
+	background: -o-linear-gradient(top, #fa951e, #950f04);
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fa951e), to(#950f04));
+	background: -moz-linear-gradient(linear, 0% 0%, 0% 100%, from(#fa951e), to(#950f04));
+	background: -webkit-linear-gradient(top, #fa951e, #950f04);
+	background: linear-gradient(top, #fa951e, #950f04);
+	padding: 10px 10px;
+	color:white;
+	margin:auto;
+	text-align:center;
+	text-decoration:none;
+	text-transform: uppercase;
+	letter-spacing: .2em;
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+input:hover{
+	
+	background: -webkit-gradient(linear, 0% 0%, 0% 80%, from(#fa951e), to(#EEEEEE));
+	background: -moz-linear-gradient(top, #fa951e,#EEEEEE  25px);
+}
+
+input.submit {
+	position:relative;
+	padding:4px;
+	background:#950f04;
+	color:#fff;
+	font-family: Tahoma, Geneva, sans-serif;
+	font-weight:bold;
+	height:30px;
+	-webkit-border-radius: 15px;
+	-moz-border-radius: 15px;
+	border-radius: 15px;
+	border: 1px solid #950f04;
+	
+	margin-top: 10px;
+	}
+
+.short{
+	width:48%;
+
+}
+
+.hstrip{
+	height: 1px;
+	border-style: solid;
+	border-color: white;
+	background-color:white;
+    clear:both;
+}
+
+#logo{
+	display: block;
+    height: 49px;
+    margin-left: 20px;
+    color: white;
+    font-size: 48px;
+    font-weight: bold;
+    letter-spacing: -4px;
+    text-shadow: 1px 2px 2px #000;
+}
+
+div#registerform,#passchangeform,#resetpassform{
+	margin-left:auto;
+    margin-right:auto;
+    margin-top:10px;
+    min-width:400px;
+    width:50%;
+}
+
+.registerfields,.passchangefields,.resetpassfields {
+    background: #d9d7c7 ;
+    
+    float: center;
+    border: 5px solid white;
+    padding-top: 0.5em;
+}
+
+label {
+  float:left;
+  width:25%;
+  margin-right:0.5em;
+  padding-top:0.2em;
+  text-align:right;
+  font-weight:bold;
+}

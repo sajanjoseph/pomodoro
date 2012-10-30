@@ -5,7 +5,7 @@
 <div class="subtitle short">Register</div>
 
 	   <div id="registerform">
-        <form action="/pomlog/account/register/" method="POST">{% csrf_token %}
+        <form action="." method="POST">{% csrf_token %}
         {% if form.non_field_errors %}
             {{ form.non_field_errors }}
 		{% endif %}
@@ -20,7 +20,7 @@
             {% if form.password2.errors %}<p class="error">{{ form.password2.errors }}</p>{% endif %}
            
         <p>
-            <input type="submit" value="Submit" />
+            <input type="submit" value="Submit" class="submit"/>
         </p>
         </fieldset>
         

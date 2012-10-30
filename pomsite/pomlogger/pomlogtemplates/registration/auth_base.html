@@ -3,12 +3,13 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>PomLog{% block title %} {% endblock %}</title>
-<LINK REL=StyleSheet HREF="{{MEDIA_URL}}css/newlook.css" TYPE="text/css" MEDIA="screen, print"/>
+<LINK REL=StyleSheet HREF="{{MEDIA_URL}}css/registration-maroon.css" TYPE="text/css" MEDIA="screen, print"/>
 <link rel="shortcut icon" href="{{ MEDIA_URL }}img/pomodoro-icon.ico"/>
 </head>
 <body>
 
-<span id="logo"> Pomodoro Logger</span>
+
+<span id="logo"> <img src="{{ MEDIA_URL }}img/pomodoroicon.png" HEIGHT="100" WIDTH="100"></span>
 <div id="hstrip"/>
 <div id="content">
    {% block content %}
