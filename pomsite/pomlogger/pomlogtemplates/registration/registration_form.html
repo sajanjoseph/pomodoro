@@ -7,17 +7,17 @@
 	   <div id="registerform">
         <form action="." method="POST">{% csrf_token %}
         {% if form.non_field_errors %}
-            {{ form.non_field_errors }}
+           <div class="error"> {{ form.non_field_errors }}</div>
 		{% endif %}
         <fieldset class="registerfields">            
             <p><label for="id_username">Username:</label> {{ form.username }}</p>
-            {% if form.username.errors %}<p class="error">{{ form.username.errors }}</p>{% endif %}            
+            {% if form.username.errors %}<span class="error">{{ form.username.errors }}</span>{% endif %}            
             <p><label for="id_email">EmailAddress:</label>{{ form.email }}</p>
-            {% if form.email.errors %}<p class="error">{{ form.email.errors }}</p>{% endif %}
+            {% if form.email.errors %}<span class="error">{{ form.email.errors }}</span>{% endif %}
             <p><label for="id_password1">Password:</label>{{ form.password1 }}</p>
-            {% if form.password1.errors %}<p class="error">{{ form.password1.errors }}</p>{% endif %}
+            {% if form.password1.errors %}<span class="error">{{ form.password1.errors }}</span>{% endif %}
             <p><label for="id_password2">Password(again):</label>{{ form.password2 }}</p>
-            {% if form.password2.errors %}<p class="error">{{ form.password2.errors }}</p>{% endif %}
+            {% if form.id_password2.errors %}<span class="error">{{ form.id_password2.errors }}</span>{% endif %}
            
         <p>
             <input type="submit" value="Submit" class="submit"/>

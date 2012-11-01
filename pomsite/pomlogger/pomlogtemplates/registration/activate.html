@@ -2,8 +2,7 @@
 {% block content %}{{block.super}}
 
 
-<span id="message">Your account is now active!</span>  
-<p class="center">  <a class="btnlnk" href="{% url pomlog_login %}" > Login </a> </p> 
+<div class="message short">Your account is now active! <a  href="{% url pomlog_login %}" > Login </a></div>  
 
 {% endblock %}
 {% block whatis %}

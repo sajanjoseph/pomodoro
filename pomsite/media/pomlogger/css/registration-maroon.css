@@ -6,7 +6,7 @@ body{
 
 
 .subtitle {
-	clear:both;
+	
     background: #6A942F;
 	background: -moz-linear-gradient(top, #fa951e, #950f04);
 	background: -ms-linear-gradient(top, #fa951e, #950f04);
@@ -62,7 +62,7 @@ input.submit {
 
 #logo{
 	display: block;
-    height: 49px;
+    
     margin-left: 20px;
     color: white;
     font-size: 48px;
@@ -78,7 +78,9 @@ div#registerform,#passchangeform,#resetpassform{
     min-width:400px;
     width:50%;
 }
-
+.error,.errorlist{
+	color:red;
+}
 .registerfields,.passchangefields,.resetpassfields {
     background: #d9d7c7 ;
     
@@ -86,7 +88,17 @@ div#registerform,#passchangeform,#resetpassform{
     border: 5px solid white;
     padding-top: 0.5em;
 }
-
+.message{
+	background: #d9d7c7 ;
+    border: 5px solid white;
+    text-align:center;
+    margin-left:auto;
+    margin-right:auto;
+    color: #950f04;
+    font-size: 1.1em;
+    font-weight: bold;
+    letter-spacing: 4px;
+}
 label {
   float:left;
   width:25%;
@@ -94,4 +106,12 @@ label {
   padding-top:0.2em;
   text-align:right;
   font-weight:bold;
+}
+
+#sidebar{
+   color:darkgray;
+   padding-bottom :2em;	
+}
+#sidebar h3{
+	text-transform: uppercase;
 }
