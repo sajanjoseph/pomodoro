@@ -6,35 +6,44 @@
 
 {% block content %}{{block.super}}
 
-<br><br/>
-<div class="cat-detail">
-	<table >
-	<caption>{{page_title}}</caption>
-	<tr>  
-	<th>Name </th> <td>{{ object.name}} </td>
-	</tr>
-	<tr>
-	<th>Description </th> <td>{{object.description }} </td>
-	</tr>
-	</table>
+<div class="entry-details">
+	<p>
+		<label class="caption">Name:</label>
+		<span>
+			{{ object.name}}
+		</span>
+	</p>
+	
+	<p>
+		<label class="caption">Description:</label>
+		<span>
+			{{ object.description}}
+		</span>
+	</p>
+	
+	
 </div>
-{% if entries %}
 
+
+{% if entries %}
 <br><br/>
-<span class="subtitle">ENTRIES IN THIS CATEGORY</span>
-<br><br/>
+
+<p class="subtitle halfpagewide">ENTRIES IN THIS CATEGORY</p>
+
+
 {% include "pomlogger/includes/entries_list.html" %}
 {% include "pomlogger/includes/time_on_categories.html" %}
 
 {% else %}
-
+<div class="noentries">
 <h3>No Entries in {{ object.name}} </h3> 
+<div class="noentries">
 {% endif %}
 
 {% endblock %}
 
 {% block whatis %}
-<p>
+<h4>
 Details of the category {{object.name}} and {{entries.paginator.count}} Entr{{entries.paginator.count|pluralize:"y,ies" }} in it
-</p>
+</h4>
 {% endblock %}

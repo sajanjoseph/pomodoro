@@ -6,16 +6,20 @@
 
 {% block content %}
 {{block.super}}
+
 <br>
 <form method='post' action=".">{% csrf_token %}
-<table>
-<caption>{{page_title}}</caption>
-{{categoryform.as_table}}
-</table>
-<input type="submit" value="Submit">
+
+<div class="entry-details-input">
+<div class="subtitle"> edit category</div>
+{{categoryform.as_p}}
+<input type="submit" value="Submit" class="submit">
+</div>
+
+
 </form>
 {% endblock %}
 
 {% block whatis %}
-add/edit category page
+<h4>add/edit category page</h4>
 {% endblock %}

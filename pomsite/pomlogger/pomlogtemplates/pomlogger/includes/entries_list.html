@@ -1,21 +1,21 @@
 {% if entries.object_list %}
-<div class = "entry-list short">
+<div class = "entry-list">
 
 <div class="hstrip"></div>
 	
 	{% for anentry in entries.object_list %}
 	<form method="post" action="{% url pomlog_delete_entry anentry.id %}" id="delete-entry-form">{%csrf_token%}
-	<p id="entry-list-row">
+	<p class="entry-list-row">
        
-	<span id="entry-name">
+	<span class="entry-name">
 	<a href="{{anentry.get_absolute_url }}" > {{anentry.description|truncatewords:2}}  </a>
 	</span>
-	<span id="edit-entry">
+	<span class="edit-entry">
 	<a href="{% url pomlog_edit_entry anentry.id %}"> EDIT </a>
 	</span>
 	
 	
-		<input id="entry-delete-button" type="submit" value="DELETE" />
+		<input  type="submit" class="delete" value="DELETE" />
 	
 	<span id="unshare-entry">
 	

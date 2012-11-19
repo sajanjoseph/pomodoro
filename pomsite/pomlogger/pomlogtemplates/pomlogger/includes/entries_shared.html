@@ -9,40 +9,30 @@
 
 
 {% if entries_sharedto_me %}
-<div class="shared">
-<table class="shared-entries">
-<caption>Following {{entries_sharedto_me|length}} Entr{{entries_sharedto_me|length|pluralize:"y is,ies are"}} shared to you</caption>
-<tr>
-<th>Entry </th>
-<th>Author </th>
-<th>Entry Date </th>
-<th> Categories</th>
-<th>Start Time </th>
-<th> End Time</th>
-</tr>
-{% for anentry in entries_sharedto_me %}
-	<tr> 
-<td><a href="{{anentry.get_absolute_url }}" > {{anentry.description|truncatewords:10}}  </a></td>
-<td> {{anentry.author}}   </td>
-<td> {{anentry.today}}   </td>
-<td> {% for x in anentry.categories.all %}
-                    {{x.name}}
-                {% if forloop.last %}{% else %}, {% endif %} 
-             {% endfor %} 
-</td>
-<td>{{ anentry.start_time}}  </td>
-<td>{{ anentry.end_time}}  </td>
-</tr>
-{% endfor %}
-</table>
+<div class="subtitle halfpagewide">
+Following {{entries_sharedto_me|length}} Entr{{entries_sharedto_me|length|pluralize:"y is,ies are"}} shared to you
 </div>
+<div class="entry-list">
+  {% for anentry in entries_sharedto_me %}
+	<p class="entry-list-row">
+		<span class="entry-name">
+		<a href="{{anentry.get_absolute_url }}" > {{anentry.description|truncatewords:2}}  </a>
+		</span>
+		<span>created by {{anentry.author}}</span>
+  {% endfor %}
+</div>
+
+
+
 {% else %}
+<div class="noentries">
 <h3> No entries shared to you  </h3>
+</div>
 {% endif %}
 
 {% endblock %}
 
 
 {% block whatis %}
-<p>shared entries</p>
+<h4>shared entries</h4>
 {% endblock %}

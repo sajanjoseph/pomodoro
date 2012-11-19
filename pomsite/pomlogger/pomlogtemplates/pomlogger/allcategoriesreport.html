@@ -7,18 +7,26 @@
 {{block.super}}
 
 {%if entrycount > 0 %}
-<h3>ALL CATEGORIES</h3>  
-<img src="{% url pomlog_render_categories_chart %}"
+<p class="subtitle halfpagewide">ALL CATEGORIES</p>
+<div class="chart-entries-day">
+<img class="chart-categories"src="{% url pomlog_render_categories_chart %}"
 			
 			alt="categories chart"
-			width="700" height="700"
+			
 			/>
 
 
-
+</div>
 {% else %} 
+<div class="noentries">
 <h3> You have not created any entry  yet</h3>
-
+</div>
+<div class="new-entry-link">
+<a href="{% url pomlog_add_entry %}"> 
+<span class="caption">ADD NEW ENTRY</span>
+</a>
+</div>
+<p class="resetfloat"></p>
 {% endif %}
 
 
@@ -26,7 +34,7 @@
 {% endblock %}
 
 {% block whatis %}
-<p>
+<h4>
 Chart of Time spent on {{sorteddurations|length}} categor{{ sorteddurations|length|pluralize:"y,ies"}} 
-</p>
+</h4>
 {% endblock %}

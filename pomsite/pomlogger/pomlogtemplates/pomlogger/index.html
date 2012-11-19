@@ -17,25 +17,16 @@
  {% endblock %}
 
 {% block content %}{{block.super}}
-
-<p id="change-pass">
-<a class="btnlink" href="{% url auth_password_change %}"><img src="{{ MEDIA_URL }}img/keysmall.png">Change your password</a>
-</p>
-
-
+	 
 <div id="calendarspace">
 <div id='calendar'></div>
 </div>
 
-<div id="calendarspace">
-<div id='calendar2'></div>
-</div>
 
 
 {% endblock %}
 {%block whatis %}
-<p>
-Pomodoro App Home Page
-</p>
+<h4>Pomodoro App Home Page</h4>
+
 {% endblock %}
 

@@ -8,29 +8,88 @@
 {{block.super}}
 
 <br><br/>
-<table >
 
-<tr>
-    <th> Categories</th>
-    <td> {% for x in object.categories.all %}
-                    {{x.name}}
-                {% if forloop.last %}{% else %}, {% endif %} 
-             {% endfor %} 
-    </td>
-</tr>
-<tr>   <th> Author   </th> <td> {{object.author}} </td>  </tr>
- <tr>   <th> Date posted   </th> <td> {{object.today|date:"j F, Y"}} </td>  </tr>
-<tr>    <th> Start time    </th>   <td> {{ object.start_time}} </td>  </tr>
-<tr>    <th> End time      </th>   <td> {{ object.end_time}} </td> </tr>
-<tr>    <th> Duration      </th>   <td> {{ duration}} minutes  </td> </tr>
+<div class="entry-details">
+<p>
+<label class="caption">Categories  :</label>
+<span>
+{% for x in object.categories.all %}
+   {{x.name}}
+   {% if forloop.last %}{% else %}, {% endif %} 
+{% endfor %} 
+</span>
+</p>
+
+<p >
+<label class="caption">
+Author  :
+</label>
+<span>
+ {{object.author}} 
+</span>
+</p>
+
+
+<p>
+<label class="caption">
+Date posted  :
+</label>
+<span>
+ {{object.today|date:"j F, Y"}} 
+</span>
+</p>
+
+<p>
+<label class="caption">
+Start time   :
+</label>
+<span>
+ {{ object.start_time}}
+</span>
+</p>
+
+<p>
+<label class="caption">
+End time   :
+</label>
+<span>
+ {{ object.end_time}}
+</span>
+</p>
+
+<p>
+<label class="caption">
+Duration   :
+</label>
+<span>
+ {{ duration}} minutes
+</span>
+</p>
+
 {% if object.description %}
-<tr>    <th> Description   </th>   <td> {{object.description}}</td>  </tr>
+	<p >
+	<label class="caption">
+	Description   :
+	</label>
+	<span>
+	 {{object.description}}
+	</span>
+	</p>
 {% endif %}
 
-</table>
+</div>
+{% if user == object.author %}
+<div id="modifybuttons">
+	<span class="edit-entry" >
+	<a href="{% url pomlog_edit_entry object.id %}"> EDIT </a>
+	</span>
 
-
-
+	<form  class="inline" method="post" action="{% url pomlog_delete_entry object.id %}" id="delete-entry-form" >
+	{%csrf_token%}
+	<input  type="submit" class="delete" value="DELETE" > </input>
+	</form>
+</div>
+{% endif %}
 
 {% endblock %}
 

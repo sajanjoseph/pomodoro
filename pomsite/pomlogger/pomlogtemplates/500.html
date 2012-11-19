@@ -4,12 +4,13 @@
  </head>
 <body>
 {% url home as home_url %}
-<span id="logo"> Pomodoro Logger</span>
-<div class="hstrip"/>
+<span id="logo"><img class="logo-image" src="{{MEDIA_URL}}img/pomodoroicon.png" ></img> Pomodoro Logger</span>
+
 <div class="server-error">
+
 <p class="error-title">sorry..server error!</p>
 
-<a href="{{ home_url }}"> <img src="{{ MEDIA_URL }}img/500Err.jpg"> </a>
+<a href="{{ home_url }}"> <img class="error"  src="{{ MEDIA_URL }}img/500Err.jpg"> </a>
 </div>
 
 <div id="sidebar"> 

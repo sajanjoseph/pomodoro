@@ -9,9 +9,9 @@
 
 
 <a href="{% url pomlog_add_entry %}"> 
-<span class="sectionhead leftfloat">ADD NEW POMODORO ENTRY</span>
+<span class="sectionhead left">ADD NEW ENTRY</span>
 </a>
-
+<p class="resetfloat"></p>
 
 
 {% if entries.object_list %}
@@ -27,9 +27,9 @@
 <p class="sharelink">
 <a class="btnlink" href="{% url pomlog_share_entries  %}">Share Entries to Others</a>
 </p>
-
+<p class="resetfloat"></p>
 {% else %}
-<div id="noentries">
+<div class="noentries">
 <h3> You have not created any entry  yet</h3>
 </div>
 {% endif %}
@@ -38,14 +38,14 @@
 <p class="sharelink">
 <a class="btnlink" id="view_shared_entries" href="{% url pomlog_entries_shared %}">View Entries Shared To Me</a>
 </p>
-
+<p class="resetfloat"></p>
 
 {% endblock %}
 
 
 {% block whatis %}
-<p>Listing of all Entries &
+<h4>Listing of all Entries &
 Time spent on {{sorteddurations|length}} categor{{ sorteddurations|length|pluralize:"y,ies"}} till now 
-</p>
+</h4>
 {% endblock %}
 

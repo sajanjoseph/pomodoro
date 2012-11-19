@@ -11,11 +11,11 @@
 {% if entries.object_list %}
 {% include "pomlogger/includes/time_on_categories.html" %}
 
-<h3> Entries for the year {{year}} </h3>
+<h3 class="caption"> Entries for the year {{year}} </h3>
 
 {% include "pomlogger/includes/entries_list.html" %}
 {% else %}
-<div id="noentries">
+<div id="noentries" class="caption">
 <h3>No Entries in {{year}} </h3> <br/>
 </div>
 {% endif %}
@@ -25,7 +25,7 @@
 
 
 {% block whatis %}
-<p>
+<h4>
 Time spent on {{sorteddurations|length}} categor{{ sorteddurations|length|pluralize:"y,ies"}} in  {{year}}
-</p>
+</h4>
 {% endblock %}

@@ -7,15 +7,24 @@
 {{block.super}}
 
 {%if entrycount > 0 %}
-<img src="{% url pomlog_render_graph_for_day year month day%}"
+<p class="subtitle halfpagewide">Entries for {{day}}-{{month}}-{{year}} </p>
+<div class="chart-entries-day">
+<img class="chart-entries-day" src="{% url pomlog_render_graph_for_day year month day%}"
 			
-			alt="graph for a day"
-			width="900" height="600"/>
+			alt="chart for a day"
+			/>
 
-
+</div>
 {% else %} 
+<div class="noentries">
 <h3> You have not created any entry  yet</h3>
-
+</div>
+<div class="new-entry-link">
+<a href="{% url pomlog_add_entry %}"> 
+<span class="caption">ADD NEW ENTRY</span>
+</a>
+</div>
+<p class="resetfloat"></p>
 {% endif %}
 
 {% endblock %}

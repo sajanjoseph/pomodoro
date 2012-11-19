@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <title>PomLog{% block title %} {% endblock %}</title>
-<LINK REL=StyleSheet HREF="{{MEDIA_URL}}css/newlook.css" TYPE="text/css" MEDIA="screen, print"/>
+<LINK REL=StyleSheet HREF="{{MEDIA_URL}}css/pomodoro-maroon.css" TYPE="text/css" MEDIA="screen, print"/>
 <LINK REL=StyleSheet HREF="{{MEDIA_URL}}css/fullcalendar.css" TYPE="text/css" MEDIA="screen, print"/>
 <link rel="shortcut icon" href="{{ MEDIA_URL }}img/pomodoro-icon.ico"/>
 
@@ -17,24 +17,29 @@ var M_URL = "{{MEDIA_URL}}";
 <body{% block load_js %}{% endblock %}>
 
 
-<span id="logo"> Pomodoro Logger</span>
-<div class="hstrip"/>
+<span id="logo"><img class="logo-image" src="{{MEDIA_URL}}img/pomodoroicon.png" ></img> Pomodoro Logger</span>
+
 <div id="content">
    {% block content %}
    
-   <p class="subtitle">
+   
+   <div id="userinfo" class="rightcorner">
+   {% block userinfo %}
    {% if user %}
-   Welcome {{user.username}}
+   Welcome {{user.username}}<br></br>
    {% endif %}
-   </p>
-   <p class="rightcorner">
-   <span>{% now "jS  F Y - f A" %}
+   <span>{% now "jS  F Y - f A" %}<br></br>
+      <p id="change-pass">
+	    <a class="btnlink" href="{% url auth_password_change %}"><img src="{{ MEDIA_URL }}img/keysmall.png">Change your password</a>
+	  </p>
    <form id="logoutform" method="post" action="{% url pomlog_logout %}">{% csrf_token %}
    	<input type="hidden" name="next" value="{{next|escape}}" />
         <input type="hidden" name="confirm" value="true" />
-        <input type="submit" value="Logout" id="logout-button"/>
+        <input type="submit" value="Logout" id="logout-button" class="submit"/>
    </form>
-   </p>
+   {% endblock %}
+   </div>
+   <p class="resetfloat"></p>
    {% endblock %}
  </div>
 
@@ -63,8 +68,8 @@ var M_URL = "{{MEDIA_URL}}";
    	{% endifnotequal %}
 
 </div>
-<div>
-<span class="sectionhead"> page info </span>
+<div class="pageinfo">
+<h3> Page Info </h3>
 {% block whatis %}
 {% endblock %}
 </div>

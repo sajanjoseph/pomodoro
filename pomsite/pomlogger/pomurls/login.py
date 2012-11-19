@@ -23,13 +23,6 @@ urlpatterns+=custom_reg_patterns
 #
 urlpatterns+=regurlpatterns
 
-
-#urlpatterns+=patterns('registration.views',
-#url(r'^register/$','register',{},name='pomlog_register'),
-#
-#                      
-#)
-
 #urlpatterns+=patterns('pomlogger.views',
 #url(r'^sendmail/$','sendmail',{},name='sendmail'),                  
 #                      )

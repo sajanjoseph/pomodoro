@@ -6,13 +6,15 @@
 {% block content %}
 {{block.super}}
 
-<div id="reports">
+<div class="reports">
 <ul id ="entriesplots" class="report">
-    
+    <div class ="new-entry-link">
     <li id="entriesplots_list" class="report">
-        <a class ="button" href="{% url pomlog_allcategories_report   %}"> All Categories Plot </a>
+        <a  href="{% url pomlog_allcategories_report   %}"> 
+        
+        <p class="caption">All Categories Plot</p> </a>
     </li>
-    
+    </div>
     <li id="dailyentriesplots_list" class="report">
     <form class="reports" action="." >
     <span>
@@ -37,7 +39,7 @@
             {% endfor %}
         </select>
         
-        <input type="submit" value="Plot for entries of the day" class="button"/>
+        <input type="submit" value="Plot for entries of the day" class="submit"/>
         </span>
        </form>
     </li>
@@ -50,7 +52,7 @@
 {% endblock %}
 
 {% block whatis %}
-<p>
+<h4>
 Links to various Plots 
-</p>
+</h4>
 {% endblock %}

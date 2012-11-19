@@ -105,7 +105,6 @@ class PomEntryShareForm(Form):
         self.fields['users_selected']=ModelMultipleChoiceField(queryset=User.objects.exclude(username=request.user.username))
 
     def clean_sharing_options(self):
-        #print 'PomEntryShareForm::clean_sharing_options()'
         try:
             share_options=self.cleaned_data['sharing_options']
                         
@@ -115,7 +114,6 @@ class PomEntryShareForm(Form):
         return share_options
 
     def clean_entries_selected(self):
-        #print 'PomEntryShareForm::clean_entries_selected()'
         try:
             entries_selected=self.cleaned_data['entries_selected']
                         
@@ -125,7 +123,6 @@ class PomEntryShareForm(Form):
         return entries_selected
 
     def clean_users_selected(self):
-        print 'PomEntryShareForm::clean_users_selected()'
         try:
             users_selected=self.cleaned_data['users_selected']
 
@@ -135,7 +132,6 @@ class PomEntryShareForm(Form):
         return users_selected
 
     def clean_categories_selected(self):
-        print 'PomEntryShareForm::clean_categories_selected()'
         try:
             cats_selected=self.cleaned_data['categories_selected']
 
@@ -144,13 +140,9 @@ class PomEntryShareForm(Form):
         return cats_selected
         
     def clean(self):
-        print 'PomEntryShareForm::clean()'
         cleaned_data=self.cleaned_data
         if 'sharing_options' in cleaned_data and 'entries_selected' in cleaned_data:
             if cleaned_data['sharing_options']==u'selectedentries' and len(cleaned_data['entries_selected'])==0:
                 raise ValidationError('select at least one entry from list box')
-        else:
-            print 'if condition failed'
-        print 'PomEntryShareForm::cleaned_data=',cleaned_data
         return  cleaned_data
 

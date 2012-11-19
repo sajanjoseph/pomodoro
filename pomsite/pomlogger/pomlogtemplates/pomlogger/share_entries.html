@@ -10,21 +10,18 @@
 {% block content %}
 {{block.super}}
 
-
-
-<div id="shareform">
-<FORM class="share" action="." method="POST">{% csrf_token %}
-<h3>Share</h3>
-	<p id="share-allentries">
+<div >
+	<p class="caption"> share </p>
+	<FORM class="share" action="." method="POST">{% csrf_token %}
+	<p id="share-allentries" class="share">
 	<INPUT TYPE="radio" NAME="sharing_options" VALUE= "allentries" onclick="hideAll();" >All Entries 
 	</p>
-	<p id="share-selectedentries">
+	<p id="share-selectedentries" class="share">
 	<INPUT TYPE="radio" NAME="sharing_options" VALUE= "selectedentries"  onclick="showEntriesList();" >Select from Entries
 	</p>
-	<p id="share-entriesofcat">
+	<p id="share-entriesofcat" class="share">
 	<INPUT TYPE="radio" NAME="sharing_options" VALUE= "entriesofcat" onclick="showCategories();" >Entries with Category
 	</p>
-	
 	
 	<div id="some_entries_selected">
 	<table>
@@ -42,23 +39,24 @@
 
 	
 	<div id="users_selected">
-	<h3>With Users</h3>
+	<p class="caption">With Users</p>
 	<table>
 	{{sharemyentryform.users_selected}}
 	</table>
-	<INPUT type="submit" value="Share">
+	<INPUT type="submit" value="Share" class="submit">
 	</div>
+	</FORM>
 	
-
-</FORM>
 </div>
+
+
 {% endblock %}
 
 
 
 
 {% block whatis %}
-<p>
+<h4>
 page for sharing entries with other users
-</p>
+</h4>
 {% endblock %}

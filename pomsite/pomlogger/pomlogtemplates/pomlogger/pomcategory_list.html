@@ -9,21 +9,30 @@
 <br>
 
 {% if cats|length_is:"0" %}
-<h3>No categories created </h3><br/>
+<div class="noentries">
+<h3>No categories created </h3>
+</div>
+<div class="new-entry-link">
+<a href="{% url pomlog_add_entry %}"> 
+<span class="caption">ADD NEW ENTRY</span>
+</a>
+</div>
 {% else %}
 
 
-<table id="cats">
-<caption>All Categories</caption>
-{% for k in cats %}
-<tr>
-<td> <a href="{{k.get_absolute_url}}" > {{k.name}}</a></td>
+<p class="subtitle halfpagewide"> categories </p>
 
-<td> <a href="{% url pomlog_edit_category k.slug %}" > EDIT </a>  </td>
+<div class = "entry-list bottom-round-border">
 
-</tr>
-{% endfor %}
-</table>
+	{% for k in cats %}
+	  <p class="entry-list-row caption">
+	   <a href="{{k.get_absolute_url}}" > {{k.name}}</a>
+	   <span class="edit-entry">
+	   	<a href="{% url pomlog_edit_category k.slug %}" > EDIT </a>
+	   </span>
+	  </p>
+	 {% endfor %}
+</div>
 
 {% endif%}
 
@@ -31,7 +40,7 @@
 {% endblock %}
 
 {% block whatis %}
-<p>
+<h4>
 Listing of <b> {{cats|length}}</b> categor{{cats|length|pluralize:"y,ies" }} in this log
-</p>
+</h4>
 {% endblock %}

@@ -1,17 +1,17 @@
 {% load pomodoro_filters %}
 {% if sorteddurations %}
 <div id="category-duration">
-<p class="subtitle timecatslist">Total time spent on {{sorteddurations|length}} categories </p>
+<p class="subtitle halfpagewide">Total time spent on {{sorteddurations|length}} categories </p>
 
 <div class="duration-list">
 
-<p>
+
 <ul>
 {% for x in sorteddurations %}
   <li>{{x.0}}: {{x.1|mts_to_hours}}  </li>
 {% endfor %}
 </ul>
-</p>
+
 </div>
 </div>
 {% endif %}

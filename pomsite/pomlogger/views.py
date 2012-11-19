@@ -507,7 +507,6 @@ def get_own_entries_with_cats(cats,user):
     for cat in cats:
         entries=PomEntry.objects.filter(categories=cat).filter(author=user)
         ownentries_with_cats.extend(entries)
-
     return list(set(ownentries_with_cats))
 
 
@@ -547,9 +546,6 @@ def share_entries_with_users(entries,users):
 def share_entry_with_user(entry,user):
     if not is_shared(entry,user):
         entry.sharedwith.add(user)
-    else:
-        #print 'the entry:',entry,' is already shared with user:',user
-        pass
 
 def is_shared(entry,user):
     if user in entry.sharedwith.all():
