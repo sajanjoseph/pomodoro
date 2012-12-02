@@ -1,7 +1,7 @@
 from pomlogger.models import PomEntry,PomCategory
-from pomlogger.models import PomCategoryForm,PomCategoryNameForm
-from pomlogger.models import PomEntryForm,PomEntryEditForm
-from pomlogger.models import PomEntryDescForm,PomEntryShareForm
+from pomlogger.forms import PomCategoryForm,PomCategoryNameForm
+from pomlogger.forms import PomEntryForm,PomEntryEditForm,PomEntryDifficultyForm
+from pomlogger.forms import PomEntryDescForm,PomEntryShareForm
 
 from django.core.urlresolvers import reverse
 
@@ -239,13 +239,28 @@ def get_categories(catnames):
 def add_new_entry(request,template_name,page_title):
     form_data = get_form_data(request)
     form = PomEntryDescForm(form_data)
+    difficulty_form = PomEntryDifficultyForm(form_data)#added difficulty
     catnameform = PomCategoryNameForm(form_data)
     errorlist = []
-    context={'page_title':page_title,'entryform':form,'categoryform':catnameform,'errorlist':errorlist}
-    if request.method=='POST' and form.is_valid() and catnameform.is_valid():
+    
+    context={'page_title':page_title,'difficulty_form':difficulty_form,'entryform':form,'categoryform':catnameform,'errorlist':errorlist}
+    if request.method=='POST' and form.is_valid()  and catnameform.is_valid():
+        difficulty_form_valid = difficulty_form.is_valid()
+        #print 'post:: difficulty_form_valid=',difficulty_form_valid
+        if not difficulty_form_valid:
+            #print 'returning'
+            return custom_render(request,context,template_name)            
         desc = form.cleaned_data['description']
+        difficulty = difficulty_form.cleaned_data['difficulty']#added difficulty
+        #print 'cleaned_data difficulty=',difficulty,'type=',type(difficulty)
         start_time_string = request.POST[u'timerstarted']
         stop_time_string = request.POST[u'timerstopped']
+        #print 'start_time_string=',start_time_string,len(start_time_string)
+        #print 'stop_time_string=',stop_time_string,len(stop_time_string)
+        if len(start_time_string)==0 or len(stop_time_string)==0:
+            print 'starttime and endtime cannot be empty'
+            errorlist.append('starttime and endtime cannot be empty')
+            return custom_render(request,context,template_name)
         start_time = long(start_time_string)
         stop_time = long(stop_time_string)
         if not (start_time < stop_time):
@@ -271,7 +286,10 @@ def add_new_entry(request,template_name,page_title):
                 x.users.add(request.user)#need to append, not assign
         newentry.categories=cats
         newentry.author=request.user
+        newentry.difficulty = difficulty#added difficulty
+        #print 'before save with diff=',difficulty
         newentry.save()
+        #print 'newentry saved with diff=',difficulty
         return redirect('pomlog_entry_archive_index')
     return custom_render(request,context,template_name)
 

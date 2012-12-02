@@ -77,7 +77,8 @@ var hideElement=function(elementId){
 };
 
 var display_error_inline=function(msg,elemId){
-    var msg_elem = $('<i>'+msg+'</i><br/>');
+	var msg_elem = $('<span class="error">'+msg+'</span>');
+    //var msg_elem = $('<i>'+msg+'</i><br/>');
     elem_selector='#'+elemId;
     var elem=$(elem_selector);
     msg_elem.insertAfter(elem).fadeIn('slow').animate({opacity: 1.0}, 5000).fadeOut('slow',function() { msg_elem.remove(); });
@@ -113,7 +114,7 @@ var validate=function(){
 
 
 $('#timebtn').click(timerBtnClicked);
-$('#timeform').submit(validate);
+//$('#timeform').submit(validate);
 
 //$('#timeform').attr('onsubmit',validate);
 }//all encompassing function

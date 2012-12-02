@@ -2,9 +2,10 @@
 {% block title %}{{block.super}}|{{ page_title }}{% endblock %}
 {% block js %}
 {{block.super}}
-<script type="text/javascript"  src="{{MEDIA_URL}}js/jquery-1.7.1.min.js" ></script>
+<script type="text/javascript"  src="{{MEDIA_URL}}js/jquery-1.8.3.js" ></script>
 <script type="text/javascript"  src="{{MEDIA_URL}}js/pom_timer.js" ></script>
-    
+<script type="text/javascript"  src="{{MEDIA_URL}}js/jquery-ui-1.9.2.custom.js" ></script>
+<script type="text/javascript"  src="{{MEDIA_URL}}js/difficultypicker.js" ></script>
 
  {% endblock %}
 
@@ -29,9 +30,15 @@
     </span>
     
      <div id="entrydata">
-     	{% if entryform.non_field_errors %}
-      		<p class="nonfielderror">{{ entryform.non_field_errors|join:", " }}</p>
-  		{% endif %}
+        {% if errorlist %}
+        
+        {% for error in errorlist %}
+        	<span class="error">
+           {{error }}
+           </span>
+        {% endfor %}
+        
+     	{% endif %}
   		<div class="entry-details-input">
 	  		<p>
 	  			<label for="id_start_time"> <span id="timer-start"> Timer started at:</span></label>
@@ -44,12 +51,17 @@
   			</p>
   			<p>
   			<label for="id_description"><span id="entry-description">Enter Description:</span></label>
-  			{{entryform.description}}
+  			{{entryform.description}} {{entryform.description.errors}}
   			</p>
   			
   			<p>
+  			<label for="id_difficulty"><span id="entry-difficulty">Enter Difficulty (1-10):</span></label>
+  			{{difficulty_form.difficulty}} {{difficulty_form.difficulty.errors}}
+  			</p>
+  			<p id="slider" > </p>
+  			<p>
   			<label for="id_categories"><span id="entry-categories">Enter Categories:</span></label>
-  			{{categoryform.categories}}
+  			{{categoryform.categories}} {{categoryform.categories.errors}}
   			</p>
   			
   			<p>

@@ -270,6 +270,7 @@ form#timeform{
 span#ctimefld{
 	display:none;
 }
+/*initially div with entry details input form is invisible */
 div#entrydata{
 	display:none;
 }
@@ -444,4 +445,19 @@ div#users_selected{
 img.error{
 	border:4px solid #FA951E;
 	
+}
+ul.errorlist{
+	width:50%;
+	color:white;
+	background-color:red;
+	font-size:1.2em;
+	
+}
+ul.errorlist li{
+	list-style-type: none;
+}
+span.error{
+	color:white;
+	background-color:red;
+	font-size:1.2em;
 }
