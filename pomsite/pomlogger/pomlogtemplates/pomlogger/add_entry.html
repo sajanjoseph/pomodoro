@@ -6,11 +6,24 @@
 <script type="text/javascript"  src="{{MEDIA_URL}}js/pom_timer.js" ></script>
 <script type="text/javascript"  src="{{MEDIA_URL}}js/jquery-ui-1.9.2.custom.js" ></script>
 <script type="text/javascript"  src="{{MEDIA_URL}}js/difficultypicker.js" ></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('#start_time_show').html(new Date({{start_time_string}}).toLocaleTimeString());
+	$('#stop_time_show').html(new Date({{stop_time_string}}).toLocaleTimeString());
+	$('#timerstarted').attr("value",{{start_time_string}});
+	$('#timerstopped').attr("value",{{stop_time_string}});
+{% if difficulty_form.difficulty.errors or entryform.description.errors or categoryform.categories.errors or errorlist %}
+  $('#entrydata').show();
 
+{% endif %}
+});
+</script>
  {% endblock %}
 
 
 {% block content %}
+
+
 
 
 <p class="resetfloat"></p><br></br>

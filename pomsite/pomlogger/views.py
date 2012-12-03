@@ -243,55 +243,59 @@ def add_new_entry(request,template_name,page_title):
     catnameform = PomCategoryNameForm(form_data)
     errorlist = []
     
-    context={'page_title':page_title,'difficulty_form':difficulty_form,'entryform':form,'categoryform':catnameform,'errorlist':errorlist}
-    if request.method=='POST' and form.is_valid()  and catnameform.is_valid():
-        difficulty_form_valid = difficulty_form.is_valid()
-        #print 'post:: difficulty_form_valid=',difficulty_form_valid
-        if not difficulty_form_valid:
-            #print 'returning'
-            return custom_render(request,context,template_name)            
-        desc = form.cleaned_data['description']
-        difficulty = difficulty_form.cleaned_data['difficulty']#added difficulty
-        #print 'cleaned_data difficulty=',difficulty,'type=',type(difficulty)
+    context={'page_title':page_title,'difficulty_form':difficulty_form,'entryform':form,'categoryform':catnameform,'errorlist':errorlist,'start_time_string':'','stop_time_string':'','form_errors':False}
+    
+    if request.method=='POST':
         start_time_string = request.POST[u'timerstarted']
         stop_time_string = request.POST[u'timerstopped']
-        #print 'start_time_string=',start_time_string,len(start_time_string)
-        #print 'stop_time_string=',stop_time_string,len(stop_time_string)
-        if len(start_time_string)==0 or len(stop_time_string)==0:
-            print 'starttime and endtime cannot be empty'
-            errorlist.append('starttime and endtime cannot be empty')
+        context['start_time_string'] = start_time_string
+        context['stop_time_string'] = stop_time_string
+        if  form.is_valid()  and catnameform.is_valid() and difficulty_form.is_valid():
+            desc = form.cleaned_data['description']
+            difficulty = difficulty_form.cleaned_data['difficulty']#added difficulty
+            #print 'cleaned_data difficulty=',difficulty,'type=',type(difficulty)
+            
+            #print 'start_time_string=',start_time_string,len(start_time_string)
+            #print 'stop_time_string=',stop_time_string,len(stop_time_string)
+            if len(start_time_string)==0 or len(stop_time_string)==0:
+                #print 'starttime and endtime cannot be empty'
+                errorlist.append('starttime and endtime cannot be empty')
+                return custom_render(request,context,template_name)
+            start_time = long(start_time_string)
+            stop_time = long(stop_time_string)
+            if not (start_time < stop_time):
+                #need to put this in errors
+                errorlist.append('starttime should be less than endtime')
+                return custom_render(request,context,template_name)
+            try:
+                start_ttpl,stop_ttpl = get_timetuples(start_time,stop_time)
+                start_timeval=datetime.time(*start_ttpl)
+                stop_timeval=datetime.time(*stop_ttpl)
+            except ValueError:
+                errorlist.append('format of time entries not correct')
+                return custom_render(request,context,template_name)
+            newentry=PomEntry(description=desc)
+            newentry.save()
+            newentry.start_time=start_timeval
+            newentry.end_time=stop_timeval
+            catnames=catnameform.cleaned_data['categories']
+            catnames=get_list_of_names(catnames)
+            cats=get_categories(catnames)
+            for x in cats:
+                if request.user not in x.users.all():
+                    x.users.add(request.user)#need to append, not assign
+            newentry.categories=cats
+            newentry.author=request.user
+            newentry.difficulty = difficulty#added difficulty
+            #print 'before save with diff=',difficulty
+            newentry.save()
+            #print 'newentry saved with diff=',difficulty
+            return redirect('pomlog_entry_archive_index')
+        else:
+            context['form_errors']=True
             return custom_render(request,context,template_name)
-        start_time = long(start_time_string)
-        stop_time = long(stop_time_string)
-        if not (start_time < stop_time):
-            #need to put this in errors
-            errorlist.append('starttime should be less than endtime')
-            return custom_render(request,context,template_name)
-        try:
-            start_ttpl,stop_ttpl = get_timetuples(start_time,stop_time)
-            start_timeval=datetime.time(*start_ttpl)
-            stop_timeval=datetime.time(*stop_ttpl)
-        except ValueError:
-            errorlist.append('format of time entries not correct')
-            return custom_render(request,context,template_name)
-        newentry=PomEntry(description=desc)
-        newentry.save()
-        newentry.start_time=start_timeval
-        newentry.end_time=stop_timeval
-        catnames=catnameform.cleaned_data['categories']
-        catnames=get_list_of_names(catnames)
-        cats=get_categories(catnames)
-        for x in cats:
-            if request.user not in x.users.all():
-                x.users.add(request.user)#need to append, not assign
-        newentry.categories=cats
-        newentry.author=request.user
-        newentry.difficulty = difficulty#added difficulty
-        #print 'before save with diff=',difficulty
-        newentry.save()
-        #print 'newentry saved with diff=',difficulty
-        return redirect('pomlog_entry_archive_index')
-    return custom_render(request,context,template_name)
+    elif request.method == 'GET':
+        return custom_render(request,context,template_name)
 
 def get_timetuples(starttime,endtime):
     try:
