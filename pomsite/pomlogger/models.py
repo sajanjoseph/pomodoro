@@ -7,19 +7,20 @@ from django.template.defaultfilters import truncatewords
 
 
 class PomCategory(models.Model):
-    name=models.CharField(unique=True,max_length=50)
+    name=models.CharField(max_length=50)
     description=models.TextField(blank=True)
-    users=models.ManyToManyField(User)
+    creator = models.ForeignKey(User,null=True)
     slug=models.SlugField(editable=False)
     
     class Meta:
-		verbose_name_plural="PomCategories"
+        verbose_name_plural="PomCategories"
+        unique_together = ('name','creator',)
 
     def __unicode__(self):
         return self.name
 
     def save(self,*args,**kwargs):
-        self.name=self.name.strip()
+        self.name=self.name.strip().lower()
         self.slug=slugify(self.name)
         super(PomCategory,self).save(*args,**kwargs)
     

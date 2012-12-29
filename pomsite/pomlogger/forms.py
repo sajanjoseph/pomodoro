@@ -2,6 +2,7 @@ from pomlogger.models import PomEntry,PomCategory
 from django.forms import ModelForm,Form,ValidationError
 from django.forms import CharField,Textarea,TimeField,IntegerField
 from django.forms import RadioSelect,ChoiceField,ModelMultipleChoiceField
+from django.contrib.auth.models import User
 
 class PomEntryForm(ModelForm):    
     class Meta:
@@ -40,7 +41,7 @@ class PomEntryDifficultyForm(Form):
 class PomCategoryForm(ModelForm):
     class Meta:
         model=PomCategory
-        exclude = ('slug','users',)
+        exclude = ('slug','creator')
 class PomCategoryNameForm(Form):
     categories=CharField(max_length=200)
 

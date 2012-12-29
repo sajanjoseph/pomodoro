@@ -1,3 +1,4 @@
-#Wed Nov 28 13:48:29 IST 2012
+#Fri Dec 14 11:31:05 IST 2012
 eclipse.preferences.version=1
 encoding//pomsite/pomlogger/migrations/0002_auto__add_field_pomentry_difficulty.py=utf-8
+encoding//pomsite/pomlogger/migrations/0004_add_creator.py=utf-8

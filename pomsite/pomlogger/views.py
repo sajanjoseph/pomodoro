@@ -199,24 +199,43 @@ def canview(entry,user):
     else:
         return False
 
+#@login_required
+#@transaction.commit_on_success
+#def delete_entry(request,id):
+#    entry=get_object_or_404(PomEntry,id=id,author=request.user )
+#    #need to remove user from its categories
+#    cats=entry.categories.all()
+#    #print 'delete_entry()::cats=',cats
+#    remove_user_from_categories(cats,request.user)
+#    entry.delete()
+#    #logger.debug("entry deleted")
+#    #remove categories that have no entries associated
+#    remove_lone_categories()
+#    return redirect('pomlog_entry_archive_index')
+
 @login_required
 @transaction.commit_on_success
 def delete_entry(request,id):
     entry=get_object_or_404(PomEntry,id=id,author=request.user )
     #need to remove user from its categories
-    cats=entry.categories.all()
-    #print 'delete_entry()::cats=',cats
-    remove_user_from_categories(cats,request.user)
+    #remove_user_from_categories(cats,request.user)
     entry.delete()
     #logger.debug("entry deleted")
     #remove categories that have no entries associated
-    remove_lone_categories()
+    remove_lone_categories(request.user)
     return redirect('pomlog_entry_archive_index')
 
-
-def remove_lone_categories():
+#def remove_lone_categories():
+#    #print 'remove_lone_categories()'
+#    allcats=PomCategory.objects.all()
+#    for acat in allcats:
+#        entries_of_acat=PomEntry.objects.filter(categories=acat)
+#        if entries_of_acat.count()==0:
+#            acat.delete()
+#            #print 'deleted ',acat
+def remove_lone_categories(user):
     #print 'remove_lone_categories()'
-    allcats=PomCategory.objects.all()
+    allcats=PomCategory.objects.filter(creator=user)
     for acat in allcats:
         entries_of_acat=PomEntry.objects.filter(categories=acat)
         if entries_of_acat.count()==0:
@@ -224,14 +243,20 @@ def remove_lone_categories():
             #print 'deleted ',acat
 
 
-def get_categories(catnames):
+#def get_categories(catnames):
+#    cats=[]
+#    for name in catnames:
+#        if name and  not name.isspace():
+#            cat,status=PomCategory.objects.get_or_create(name__iexact=name.strip(),defaults={'name':name,'description':name})# if no defaults ,IntegrityError
+#            cats.append(cat)
+#    return cats
+def get_categories(user,catnames):
     cats=[]
     for name in catnames:
         if name and  not name.isspace():
-            cat,status=PomCategory.objects.get_or_create(name__iexact=name.strip(),defaults={'name':name,'description':name})# if no defaults ,IntegrityError
+            cat,status=PomCategory.objects.get_or_create(name__iexact=name.strip(),creator=user,defaults={'name':name,'description':name,'creator':user})# added creator
             cats.append(cat)
     return cats
-
 
 
 @login_required
@@ -280,10 +305,12 @@ def add_new_entry(request,template_name,page_title):
             newentry.end_time=stop_timeval
             catnames=catnameform.cleaned_data['categories']
             catnames=get_list_of_names(catnames)
-            cats=get_categories(catnames)
+            cats=get_categories(request.user,catnames)#added user as creator
+            """
             for x in cats:
                 if request.user not in x.users.all():
                     x.users.add(request.user)#need to append, not assign
+            """
             newentry.categories=cats
             newentry.author=request.user
             newentry.difficulty = difficulty#added difficulty
@@ -368,25 +395,25 @@ def edit_entry(request,id,template_name,page_title):
         #print 'edit_entry()::edited_entry=',edited_entry
         catnames=catnameform.cleaned_data['categories']
         #print 'edit_entry()::catnames=',catnames
-        new_categorynames_list=get_list_of_names(catnames)
-        newlyaddedcatnames=set(new_categorynames_list)-set(old_categorynames_list)
-        newlyaddedcatnames=list(newlyaddedcatnames)
-        removedcatnames=set(old_categorynames_list)-set(new_categorynames_list)
-        removedcatnames=list(removedcatnames)
+#        new_categorynames_list=get_list_of_names(catnames)
+#        newlyaddedcatnames=set(new_categorynames_list)-set(old_categorynames_list)
+#        newlyaddedcatnames=list(newlyaddedcatnames)
+#        removedcatnames=set(old_categorynames_list)-set(new_categorynames_list)
+#        removedcatnames=list(removedcatnames)
         #print 'edit_entry()::removedcatnames=',removedcatnames
         #for each name in newlyaddedcatnames,get or create category object, add this user in its users field
-        if newlyaddedcatnames:
-            newlyaddedcats=get_categories(newlyaddedcatnames)
-            add_user_to_categories(newlyaddedcats,request.user)
-        #for each name in removedcatnames ,get category object ,remove this user from its users field
-        if removedcatnames:
-            removedcats=get_categories(removedcatnames)
-            #print 'edit_entry()::removedcats=',removedcats
-            remove_user_from_categories(removedcats,request.user)
-        cats=get_categories(get_list_of_names(catnames))
+#        if newlyaddedcatnames:
+#            newlyaddedcats=get_categories(newlyaddedcatnames)
+#            add_user_to_categories(newlyaddedcats,request.user)
+#        #for each name in removedcatnames ,get category object ,remove this user from its users field
+#        if removedcatnames:
+#            removedcats=get_categories(removedcatnames)
+#            #print 'edit_entry()::removedcats=',removedcats
+#            remove_user_from_categories(removedcats,request.user)
+        cats=get_categories(request.user,get_list_of_names(catnames))
         edited_entry.categories=cats
         edited_entry.save()
-        remove_lone_categories()#update to remove cats with no entries           
+        remove_lone_categories(request.user)#update to remove cats with no entries           
         return redirect('pomlog_entry_archive_index')
     return custom_render(request,context,template_name)
 
@@ -405,12 +432,16 @@ def update_cats_with_editable_status(user,categories):
     return cats
 
 
+#def get_categories_of_user(user):
+#    ownentries=PomEntry.objects.filter(author=user)
+#    owncats=[]
+#    for entry in ownentries:
+#        catsofentry=entry.categories.all()
+#        owncats.extend(catsofentry)
+#    return list(set(owncats))
+
 def get_categories_of_user(user):
-    ownentries=PomEntry.objects.filter(author=user)
-    owncats=[]
-    for entry in ownentries:
-        catsofentry=entry.categories.all()
-        owncats.extend(catsofentry)
+    owncats= PomCategory.objects.filter(creator=user)
     return list(set(owncats))
 
 @login_required
@@ -423,7 +454,7 @@ def category_list(request,template_name,page_title):
 
 @login_required
 def category_detail(request,slug,template_name,page_title):
-    category=get_object_or_404(PomCategory,slug=slug,users=request.user)
+    category=get_object_or_404(PomCategory,slug=slug,creator=request.user)
     now=datetime.datetime.now()
     entryset=PomEntry.objects.filter(categories=category,author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
@@ -434,11 +465,22 @@ def category_detail(request,slug,template_name,page_title):
 
 
 
+#@login_required
+#@transaction.commit_on_success
+#def delete_category(request,slug):
+#    cat=get_object_or_404(PomCategory,slug=slug)
+#    if cat.users.count()==1 and request.user in cat.users.all():
+#        cat.delete()
+#        #logger.info('deleted category:'+slug)
+#    else:
+#        pass
+#        #logger.info('cannot delete category')
+#    return redirect('pomlog_category_list')
 @login_required
 @transaction.commit_on_success
 def delete_category(request,slug):
-    cat=get_object_or_404(PomCategory,slug=slug)
-    if cat.users.count()==1 and request.user in cat.users.all():
+    cat=get_object_or_404(PomCategory,slug=slug,creator=request.user)
+    if cat.pomentry_set.count()==0:
         cat.delete()
         #logger.info('deleted category:'+slug)
     else:
@@ -446,13 +488,36 @@ def delete_category(request,slug):
         #logger.info('cannot delete category')
     return redirect('pomlog_category_list')
 
+#def is_duplicate_cat(name):
+#    if PomCategory.objects.filter(name__iexact=name).count()!=0:
+#        return True
+#    else:
+#        return False
 
-def is_duplicate_cat(name):
-    if PomCategory.objects.filter(name__iexact=name).count()!=0:
+#@transaction.commit_on_success
+#def add_or_edit(request,page_title,template_name,instance=None):
+#    form_data=get_form_data(request)
+#    form=PomCategoryForm(form_data,instance=instance)
+#    context={'categoryform':form,'page_title':page_title}
+#    if request.method=='POST' and form.is_valid():
+#        name=form.cleaned_data['name']
+#        name=name.strip()
+#        if is_duplicate_cat(name):
+#            if instance!=None:
+#                form.save()
+#                return redirect('pomlog_category_list')
+#            else:
+#                return custom_render(request,context,template_name)
+#        else:
+#            form.save()
+#            return redirect('pomlog_category_list') 
+#    return custom_render(request,context,template_name)
+
+def is_duplicate_cat(user,name):
+    if PomCategory.objects.filter(name__iexact=name,creator=user).count()!=0:
         return True
     else:
         return False
-
 @transaction.commit_on_success
 def add_or_edit(request,page_title,template_name,instance=None):
     form_data=get_form_data(request)
@@ -461,7 +526,7 @@ def add_or_edit(request,page_title,template_name,instance=None):
     if request.method=='POST' and form.is_valid():
         name=form.cleaned_data['name']
         name=name.strip()
-        if is_duplicate_cat(name):
+        if is_duplicate_cat(request.user,name):
             if instance!=None:
                 form.save()
                 return redirect('pomlog_category_list')
@@ -472,32 +537,43 @@ def add_or_edit(request,page_title,template_name,instance=None):
             return redirect('pomlog_category_list') 
     return custom_render(request,context,template_name)
 
-
-
 @login_required
 def add_category(request,template_name,page_title):
     return add_or_edit(request,page_title,template_name) 
 
-def has_permission(user,category):
-    catsofuser=get_categories_of_user(user)
-    return (category in catsofuser)
+#def has_permission(user,category):
+#    catsofuser=get_categories_of_user(user)
+#    return (category in catsofuser)
 
 '''
 def has_permission(user,category):
     return (category.users.count()==1  or category.users.count()==0 )and user in category.users.all()
 '''
 
-@login_required
-def edit_category(request,slug,template_name,page_title):
-    cat=get_object_or_404(PomCategory,slug=slug)
-    if has_permission(request.user,cat):
-        return add_or_edit(request,page_title,template_name,instance=cat)
-    else:
-        raise Http404
+#@login_required
+#def edit_category(request,slug,template_name,page_title):
+#    cat=get_object_or_404(PomCategory,slug=slug)
+#    if has_permission(request.user,cat):
+#        return add_or_edit(request,page_title,template_name,instance=cat)
+#    else:
+#        raise Http404
 
 @login_required
+def edit_category(request,slug,template_name,page_title):
+    cat=get_object_or_404(PomCategory,slug=slug,creator=request.user)
+    return add_or_edit(request,page_title,template_name,instance=cat)
+
+#@login_required
+#def list_entries_of_category(request,slug,template_name,page_title):
+#    cat = get_object_or_404(PomCategory,slug=slug)
+#    entryset=PomEntry.objects.filter(categories=cat,author=request.user).order_by('-today','-end_time')
+#    category_duration_dict=get_duration_for_categories(entryset)
+#    entries = get_pagination_entries(request, entryset)
+#    context={'category_duration_dict':category_duration_dict,'entries':entries,'page_title':page_title}
+#    return custom_render(request,context,template_name)
+@login_required
 def list_entries_of_category(request,slug,template_name,page_title):
-    cat = get_object_or_404(PomCategory,slug=slug)
+    cat = get_object_or_404(PomCategory,slug=slug,creator=request.user)
     entryset=PomEntry.objects.filter(categories=cat,author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
     entries = get_pagination_entries(request, entryset)
@@ -509,20 +585,20 @@ def get_form_data(request):
     return request.POST if request.method=='POST' else None
 
 
-def get_categories_from_idstring(cat_id_list):
-    cats=[]
-    for id in cat_id_list:
-        cat=PomCategory.objects.get(id=id)
-        cats.append(cat)
-
-    return cats
-
-def get_entries_from_idstring(entry_id_list):
-    entries=[]
-    for id in entry_id_list:
-        entry=PomEntry.objects.get(id=id)
-        entries.append(entry)
-    return entries
+#def get_categories_from_idstring(cat_id_list):
+#    cats=[]
+#    for id in cat_id_list:
+#        cat=PomCategory.objects.get(id=id)
+#        cats.append(cat)
+#
+#    return cats
+#
+#def get_entries_from_idstring(entry_id_list):
+#    entries=[]
+#    for id in entry_id_list:
+#        entry=PomEntry.objects.get(id=id)
+#        entries.append(entry)
+#    return entries
 
 def get_own_entries_with_cats(cats,user):
     ownentries_with_cats=[]
