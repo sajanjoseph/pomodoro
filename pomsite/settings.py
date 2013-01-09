@@ -76,7 +76,7 @@ PAGINATE_BY=10
 CHART_TYPE="bar"
 
 #barchart related constant values
-BAR_WIDTH = .2
+BAR_WIDTH = .1
 PLOT_OFFSET = .3
 BAR_COLOR = '#52E4FF'
 LABEL_COLOR = 'blue'
@@ -143,5 +143,13 @@ INSTALLED_APPS = (
     'pomlogger',
    
 )
+
+CACHES = {
+        'default': {
+                'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+                'LOCATION': '127.0.0.1:11211',
+            }
+          }
+
 #account activation open for a week
 ACCOUNT_ACTIVATION_DAYS = 7

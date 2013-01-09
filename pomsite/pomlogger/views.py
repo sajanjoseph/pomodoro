@@ -47,10 +47,20 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 import simplejson
 
+from django.core.cache import cache
 
 from settings import DEFAULT_FROM_EMAIL
 
 #logger = logging.getLogger("pomodoro")
+
+prefix = 'pomodoro'
+def key_function(args,prefix=prefix):
+    #sample pomodoro-myusername-entrylist'
+    #
+    keyargs =[prefix]
+    keyargs.extend(args)
+    key = '-'.join(keyargs)
+    return key
 
 @require_POST
 @never_cache
@@ -61,10 +71,31 @@ def logout(request):
 def server_error(request,template_name="500.html"):
     return custom_render(request,{},template_name)
 
-
-
 @login_required
 def index(request, template_name):
+    path=request.path
+    entries_count=[]
+    index_key = key_function([request.user.username],'index')
+    entry_count_dump = cache.get(index_key) if cache.has_key(index_key) else None
+    if not entry_count_dump:
+        #print 'no index_key in cache..calling db'
+        entries_dict=PomEntry.objects.filter(author=request.user).values('today').annotate(dcount=Count('today'))
+        for record in entries_dict:
+            count=record['dcount']
+            datevalue=record['today']
+            entries_count.append({
+                                  'title':str(count),
+                                  'start':datevalue.strftime("%Y-%m-%d"),
+                                  'end':datevalue.strftime("%Y-%m-%d")
+                                  })
+        entry_count_dump=simplejson.dumps(entries_count)
+        cache.set(index_key,entry_count_dump)
+    #print 'index()::entry_count_dump[0]=',entry_count_dump[0:70]
+    cr=custom_render(request, {'path':path,'entry_count':entry_count_dump },template_name)
+    return cr
+
+@login_required
+def index1(request, template_name):
     path=request.path
     entries_count=[]
     entries_dict=PomEntry.objects.filter(author=request.user).values('today').annotate(dcount=Count('today'))
@@ -87,8 +118,8 @@ def get_month_as_number(monthname):
     mlist=list(calendar.month_abbr)
     return mlist.index(title(monthname))
 
+@login_required
 def entries_shared(request,page_title,template_name):
-    #print 'entries_shared',request.user,page_title,template_name
     entries_sharedto_me=PomEntry.objects.filter(sharedwith=request.user).order_by('-today','-end_time')#added for sharing
     context={'entries_sharedto_me':entries_sharedto_me,'page_title':page_title}
     return custom_render(request,context,template_name)
@@ -115,6 +146,14 @@ def get_duration_for_categories(entryset):
                 entry_duration_dict[acat.name]=duration_mts
     return entry_duration_dict
 
+def get_durations_for_entries1(entryset):
+    entry_duration_dict={}
+    for anentry in entryset:
+        duration_mts=timediff(anentry.start_time,anentry.end_time)
+        #store duration against entry sothat entries can be sorted in asc order of start_time
+        entry_duration_dict[anentry] = duration_mts
+    return entry_duration_dict
+
 def get_durations_for_entries(entryset):
     entry_duration_dict={}
     for anentry in entryset:
@@ -129,9 +168,13 @@ def custom_render(request,context,template):
 
 @login_required
 def entry_archive_index(request,page_title,template_name):
-    entryset=PomEntry.objects.filter(author=request.user).order_by('-today','-end_time')
+    archive_index_key = key_function([request.user.username],'archive_index')
+    entryset = cache.get(archive_index_key) if cache.has_key(archive_index_key) else None
+    if not entryset:
+        #print 'no archive index in cache..calling db'
+        entryset=PomEntry.objects.filter(author=request.user).order_by('-today','-end_time')
+        cache.set(archive_index_key,entryset)
     category_duration_dict=get_duration_for_categories(entryset)
-    
     sorteddurations=sorted(category_duration_dict.items(),key=itemgetter(1),reverse=True)
     #sorteddurations=get_pagination_entries(request, sorteddurations)#do we need this?or a simple scrollable area?
     now=datetime.datetime.now()
@@ -155,6 +198,7 @@ def get_pagination_entries(request, entryset):
         entries = paginator.page(paginator.num_pages)
     return entries
 
+@login_required
 def entry_archive_year(request,year,page_title,template_name):
     entryset=PomEntry.objects.filter(today__year=year,author=request.user).order_by('-today','-end_time')
     category_duration_dict=get_duration_for_categories(entryset)
@@ -213,6 +257,16 @@ def canview(entry,user):
 #    remove_lone_categories()
 #    return redirect('pomlog_entry_archive_index')
 
+def remove_index_key_from_cache(request):
+    index_key = key_function([request.user.username],'index')
+    if cache.has_key(index_key):
+        cache.delete(index_key)
+
+def remove_archive_index_key_from_cache(request):
+    archive_index_key = key_function([request.user.username],'archive_index')
+    if cache.has_key(archive_index_key):
+        cache.delete(archive_index_key)
+
 @login_required
 @transaction.commit_on_success
 def delete_entry(request,id):
@@ -220,6 +274,9 @@ def delete_entry(request,id):
     #need to remove user from its categories
     #remove_user_from_categories(cats,request.user)
     entry.delete()
+    #delete index key from cache
+    remove_index_key_from_cache(request)
+    remove_archive_index_key_from_cache(request)
     #logger.debug("entry deleted")
     #remove categories that have no entries associated
     remove_lone_categories(request.user)
@@ -316,6 +373,8 @@ def add_new_entry(request,template_name,page_title):
             newentry.difficulty = difficulty#added difficulty
             #print 'before save with diff=',difficulty
             newentry.save()
+            remove_index_key_from_cache(request)#removes index_key from cache
+            remove_archive_index_key_from_cache(request)
             #print 'newentry saved with diff=',difficulty
             return redirect('pomlog_entry_archive_index')
         else:
@@ -413,6 +472,7 @@ def edit_entry(request,id,template_name,page_title):
         cats=get_categories(request.user,get_list_of_names(catnames))
         edited_entry.categories=cats
         edited_entry.save()
+        remove_archive_index_key_from_cache(request)#remove archive index key
         remove_lone_categories(request.user)#update to remove cats with no entries           
         return redirect('pomlog_entry_archive_index')
     return custom_render(request,context,template_name)
@@ -688,22 +748,67 @@ def report_entries_for_day(request,year,month,day,page_title,template_name):
 @login_required
 def render_graph_for_day(request,year,month,day):
     month = get_month_as_number(month)
-    entryset=PomEntry.objects.filter(today__year=year,today__month=month,today__day=day,author=request.user)
-    entry_duration_dict = get_durations_for_entries(entryset)
-    category_duration_dict = get_duration_for_categories(entryset)
-    canvas=create_chart(CHART_TYPE,entry_duration_dict)
+    entryset=PomEntry.objects.filter(today__year=year,today__month=month,today__day=day,author=request.user).order_by('today','start_time')
+    #entry_duration_dict = get_durations_for_entries(entryset)
+    entry_duration_dict = get_durations_for_entries1(entryset)
+    #category_duration_dict = get_duration_for_categories(entryset)
+    canvas = create_chart(CHART_TYPE,entry_duration_dict)
     response = HttpResponse(content_type = 'image/png')
     canvas.print_png(response)
     return response
     
 def create_chart(chart_type,map):
     if chart_type is "bar":
-        return create_barchart(map)
+        return create_barchart1(map)
     elif chart_type is "pie":
         return create_piechart(map)
 
+def create_barchart1(map):
+    now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
+    xvalues = map.keys()
+    #sort in asc order of date,time
+    xvalues.sort(key = lambda e:datetime.datetime.combine(e.today,e.start_time))
+    xvaluenames = [xvalue.__unicode__() for xvalue in xvalues]
+    #print 'xvaluenames=',xvaluenames
+    yvalues = map.values()
+    #print 'yvalues=',yvalues
+    maxyvalue = get_max_value(yvalues)
+    #print 'maxyvalue=',maxyvalue
+    xdata = range(len(xvalues))
+    #print 'xdata=',xdata
+    ydata = [map[x] for x in xvalues]
+    #print 'ydata=',ydata
+    min_x,max_x = get_extreme_values(xdata)
+    #print 'min_x,max_x=',min_x,max_x
+    splitxdata = [x.split('-',1) for x in xvaluenames]
+    #print 'splitxdata=',splitxdata
+    xlabels = [x[0].split()[0] for x in splitxdata]
+    #print 'xlabels=',xlabels
+    dates = [x[1] for x in splitxdata if len(x)>1]
+    figsize= (12,6)
+    figure = plt.figure(figsize = figsize, facecolor = "white")
+    ax = figure.add_subplot(1,1,1)
+    barwidth = 0.45
+    ystep = create_ystep(maxyvalue)
+    plt.grid(True)
+    if xdata and ydata:
+        ax.bar(xdata, ydata, width=barwidth,align='center',color=BAR_COLOR)
+        ax.set_xlabel('categories',color=LABEL_COLOR)
+        ax.set_ylabel('duration in  minutes',color=LABEL_COLOR)
+        ax.set_title('duration plot created at :'+now,color=TITLE_COLOR)
+        ax.set_xticks(xdata)
+        ax.set_xlim([min_x - PLOT_OFFSET, max_x + PLOT_OFFSET])
+        ax.set_xticklabels(xlabels)
+        if ystep:
+            ax.set_yticks(range(0,maxyvalue+ystep,ystep))
+            ax.set_ylim(0,max(ydata)+ystep)
+        figure.autofmt_xdate(rotation=30)
+        canvas = FigureCanvas(figure)
+        plt.close(figure)
+        return canvas
+    
+    
 def create_barchart(map):
-    #print 'create_barchart()::map=',map
     now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
     xvalues = map.keys()
     xvalues.sort()
