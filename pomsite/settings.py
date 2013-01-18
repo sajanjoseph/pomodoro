@@ -76,7 +76,8 @@ PAGINATE_BY=10
 CHART_TYPE="bar"
 
 #barchart related constant values
-BAR_WIDTH = .1
+BAR_WIDTH = .25
+
 PLOT_OFFSET = .3
 BAR_COLOR = '#52E4FF'
 LABEL_COLOR = 'blue'

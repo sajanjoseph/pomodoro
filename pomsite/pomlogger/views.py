@@ -146,7 +146,7 @@ def get_duration_for_categories(entryset):
                 entry_duration_dict[acat.name]=duration_mts
     return entry_duration_dict
 
-def get_durations_for_entries1(entryset):
+def get_durations_for_entries(entryset):
     entry_duration_dict={}
     for anentry in entryset:
         duration_mts=timediff(anentry.start_time,anentry.end_time)
@@ -154,7 +154,7 @@ def get_durations_for_entries1(entryset):
         entry_duration_dict[anentry] = duration_mts
     return entry_duration_dict
 
-def get_durations_for_entries(entryset):
+def get_durations_for_entries_old(entryset):
     entry_duration_dict={}
     for anentry in entryset:
         duration_mts=timediff(anentry.start_time,anentry.end_time)
@@ -243,19 +243,6 @@ def canview(entry,user):
     else:
         return False
 
-#@login_required
-#@transaction.commit_on_success
-#def delete_entry(request,id):
-#    entry=get_object_or_404(PomEntry,id=id,author=request.user )
-#    #need to remove user from its categories
-#    cats=entry.categories.all()
-#    #print 'delete_entry()::cats=',cats
-#    remove_user_from_categories(cats,request.user)
-#    entry.delete()
-#    #logger.debug("entry deleted")
-#    #remove categories that have no entries associated
-#    remove_lone_categories()
-#    return redirect('pomlog_entry_archive_index')
 
 def remove_index_key_from_cache(request):
     index_key = key_function([request.user.username],'index')
@@ -282,14 +269,7 @@ def delete_entry(request,id):
     remove_lone_categories(request.user)
     return redirect('pomlog_entry_archive_index')
 
-#def remove_lone_categories():
-#    #print 'remove_lone_categories()'
-#    allcats=PomCategory.objects.all()
-#    for acat in allcats:
-#        entries_of_acat=PomEntry.objects.filter(categories=acat)
-#        if entries_of_acat.count()==0:
-#            acat.delete()
-#            #print 'deleted ',acat
+
 def remove_lone_categories(user):
     #print 'remove_lone_categories()'
     allcats=PomCategory.objects.filter(creator=user)
@@ -298,15 +278,6 @@ def remove_lone_categories(user):
         if entries_of_acat.count()==0:
             acat.delete()
             #print 'deleted ',acat
-
-
-#def get_categories(catnames):
-#    cats=[]
-#    for name in catnames:
-#        if name and  not name.isspace():
-#            cat,status=PomCategory.objects.get_or_create(name__iexact=name.strip(),defaults={'name':name,'description':name})# if no defaults ,IntegrityError
-#            cats.append(cat)
-#    return cats
 def get_categories(user,catnames):
     cats=[]
     for name in catnames:
@@ -314,7 +285,6 @@ def get_categories(user,catnames):
             cat,status=PomCategory.objects.get_or_create(name__iexact=name.strip(),creator=user,defaults={'name':name,'description':name,'creator':user})# added creator
             cats.append(cat)
     return cats
-
 
 @login_required
 @transaction.commit_on_success
@@ -491,15 +461,6 @@ def update_cats_with_editable_status(user,categories):
         cats[cat]=edit_status
     return cats
 
-
-#def get_categories_of_user(user):
-#    ownentries=PomEntry.objects.filter(author=user)
-#    owncats=[]
-#    for entry in ownentries:
-#        catsofentry=entry.categories.all()
-#        owncats.extend(catsofentry)
-#    return list(set(owncats))
-
 def get_categories_of_user(user):
     owncats= PomCategory.objects.filter(creator=user)
     return list(set(owncats))
@@ -524,18 +485,6 @@ def category_detail(request,slug,template_name,page_title):
     return custom_render(request,context,template_name)
 
 
-
-#@login_required
-#@transaction.commit_on_success
-#def delete_category(request,slug):
-#    cat=get_object_or_404(PomCategory,slug=slug)
-#    if cat.users.count()==1 and request.user in cat.users.all():
-#        cat.delete()
-#        #logger.info('deleted category:'+slug)
-#    else:
-#        pass
-#        #logger.info('cannot delete category')
-#    return redirect('pomlog_category_list')
 @login_required
 @transaction.commit_on_success
 def delete_category(request,slug):
@@ -548,30 +497,7 @@ def delete_category(request,slug):
         #logger.info('cannot delete category')
     return redirect('pomlog_category_list')
 
-#def is_duplicate_cat(name):
-#    if PomCategory.objects.filter(name__iexact=name).count()!=0:
-#        return True
-#    else:
-#        return False
 
-#@transaction.commit_on_success
-#def add_or_edit(request,page_title,template_name,instance=None):
-#    form_data=get_form_data(request)
-#    form=PomCategoryForm(form_data,instance=instance)
-#    context={'categoryform':form,'page_title':page_title}
-#    if request.method=='POST' and form.is_valid():
-#        name=form.cleaned_data['name']
-#        name=name.strip()
-#        if is_duplicate_cat(name):
-#            if instance!=None:
-#                form.save()
-#                return redirect('pomlog_category_list')
-#            else:
-#                return custom_render(request,context,template_name)
-#        else:
-#            form.save()
-#            return redirect('pomlog_category_list') 
-#    return custom_render(request,context,template_name)
 
 def is_duplicate_cat(user,name):
     if PomCategory.objects.filter(name__iexact=name,creator=user).count()!=0:
@@ -601,36 +527,14 @@ def add_or_edit(request,page_title,template_name,instance=None):
 def add_category(request,template_name,page_title):
     return add_or_edit(request,page_title,template_name) 
 
-#def has_permission(user,category):
-#    catsofuser=get_categories_of_user(user)
-#    return (category in catsofuser)
 
-'''
-def has_permission(user,category):
-    return (category.users.count()==1  or category.users.count()==0 )and user in category.users.all()
-'''
-
-#@login_required
-#def edit_category(request,slug,template_name,page_title):
-#    cat=get_object_or_404(PomCategory,slug=slug)
-#    if has_permission(request.user,cat):
-#        return add_or_edit(request,page_title,template_name,instance=cat)
-#    else:
-#        raise Http404
 
 @login_required
 def edit_category(request,slug,template_name,page_title):
     cat=get_object_or_404(PomCategory,slug=slug,creator=request.user)
     return add_or_edit(request,page_title,template_name,instance=cat)
 
-#@login_required
-#def list_entries_of_category(request,slug,template_name,page_title):
-#    cat = get_object_or_404(PomCategory,slug=slug)
-#    entryset=PomEntry.objects.filter(categories=cat,author=request.user).order_by('-today','-end_time')
-#    category_duration_dict=get_duration_for_categories(entryset)
-#    entries = get_pagination_entries(request, entryset)
-#    context={'category_duration_dict':category_duration_dict,'entries':entries,'page_title':page_title}
-#    return custom_render(request,context,template_name)
+
 @login_required
 def list_entries_of_category(request,slug,template_name,page_title):
     cat = get_object_or_404(PomCategory,slug=slug,creator=request.user)
@@ -644,21 +548,6 @@ def list_entries_of_category(request,slug,template_name,page_title):
 def get_form_data(request):
     return request.POST if request.method=='POST' else None
 
-
-#def get_categories_from_idstring(cat_id_list):
-#    cats=[]
-#    for id in cat_id_list:
-#        cat=PomCategory.objects.get(id=id)
-#        cats.append(cat)
-#
-#    return cats
-#
-#def get_entries_from_idstring(entry_id_list):
-#    entries=[]
-#    for id in entry_id_list:
-#        entry=PomEntry.objects.get(id=id)
-#        entries.append(entry)
-#    return entries
 
 def get_own_entries_with_cats(cats,user):
     ownentries_with_cats=[]
@@ -750,7 +639,7 @@ def render_graph_for_day(request,year,month,day):
     month = get_month_as_number(month)
     entryset=PomEntry.objects.filter(today__year=year,today__month=month,today__day=day,author=request.user).order_by('today','start_time')
     #entry_duration_dict = get_durations_for_entries(entryset)
-    entry_duration_dict = get_durations_for_entries1(entryset)
+    entry_duration_dict = get_durations_for_entries(entryset)
     #category_duration_dict = get_duration_for_categories(entryset)
     canvas = create_chart(CHART_TYPE,entry_duration_dict)
     response = HttpResponse(content_type = 'image/png')
@@ -759,11 +648,11 @@ def render_graph_for_day(request,year,month,day):
     
 def create_chart(chart_type,map):
     if chart_type is "bar":
-        return create_barchart1(map)
+        return create_barchart(map)
     elif chart_type is "pie":
         return create_piechart(map)
 
-def create_barchart1(map):
+def create_barchart(map):
     now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
     xvalues = map.keys()
     #sort in asc order of date,time
@@ -788,7 +677,7 @@ def create_barchart1(map):
     figsize= (12,6)
     figure = plt.figure(figsize = figsize, facecolor = "white")
     ax = figure.add_subplot(1,1,1)
-    barwidth = 0.45
+    barwidth = BAR_WIDTH
     ystep = create_ystep(maxyvalue)
     plt.grid(True)
     if xdata and ydata:
@@ -797,7 +686,9 @@ def create_barchart1(map):
         ax.set_ylabel('duration in  minutes',color=LABEL_COLOR)
         ax.set_title('duration plot created at :'+now,color=TITLE_COLOR)
         ax.set_xticks(xdata)
-        ax.set_xlim([min_x - PLOT_OFFSET, max_x + PLOT_OFFSET])
+        #ax.set_xbound(-1.0 ,5.0)#scaling xaxis -check this
+        #ax.set_xlim([min_x - PLOT_OFFSET, max_x + PLOT_OFFSET])
+        ax.set_xlim(-1,len(xdata))
         ax.set_xticklabels(xlabels)
         if ystep:
             ax.set_yticks(range(0,maxyvalue+ystep,ystep))
@@ -808,7 +699,7 @@ def create_barchart1(map):
         return canvas
     
     
-def create_barchart(map):
+def create_barchart_old(map):
     now = datetime.datetime.now().strftime("%I:%M:%S %p   %d %b,%Y")
     xvalues = map.keys()
     xvalues.sort()
