@@ -1,6 +1,6 @@
 # Django settings for pomsite project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 #client-side JavaScript will not to be able to access the session cookie
@@ -59,16 +59,22 @@ USE_I18N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 #MEDIA_ROOT = ''
-MEDIA_ROOT = '/home/sajan/dev/python/django/pomodoro/pomsite/media/pomlogger/'
+#MEDIA_ROOT = '/home/sajan/dev/python/django/pomodoro/pomsite/media/pomlogger/'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = '/site_media/'
 
-IMAGE_FOLDER_PATH = '/home/sajan/dev/python/django/pomodoro/pomsite/media/pomlogger/img'
+#IMAGE_FOLDER_PATH = '/home/sajan/dev/python/django/pomodoro/pomsite/media/pomlogger/img'
 
-LOGFILE_NAME = '/home/sajan/dev/python/django/pomodoro/pomodorolog.txt'
+#LOGFILE_NAME = '/home/sajan/dev/python/django/pomodoro/pomodorolog.txt'
 
+import os
+parentpath=os.path.abspath(os.path.join(os.path.dirname(__file__),".."))
+currentpath = os.path.dirname(os.path.abspath(__file__))
+MEDIA_ROOT = os.path.join(currentpath,'media/pomlogger/')
+IMAGE_FOLDER_PATH = os.path.join(currentpath,'media/pomlogger/img')
+#LOGFILE_NAME = os.path.join(parentpath,'pomodorolog.txt')
 
 #Pagination-number of entries to be listed per page
 PAGINATE_BY=10
@@ -130,7 +136,8 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/sajan/dev/python/django/pomodoro/pomsite/pomlogger/pomlogtemplates',
+    #'/home/sajan/dev/python/django/pomodoro/pomsite/pomlogger/pomlogtemplates',
+    os.path.join(currentpath,'pomlogger/pomlogtemplates'),
 )
 
 INSTALLED_APPS = (
@@ -154,3 +161,7 @@ CACHES = {
 
 #account activation open for a week
 ACCOUNT_ACTIVATION_DAYS = 7
+
+if os.environ.has_key('POMODORO_HEROKU_PRODUCTION') and os.environ.get('POMODORO_HEROKU_PRODUCTION')=='True':
+    #print 'heroku prod setting'
+    from production_heroku_settings import *

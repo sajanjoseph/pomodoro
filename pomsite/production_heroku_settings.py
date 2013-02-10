@@ -73,7 +73,7 @@ parentpath=os.path.abspath(os.path.join(os.path.dirname(__file__),".."))
 currentpath = os.path.dirname(os.path.abspath(__file__))
 MEDIA_ROOT = os.path.join(currentpath,'media/pomlogger/')
 IMAGE_FOLDER_PATH = os.path.join(currentpath,'media/pomlogger/img')
-LOGFILE_NAME = os.path.join(parentpath,'pomodorolog.txt')
+#LOGFILE_NAME = os.path.join(parentpath,'pomodorolog.txt')
 
 #ssl from heroku
 #SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -112,7 +112,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(currentpath,'pomlogger/pomlogtemplates')
+    os.path.join(currentpath,'pomlogger/pomlogtemplates'),
 )
 
 CACHES = {

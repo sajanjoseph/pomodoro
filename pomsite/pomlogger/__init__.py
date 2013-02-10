@@ -1,3 +1,4 @@
+"""
 import logging,logging.handlers
 from settings import LOGFILE_NAME as LOG_OUTPUTFILE
 def init_logging():
@@ -9,3 +10,4 @@ def init_logging():
     logger.addHandler(filehandler)
 
 init_logging()
+"""
