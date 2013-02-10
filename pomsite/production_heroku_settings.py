@@ -1,14 +1,14 @@
-# Django settings for pomsite project.
+# Django production settings for pomsite project.
 
-DEBUG = True
-TEMPLATE_DEBUG = DEBUG
+DEBUG = False
+TEMPLATE_DEBUG = False
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
 MANAGERS = ADMINS
-
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2' , # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
@@ -19,20 +19,12 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
-
+"""
 #login url added by sajan
 LOGIN_URL='/account/login/'
-LOGIN_REDIRECT_URL='/entries/'
+LOGIN_REDIRECT_URL='/'
 
 
-
-#localhost's debugging mail server
-#EMAIL_HOST = 'localhost'
-#EMAIL_PORT = 1025
-#EMAIL_HOST_USER = ''
-#EMAIL_HOST_PASSWORD = ''
-#EMAIL_USE_TLS = False
-#DEFAULT_FROM_EMAIL = 'testing@example.com'
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
@@ -67,7 +59,7 @@ TIME_ZONE = 'Asia/Calcutta'
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-SITE_ID = 2
+SITE_ID = 3
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
@@ -76,10 +68,15 @@ USE_I18N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 #MEDIA_ROOT = ''
-MEDIA_ROOT = '/home/sajan/dev/python/django/pomodoro/pomsite/media/pomlogger/'
-IMAGE_FOLDER_PATH = '/home/sajan/dev/python/django/pomodoro/pomsite/media/pomlogger/img'
+import os.path
+parentpath=os.path.abspath(os.path.join(os.path.dirname(__file__),".."))
+currentpath = os.path.dirname(os.path.abspath(__file__))
+MEDIA_ROOT = os.path.join(currentpath,'media/pomlogger/')
+IMAGE_FOLDER_PATH = os.path.join(currentpath,'media/pomlogger/img')
+LOGFILE_NAME = os.path.join(parentpath,'pomodorolog.txt')
 
-LOGFILE_NAME = '/home/sajan/dev/python/django/pomodoro/pomodorolog.txt'
+#ssl from heroku
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -115,8 +112,15 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/sajan/dev/python/django/pomodoro/pomsite/pomlogger/pomlogtemplates',
+    os.path.join(currentpath,'pomlogger/pomlogtemplates')
 )
+
+CACHES = {
+        'default': {
+                'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+                'LOCATION': '127.0.0.1:11211',
+            }
+          }
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -128,4 +132,11 @@ INSTALLED_APPS = (
     'pomlogger',
 )
 #account activation open for a week
-ACCOUNT_ACTIVATION_DAYS = 2
+ACCOUNT_ACTIVATION_DAYS = 7
+
+#registration closed
+REGISTRATION_OPEN = False
+
+import dj_database_url
+#DATABASES['default'] =  dj_database_url.config()
+DATABASES = {'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))}

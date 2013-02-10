@@ -25,8 +25,8 @@ DATABASES = {
 
 
 #login url 
-LOGIN_URL='/pomlog/account/login/'
-LOGIN_REDIRECT_URL='/pomlog/'
+LOGIN_URL='/account/login/'
+LOGIN_REDIRECT_URL='/'
 
 
 # mail server

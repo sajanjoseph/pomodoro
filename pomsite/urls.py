@@ -16,7 +16,7 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
-    (r'^pomlog/',include('pomlogger.urls')),
+    (r'',include('pomlogger.urls')),
     (r'^site_media/(?P<path>.*)$','django.views.static.serve',{'document_root':settings.MEDIA_ROOT}),
     (r'^500/$', 'pomlogger.views.server_error'),    
 )

@@ -1,11 +1,14 @@
 {% extends "registration/auth_base.html" %}
 {% block content %}{{block.super}}
 
+<h2>Account activation error</h2>
+Activation failed !
 
-<div class="message short">Your account is now active! <a  href="{% url pomlog_login %}" > Login </a></div>  
+
+<p>The activation key "{{ activation_key }}" is invalid and cannot be used to activate this account 
 
 {% endblock %}
 {% block whatis %}
-Activation complete message
+Activation failed message
 {% endblock %}
 

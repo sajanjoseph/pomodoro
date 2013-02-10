@@ -1,5 +1,6 @@
 [
 {"pk": 1, "model": "auth.user", "fields": {"username": "sajan", "first_name": "sajan", "last_name": "joseph", "is_active": true, "is_superuser": true, "is_staff": true, "last_login": "2012-10-11T21:05:53.064", "groups": [], "user_permissions": [], "password": "pbkdf2_sha256$10000$RH80ZKuc8a7t$9xV0gQmbnZmzGfJhXCKPQ4Av5g17L9u53tihJS52TQ4=", "email": "sajanjoseph@gmail.com", "date_joined": "2010-02-15T21:25:40"}},
 {"pk": 2, "model": "auth.user", "fields": {"username": "denny", "first_name": "denny ", "last_name": "joseph", "is_active": true, "is_superuser": false, "is_staff": true, "last_login": "2010-03-01T12:52:46", "groups": [], "user_permissions": [28, 29, 30, 25, 26, 27], "password": "pbkdf2_sha256$10000$VrdyKTkAHQAk$NiA6PwkHmPm+aW1vkRczK7/ZjtVBiU0rh3gyRI86p5E=", "email": "jimgardener@gmail.com", "date_joined": "2010-03-01T12:39:21"}},
-{"pk": 2, "model": "sites.site", "fields": {"domain": "127.0.0.1", "name": "localhost"}}
+{"pk": 2, "model": "sites.site", "fields": {"domain": "127.0.0.1", "name": "localhost"}},
+{"pk": 2, "model": "sites.site", "fields": {"domain": "http://pomodorologger.herokuapp.com", "name": "herokupom"}}
 ]
