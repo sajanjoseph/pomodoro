@@ -1,9 +1,7 @@
 @CHARSET "UTF-8";
 
 body{
-    
-    background: -webkit-gradient(linear, 0% 0%, 0% 20%, from(#b5b4b1), to(#E3E0D1));
-    background: -moz-linear-gradient(top,#b5b4b1, #E3E0D1  20%);
+    background: #b5b4b1;
 }
 .logo-image{
     height:118px;
