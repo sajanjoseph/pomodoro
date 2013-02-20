@@ -32,7 +32,7 @@ var M_URL = "{{MEDIA_URL}}";
    {% endif %}
    <span>{% now "jS  F Y - f A" %}<br></br>
       <p id="change-pass">
-	    <a class="btnlink" href="{% url auth_password_change %}"><img src="{{ MEDIA_URL }}img/keysmall.png">Change your password</a>
+	    <a class="btnlink" href="#"><img src="{{ MEDIA_URL }}img/keysmall.png">Change your password</a>
 	  </p>
    <form id="logoutform" method="post" action="{% url pomlog_logout %}">{% csrf_token %}
    	<input type="hidden" name="next" value="{{next|escape}}" />
