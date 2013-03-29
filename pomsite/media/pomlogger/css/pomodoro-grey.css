@@ -79,6 +79,7 @@ input.delete {
 /* calendar */
 div#calendarspace{
     width:50%;
+    
     background: -webkit-gradient(linear, 0% 0%, 0% 50%, from(#E3E0D1), to(#b5b4b1));
     background: -moz-linear-gradient(top, #E3E0D1,#b5b4b1  50%);
     box-shadow:0px -5px 300px #7e7c78;
@@ -227,6 +228,21 @@ span.edit-entry a{
     text-decoration:none;
     font-weight:normal;
     color:blue;
+}
+
+span.difficulty-entry{
+    background-color:#E6F8E0;
+    height:1.3em;
+    font-size:0.8em;
+    margin-left:1em;
+    margin-right:1em;
+    border-radius:15px;
+    border:1px solid #950f04;
+}
+span.difficulty-entry a{
+    text-decoration:none;
+    font-weight:normal;
+    color:red;
 }
 
 div.pagination{

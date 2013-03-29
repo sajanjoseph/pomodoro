@@ -1,0 +1,34 @@
+{% extends "pomlogger/base_reports.html" %}
+{% block title %}
+{{block.super}}|{{page_title}}
+{% endblock %}
+
+{% block js %}
+{{block.super}}
+<script type="text/javascript"  src="{{MEDIA_URL}}js/jquery-1.7.1.min.js" ></script> 
+<script type="text/javascript"  src="{{MEDIA_URL}}js/fullcalendar.js" > </script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#calendar').fullCalendar({
+            events: {{avg_diff_dump|safe}}
+        });
+    });
+</script>
+
+{% endblock %}
+
+
+{% block content %}
+{{block.super}}
+
+
+<div id="calendarspace">
+<div id='calendar'></div>
+</div>
+{% endblock %}
+
+{% block whatis %}
+<h4>
+average difficulty calendar for {{category_name}}
+</h4>
+{% endblock %}

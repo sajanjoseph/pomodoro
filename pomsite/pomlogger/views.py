@@ -9,12 +9,12 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.http import require_POST
 from django.contrib.auth.views import logout_then_login
-
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse,HttpResponseRedirect,Http404
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count,Avg
 from django.template.defaultfilters import title
 from django.http import Http404
 from django.template import RequestContext
@@ -83,34 +83,82 @@ def index(request, template_name):
         for record in entries_dict:
             count=record['dcount']
             datevalue=record['today']
+            url = create_url_for_entries_of_day(datevalue)
             entries_count.append({
                                   'title':str(count),
                                   'start':datevalue.strftime("%Y-%m-%d"),
-                                  'end':datevalue.strftime("%Y-%m-%d")
+                                  'end':datevalue.strftime("%Y-%m-%d"),
+                                  'url': url
                                   })
         entry_count_dump=simplejson.dumps(entries_count)
         cache.set(index_key,entry_count_dump)
-    #print 'index()::entry_count_dump[0]=',entry_count_dump[0:70]
+    #print 'index:dump=',entry_count_dump
     cr=custom_render(request, {'path':path,'entry_count':entry_count_dump },template_name)
     return cr
 
 @login_required
-def index1(request, template_name):
+def category_select_page(request,page_title,template_name):
+    #print 'req for diff'
     path=request.path
-    entries_count=[]
-    entries_dict=PomEntry.objects.filter(author=request.user).values('today').annotate(dcount=Count('today'))
-    for record in entries_dict:
-        count=record['dcount']
-        datevalue=record['today']
-        entries_count.append({
-                              'title':str(count),
-                              'start':datevalue.strftime("%Y-%m-%d"),
-                              'end':datevalue.strftime("%Y-%m-%d")
-                              })
-    entry_count_dump=simplejson.dumps(entries_count)
-    #print 'index()::entry_count_dump[0]=',entry_count_dump[0:70]
-    cr=custom_render(request, {'path':path,'entry_count':entry_count_dump },template_name)
+    context={'page_title':page_title}
+    return custom_render(request,context,template_name)
+
+def create_url_for_entries_of_day(datevalue):
+    month = datevalue.strftime("%m")
+    month = int(month)
+    month = calendar.month_abbr[month]
+    month = month.lower()
+    year = datevalue.strftime("%Y")
+    day = datevalue.strftime("%d")
+    url = reverse('pomlog_entry_archive_day',args=[year,month,day])
+    return url
+
+@login_required
+def average_difficulty(request,page_title,template_name,slug):
+    path=request.path
+    category = PomCategory.objects.get(slug=slug,creator=request.user)
+    category_name = category.name
+    #print 'category=',category_name
+    cat_avg_diff_list = []
+    avg_diff_key = key_function([request.user.username,slug],'cat_avg_diff')
+    avg_diff_dump = cache.get(avg_diff_key) if cache.has_key(avg_diff_key) else None
+    
+    if not avg_diff_dump:
+        entries_dict=PomEntry.objects.filter(author=request.user,categories=category).values('today').annotate(davg=Avg('difficulty'))
+        for record in entries_dict:
+            avgdiff=record['davg']
+            datevalue=record['today']
+            url = create_url_for_entries_of_day(datevalue)
+            cat_avg_diff_list.append({
+                                  'title':str(avgdiff),
+                                  'start':datevalue.strftime("%Y-%m-%d"),
+                                  'end':datevalue.strftime("%Y-%m-%d"),
+                                  'url': url
+                                  })
+        avg_diff_dump = simplejson.dumps(cat_avg_diff_list)
+        cache.set(avg_diff_key,avg_diff_dump)
+    #print 'avg_diff_dump=',avg_diff_dump
+    cr=custom_render(request, {'page_title':page_title,'category_name':category_name,'path':path,'avg_diff_dump':avg_diff_dump },template_name)
     return cr
+            
+
+#@login_required
+#def index1(request, template_name):
+#    path=request.path
+#    entries_count=[]
+#    entries_dict=PomEntry.objects.filter(author=request.user).values('today').annotate(dcount=Count('today'))
+#    for record in entries_dict:
+#        count=record['dcount']
+#        datevalue=record['today']
+#        entries_count.append({
+#                              'title':str(count),
+#                              'start':datevalue.strftime("%Y-%m-%d"),
+#                              'end':datevalue.strftime("%Y-%m-%d")
+#                              })
+#    entry_count_dump=simplejson.dumps(entries_count)
+#    #print 'index()::entry_count_dump[0]=',entry_count_dump[0:70]
+#    cr=custom_render(request, {'path':path,'entry_count':entry_count_dump },template_name)
+#    return cr
 
 def get_month_as_number(monthname):
     if title(monthname) not in calendar.month_abbr:

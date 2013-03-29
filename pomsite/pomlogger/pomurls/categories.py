@@ -35,11 +35,17 @@ url(r'^(?P<slug>[-\w]+)/$','pomlogger.views.category_detail',
     },
     name='pomlog_category_detail'),
 
+
+
 url(r'^$','pomlogger.views.category_list',
     {
     'page_title':'all categories',
     'template_name':'pomlogger/pomcategory_list.html'
     },
     name='pomlog_category_list'),
+                     
+                  
+
+
 
 )

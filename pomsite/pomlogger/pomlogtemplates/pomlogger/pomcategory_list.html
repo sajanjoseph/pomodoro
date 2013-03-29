@@ -30,6 +30,10 @@
 	   <span class="edit-entry">
 	   	<a href="{% url pomlog_edit_category k.slug %}" > EDIT </a>
 	   </span>
+	   
+	   <span class="difficulty-entry">
+        <a href="{% url pomlog_avgdifficultycalendar k.slug %}" > diff </a>
+       </span>
 	  </p>
 	 {% endfor %}
 </div>
