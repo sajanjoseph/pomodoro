@@ -793,10 +793,12 @@ def categories_report(request,page_title,template_name):
 def render_categories_chart(request):
     entryset=PomEntry.objects.filter(author=request.user)
     category_duration_dict = get_duration_for_categories(entryset)
+    canvas = None
     if category_duration_dict:
         canvas = create_piechart(category_duration_dict,chartsize=(8,8))
     response = HttpResponse(content_type = 'image/png')
-    canvas.print_png(response)
+    if canvas:
+        canvas.print_png(response)
     return response
 
 @login_required
@@ -810,7 +812,8 @@ def render_categories_chart_for_current_month(request):
     if category_duration_dict:
         canvas = create_piechart(category_duration_dict,chartsize=(8,8))
     response = HttpResponse(content_type = 'image/png')
-    canvas.print_png(response)
+    if canvas:
+        canvas.print_png(response)
     return response
 
 #untested
@@ -820,10 +823,12 @@ def render_categories_chart_for_month(request,month):
     year = now.year
     entryset = PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),author=request.user).order_by('-today','-end_time')
     category_duration_dict = get_duration_for_categories(entryset)
+    canvas = None
     if category_duration_dict:
         canvas = create_piechart(category_duration_dict,chartsize=(8,8))
     response = HttpResponse(content_type = 'image/png')
-    canvas.print_png(response)
+    if canvas:
+        canvas.print_png(response)
     return response
 
 def create_piechart(map,chartsize=(16,16)):
