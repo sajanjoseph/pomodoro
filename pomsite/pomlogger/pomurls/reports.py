@@ -22,6 +22,9 @@ url(r'^categories/$','pomlogger.views.categories_report',
 
 url(r'^categories/categories_chart/$','pomlogger.views.render_categories_chart',
 name='pomlog_render_categories_chart'),
+                     
+url(r'^categories/current_month_categories_chart/$','pomlogger.views.render_categories_chart_for_current_month',
+name='pomlog_render_categories_chart_for_current_month'),            
 
 url(r'^categories/categoryselect/$','pomlogger.views.category_select_page',
     {

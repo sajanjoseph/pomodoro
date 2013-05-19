@@ -491,6 +491,7 @@ def edit_entry(request,id,template_name,page_title):
         edited_entry.categories=cats
         edited_entry.save()
         remove_archive_index_key_from_cache(request)#remove archive index key
+        remove_index_key_from_cache(request)#check this needed?
         remove_lone_categories(request.user)#update to remove cats with no entries           
         return redirect('pomlog_entry_archive_index')
     return custom_render(request,context,template_name)
@@ -791,6 +792,33 @@ def categories_report(request,page_title,template_name):
 @login_required
 def render_categories_chart(request):
     entryset=PomEntry.objects.filter(author=request.user)
+    category_duration_dict = get_duration_for_categories(entryset)
+    if category_duration_dict:
+        canvas = create_piechart(category_duration_dict,chartsize=(8,8))
+    response = HttpResponse(content_type = 'image/png')
+    canvas.print_png(response)
+    return response
+
+@login_required
+def render_categories_chart_for_current_month(request):
+    now = datetime.datetime.now()
+    year = now.year
+    month = now.month
+    entryset = PomEntry.objects.filter(today__year=year,today__month=month,author=request.user).order_by('-today','-end_time')
+    category_duration_dict = get_duration_for_categories(entryset)
+    canvas = None
+    if category_duration_dict:
+        canvas = create_piechart(category_duration_dict,chartsize=(8,8))
+    response = HttpResponse(content_type = 'image/png')
+    canvas.print_png(response)
+    return response
+
+#untested
+@login_required
+def render_categories_chart_for_month(request,month):
+    now = datetime.datetime.now()
+    year = now.year
+    entryset = PomEntry.objects.filter(today__year=year,today__month=get_month_as_number(month),author=request.user).order_by('-today','-end_time')
     category_duration_dict = get_duration_for_categories(entryset)
     if category_duration_dict:
         canvas = create_piechart(category_duration_dict,chartsize=(8,8))

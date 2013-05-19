@@ -79,7 +79,7 @@ input.delete {
 /* calendar */
 div#calendarspace{
     width:50%;
-    
+    float:left;
     background: -webkit-gradient(linear, 0% 0%, 0% 50%, from(#E3E0D1), to(#b5b4b1));
     background: -moz-linear-gradient(top, #E3E0D1,#b5b4b1  50%);
     box-shadow:0px -5px 300px #7e7c78;
@@ -395,6 +395,22 @@ div.chart-entries-day{
     margin:auto;
     
 }
+
+div.chart-cats-summary{
+	display: inline;
+    border:4px solid #b1a3a3;
+    width:40%;
+    margin-top:3%;
+    float:right;
+    
+}
+img.chart-categories-month{
+    margin:4px;
+    width:450px;
+    height:450px;
+    
+}
+
 img.chart-entries-day{
     margin:4px;
     width:650px;

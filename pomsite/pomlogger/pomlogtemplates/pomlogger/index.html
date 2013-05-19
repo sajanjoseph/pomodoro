@@ -17,13 +17,20 @@
  {% endblock %}
 
 {% block content %}{{block.super}}
-	 
+
 <div id="calendarspace">
 <div id='calendar'></div>
 </div>
 
 
-
+<div class="chart-cats-summary">
+<img class="chart-categories-month"src="{% url pomlog_render_categories_chart_for_current_month %}"
+            
+            alt="current month categories chart"
+            
+            />
+</div>
+<div class="resetfloat"></div>
 {% endblock %}
 {%block whatis %}
 <h4>Pomodoro App Home Page</h4>
