@@ -1,4 +1,4 @@
-python==2.7.5
+python==2.7.4
 Django==1.4.3
 South==0.7.6
 distribute==0.6.28
