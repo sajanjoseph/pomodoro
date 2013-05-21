@@ -303,6 +303,9 @@ def remove_archive_index_key_from_cache(request):
         cache.delete(archive_index_key)
 
 def remove_current_month_chart_key_from_cache(request):
+    now = datetime.datetime.now()
+    year = now.year
+    month = now.month
     current_month_chart_key = key_function([request.user.username,str(year),str(month)],'current_month')
     if cache.has_key(current_month_chart_key):
         cache.delete(current_month_chart_key)
